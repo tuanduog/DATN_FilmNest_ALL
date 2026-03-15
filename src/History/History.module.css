@@ -1,0 +1,6 @@
+.movieImage {
+  height: 180px;
+  width: auto;
+  object-fit: cover;
+  border-radius: 10px 0 0 10px;
+}

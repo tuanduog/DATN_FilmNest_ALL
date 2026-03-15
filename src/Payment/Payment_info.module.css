@@ -1,0 +1,187 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.box {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sectionLabel {
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+.priceRow {
+  margin: 0;
+}
+
+.comboTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comboTable th, .comboTable td {
+  padding: 12px;
+  vertical-align: middle;
+  border-top: 1px solid #eaeaea;
+}
+
+.comboInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comboImg {
+  width: 60px;
+  border-radius: 8px;
+}
+
+.discount {
+  color: green;
+  font-weight: bold;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantityControl button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantityControl button:hover {
+  background-color: #f0f0f0;
+}
+
+.voucherInputRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.voucherInput {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.voucherButton {
+  background: linear-gradient(to right, #ff512f, #f09819);
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.voucherButton:hover {
+  opacity: 0.9;
+}
+
+.voucherTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.voucherTable th,
+.voucherTable td {
+  padding: 12px;
+  text-align: left;
+}
+
+.voucherTable th {
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.voucherTable tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+.paymentMethods {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.paymentOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border 0.3s, background-color 0.3s;
+}
+
+.paymentOption:hover {
+  background-color: #f9f9f9;
+  border-color: #888;
+}
+
+.paymentOption input[type="radio"] {
+  transform: scale(1.2);
+}
+
+.paymentOption img {
+  width: 40px;
+  height: auto;
+  object-fit: contain;
+}
+
+.paymentOption span {
+  font-weight: 500;
+  color: #333;
+}
+

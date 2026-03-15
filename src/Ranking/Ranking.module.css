@@ -1,0 +1,73 @@
+.container {
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  padding: 14px 18px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.table th {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.row:hover {
+  background-color: #f9f9f9;
+  transition: background-color 0.2s ease;
+}
+
+.poster {
+  width: 60px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.rank {
+  font-weight: bold;
+  font-size: 20px;
+  color: #e67e22;
+  text-align: center;
+}
+
+.name {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.name:hover {
+  text-decoration: underline;
+  font-weight: 600;
+  color: #0d6efd;
+  cursor: pointer;
+}
+
+.rating {
+  font-weight: bold;
+  color: #27ae60;
+}

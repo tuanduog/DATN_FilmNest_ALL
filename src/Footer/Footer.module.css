@@ -1,0 +1,42 @@
+.footerTitle {
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.footerText {
+  margin-bottom: 0.4rem;
+  color: #555;
+}
+
+.linkHoverEffect {
+  display: block;
+  color: #333;
+  margin-bottom: 6px;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.linkHoverEffect:hover {
+  color: #dc3545;
+  text-decoration: underline;
+}
+
+.socialIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f1f1;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  color: #333;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.socialIcon:hover {
+  background-color: #dc3545;
+  color: white;
+}

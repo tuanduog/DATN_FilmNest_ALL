@@ -1,0 +1,57 @@
+.wrapper {
+  padding: 40px 15px;
+  background-color: #f8f9fa;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.hotTitle {
+  font-size: 24px;
+  font-weight: bold;
+  color: #dc3545;
+}
+
+.cinemaImg {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* Căn đều đoạn văn bản bên trái */
+.justify {
+  text-align: justify;
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+.movieCard {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.movieCard:hover {
+  transform: scale(1.05);
+}
+
+.movieImg {
+  border-radius: 10px;
+  max-height: 280px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.movieName {
+  margin-top: 10px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 16px;
+}

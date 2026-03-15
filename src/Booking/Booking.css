@@ -1,0 +1,122 @@
+.screen {
+  background-color: #e0e0e0;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.seat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seat-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.seat {
+  width: 36px;
+  height: 36px;
+  margin: 4px;
+  border-radius: 6px;
+  background-color: #e0e0e0;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.seat:hover {
+  background-color: #999;
+}
+
+.seat.normal:hover {
+  background-color: #999;
+}
+
+.seat.selected {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.seat.normal.selected {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.seat.selecting {
+    background-color: hsl(212, 95%, 70%);
+}
+
+.seat.normal.selecting {
+    background-color: hsl(212, 95%, 70%);
+    color: #fff;
+}
+
+.seat.normal.sold {
+  background-color: #dd1a1d;
+  color: #fff;
+}
+
+.seat.vip.sold {
+  background-color: #dd1a1d;
+  color: #fff;
+}
+
+.seat.vip.selecting {
+  background-color: hsl(212, 95%, 70%);
+  color: #fff;
+}
+
+.seat.couple.selecting {
+  background-color: hsl(212, 95%, 70%);
+  color: #fff;
+}
+
+.seat.sold {
+  background-color: #dd1a1d;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.legend {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+/* Loại ghế */
+.seat.normal {
+  background-color: #e0e0e0;
+}
+.seat.vip {
+  border-radius: 50%;
+}
+
+/* Legend */
+.legend .seat {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  vertical-align: middle;
+  border-radius: 4px;
+}
+
+.legend .vip{
+  border-radius: 50%;
+}
+
+.legend .couple {
+  width: 48px;
+}
+

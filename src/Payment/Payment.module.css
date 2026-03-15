@@ -1,0 +1,86 @@
+.paymentContainer {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px;
+}
+
+.orderInfo {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  width: 300px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.orderInfo h5 {
+  margin-bottom: 20px;
+}
+
+.row {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.expireBox {
+  margin-top: 20px;
+  background-color: #ffe9f3;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.countdown div {
+  background-color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+.backLink {
+  display: inline-block;
+    margin-top: 10px;
+  color: #e60073;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.qrSection {
+  background: #f833a6;
+  border-radius: 16px;
+  color: white;
+  padding: 30px;
+  text-align: center;
+  width: 350px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.paymentChannels {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.qrImage {
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  margin-top: 10px;
+  background: white;
+  padding: 8px;
+}
+
+.guide a {
+  color: #ffd700;
+  text-decoration: underline;
+}
