@@ -15,7 +15,7 @@ public class Ranking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
-    private Movies movie;
+    private Movie movie;
 
     @Column(name = "rank", nullable = false)
     private Integer rank;

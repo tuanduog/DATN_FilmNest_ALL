@@ -1,6 +1,5 @@
 package com.booking.booking_ticket.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +17,7 @@ public class Cart extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
-    private Movies movie;
+    private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

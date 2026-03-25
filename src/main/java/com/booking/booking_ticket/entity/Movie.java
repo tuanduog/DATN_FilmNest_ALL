@@ -11,14 +11,14 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "movies")
+@Table(name = "movie")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Movies extends BaseEntity {
+public class Movie extends BaseEntity {
 
     @Column(name = "image", nullable = false)
     private String image;
@@ -63,5 +63,5 @@ public class Movies extends BaseEntity {
 
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude
-    private Set<Comments> setComments = new HashSet();
+    private Set<Comment> setComments = new HashSet();
 }

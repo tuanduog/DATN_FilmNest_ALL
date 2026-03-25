@@ -1,19 +1,17 @@
 package com.booking.booking_ticket.repository;
 
 import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO;
-import com.booking.booking_ticket.entity.Movies;
+import com.booking.booking_ticket.entity.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface MoviesRepository extends JpaRepository<Movies, Integer> {
+public interface MoviesRepository extends JpaRepository<Movie, Integer> {
 
-    @Query("Select distinct m.genre from Movies m")
+    @Query("Select distinct m.genre from Movie m")
     List<String> collectGenre();
 
     @Query("SELECT new com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO(m.movieName, SUM(b.totalPrice),COUNT(b),AVG(b.totalPrice)) "+

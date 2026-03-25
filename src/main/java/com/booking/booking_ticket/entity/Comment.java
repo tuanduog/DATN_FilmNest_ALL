@@ -8,13 +8,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "comment")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comments extends BaseEntity {
+public class Comment extends BaseEntity {
 
     @Column(name = "parent_id", nullable = false)
     private Integer parentId;
@@ -31,7 +31,7 @@ public class Comments extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
     @JsonIgnore
-    private Movies movie;
+    private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

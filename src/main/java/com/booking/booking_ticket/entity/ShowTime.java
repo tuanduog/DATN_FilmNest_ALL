@@ -1,9 +1,6 @@
 package com.booking.booking_ticket.entity;
 
-import java.sql.Time;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -18,8 +15,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // THÊM VÀO ĐÂY
-public class Show_time extends BaseEntity {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class ShowTime extends BaseEntity {
 
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
@@ -27,10 +24,10 @@ public class Show_time extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
     @JsonIgnore
-    private Movies movie;
+    private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Rooms room;
+    private Room room;
 }

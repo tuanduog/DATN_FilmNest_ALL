@@ -44,5 +44,5 @@ public class Booking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "showtime_id")
-    Show_time showTime;
+    ShowTime showTime;
 }

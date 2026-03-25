@@ -4,11 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.booking.booking_ticket.entity.Comments;
+import com.booking.booking_ticket.entity.Comment;
 
 @Repository
-public interface CommentRepository extends JpaRepository<Comments, Integer> {
+public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
-    List<Comments> findByMovie_IdOrderByCreatedAtAsc(Integer movieId);
+    List<Comment> findByMovie_IdOrderByCreatedAtAsc(Integer movieId);
 }

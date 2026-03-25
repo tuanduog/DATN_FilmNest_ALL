@@ -1,7 +1,6 @@
 package com.booking.booking_ticket.service.Impl;
 
-import com.booking.booking_ticket.dto.RoomDTO;
-import com.booking.booking_ticket.entity.Rooms;
+import com.booking.booking_ticket.entity.Room;
 import com.booking.booking_ticket.repository.RoomRepository;
 import com.booking.booking_ticket.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ public class RoomServiceImpl implements RoomService {
 
 
     @Override
-    public List<Rooms> getRoomByTheaterId(int theaterId) {
+    public List<Room> getRoomByTheaterId(int theaterId) {
         return  roomRepository.getRoomsByTheater(theaterId);
     }
 }
