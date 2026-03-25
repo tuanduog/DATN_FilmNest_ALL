@@ -27,21 +27,28 @@ public class Movies {
 
     @Column(name = "image", nullable = false)
     private String image;
+
     @Column(name = "trailer_url", nullable = false)
     private String trailerUrl;
+
     @Column(name = "movie_name", nullable = false)
     private String movieName;
+
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
-    // nhớ thêm columndefinition vì spring.jpa.hibernate.ddl-auto=update cố chạy gán varchar(255)
     private String movieDescription;
+
     @Column(name = "director", nullable = false)
     private String director;
+
     @Column(name = "cast", nullable = false)
     private String cast;
+
     @Column(name = "genre", nullable = false)
     private String genre;
+
     @Column(name = "duration", nullable = false)
     private String duration;
+
     @Column(name = "release_date", nullable = false)
     private LocalDate releaseDate;
 
@@ -55,19 +62,11 @@ public class Movies {
     @ToString.Exclude
     private Set<Ranking> setRank = new HashSet();
 
-
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude
     private Set<Cart> setCart = new HashSet();
 
-
-    // @OneToMany(mappedBy = "movie")
-    // @ToString.Exclude
-    // private Set<Reviews> setReview = new HashSet();
-
-
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude
     private Set<Comments> setComments = new HashSet();
-
 }

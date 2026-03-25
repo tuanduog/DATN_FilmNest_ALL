@@ -1,6 +1,6 @@
 package com.booking.booking_ticket.dto;
 
-import com.booking.booking_ticket.utils.UserRole;
+import com.booking.booking_ticket.utils.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +14,5 @@ public class UserDTO {
     private String email;
     private String phone;
     private String membership;
-    private UserRole userRole;
+    private Role role;
 }

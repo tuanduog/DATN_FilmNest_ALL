@@ -11,8 +11,7 @@ import java.util.List;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Rooms,Integer> {
+
     @Query("select r from Rooms r where r.theater.theaterId = :theaterId")
     List<Rooms> getRoomsByTheater(@Param("theaterId") Integer theaterId);
-
-
 }

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.booking.booking_ticket.utils.TicketStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
@@ -15,36 +16,37 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Booking {
     @Id
     @Column(name = "booking_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer bookingId;
+    Integer bookingId;
 
     @Column(name = "chair", nullable = false)
-    private String chair;
+    String chair;
 
     @Column(name = "total_price", nullable = false)
-    private Double totalPrice;
+    Double totalPrice;
 
     @Column(name = "combo", nullable = false)
-    private String combo;
+    String combo;
 
     @Column(name = "date", nullable = false)
-    private LocalDate date;
+    LocalDate date;
 
     @Column(name = "created_at")
-    private LocalDateTime created_at;
+    LocalDateTime created_at;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private TicketStatus ticketStatus;
+    TicketStatus ticketStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users user;
+    Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "showtime_id")
-    private Show_time showTime;
+    Show_time showTime;
 }

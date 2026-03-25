@@ -1,6 +1,6 @@
 package com.booking.booking_ticket.dto.request;
 
-import com.booking.booking_ticket.utils.UserRole;
+import com.booking.booking_ticket.utils.Role;
 import lombok.*;
 
 import java.io.Serializable;
@@ -23,6 +23,6 @@ public class UserRequestDTO implements Serializable {
 
     private String membership;
 
-    private UserRole userRole;
+    private Role role;
 
 }
