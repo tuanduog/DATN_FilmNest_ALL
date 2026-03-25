@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/FILM_NEST?useSSL=false&serverTimezone=UTC}
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/booking_ticket?useSSL=false&serverTimezone=UTC}
     username: ${MYSQL_USER:tuanduog}
     password: ${MYSQL_PASSWORD:abc123!@#}
 

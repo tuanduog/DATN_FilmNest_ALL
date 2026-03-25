@@ -1,6 +1,5 @@
 package com.booking.booking_ticket.dto.response;
 
-import com.booking.booking_ticket.utils.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 

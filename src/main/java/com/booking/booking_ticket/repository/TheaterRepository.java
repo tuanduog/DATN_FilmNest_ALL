@@ -16,7 +16,4 @@ public interface TheaterRepository extends JpaRepository<Theaters,Integer> {
 
     @Query("select t from Theaters t where t.theaterLocation like :location")
     List<Theaters> getTheatersByTheaterLocation(@Param("location") String location);
-
-
-
 }

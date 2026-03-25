@@ -6,7 +6,7 @@ import com.booking.booking_ticket.entity.InvalidToken;
 import com.booking.booking_ticket.entity.Users;
 import com.booking.booking_ticket.repository.InvalidTokenRepsitory;
 import com.booking.booking_ticket.repository.UsersRepository;
-import com.booking.booking_ticket.utils.UserRole;
+import com.booking.booking_ticket.utils.Role;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -68,10 +68,13 @@ public class AuthServiceImpl implements AuthService {
     public String generateToken(Users account) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
         String role;
-        if (account.getUserRole() == UserRole.CUSTOMER)
-            role = "Customer";
-        else
-            role = account.getUserRole() == UserRole.MANAGER ? "Manager" : "Administrator";
+        if (account.getRole() == Role.USER)
+            role = "User";
+        else if (account.getRole() == Role.MANAGER)
+            role = "Manager";
+        else if (account.getRole() == Role.ADMINISTRATOR)
+            role = "Admin";
+        else role = "Staff";
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .claim("scope", role)
@@ -140,10 +143,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-
-
-
-
     @Override
     public long registerCustomer(RegisterRequestDTO registerRequestDTO) {
 
@@ -153,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(registerRequestDTO.getEmail())
                 .phone(registerRequestDTO.getPhone())
                 .membership("no membership")
-                .userRole(UserRole.CUSTOMER)
+                .role(Role.USER)
                 .build();
 
         Users customer = usersRepository.save(a);
@@ -173,13 +172,6 @@ public class AuthServiceImpl implements AuthService {
             System.out.println(token);
             SignedJWT jwt = SignedJWT.parse(token);
             System.out.println(token);
-            // var signToken = verifyToken(request.getToken(), true);
-            // //Lấy body
-            // String jit = signToken.getJWTClaimsSet().getJWTID();
-            //
-            // Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
-
-            // log.info("DATETIME: {}", expiryTime.toInstant());
 
             invalidTokenRepsitory.save(InvalidToken.builder()
                     .token_id(token)

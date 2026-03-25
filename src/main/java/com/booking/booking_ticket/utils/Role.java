@@ -2,11 +2,17 @@ package com.booking.booking_ticket.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum UserRole {
+public enum Role {
+
     @JsonProperty("administrator")
     ADMINISTRATOR,
-    @JsonProperty("customer")
-    CUSTOMER,
+
     @JsonProperty("manager")
-    MANAGER
+    MANAGER,
+
+    @JsonProperty("staff")
+    STAFF,
+
+    @JsonProperty("user")
+    USER
 }
