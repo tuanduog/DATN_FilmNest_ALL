@@ -56,7 +56,6 @@ public interface BookingRepository extends JpaRepository<Booking,Integer> {
             "GROUP BY m.genre")
     List<BookingByCategoryStats> countBookingsByMovieCategory();
 
-
     @Query("SELECT new com.booking.booking_ticket.dto.response.BookingResponse(u.username, b.totalPrice, m.movieName, b.ticketStatus) " +
             "FROM Booking b " +
             "JOIN b.user u " +
@@ -64,38 +63,34 @@ public interface BookingRepository extends JpaRepository<Booking,Integer> {
             "JOIN s.movie m")
     List<BookingResponse> getAllBookingResponse();
 
-
-
     @Query("""
-            SELECT new com.booking.booking_ticket.dto.BookingDTO(
-                b.id,
-                b.chair,
-                b.totalPrice,
-                b.combo,
-                b.date,
-                m.image,
-                m.movieName,
-                s.startTime,
-                r.roomName,
-                t.theaterName,
-                t.theaterLocation
-            )
-                FROM Booking b
-                JOIN b.showTime s
-                JOIN s.movie m
-                JOIN s.room r
-                JOIN r.theater t
-                WHERE b.user.id = :userId
-            """)
-            List<BookingDTO> findBookingByUserId(@Param("userId") Integer userId);
+        SELECT new com.booking.booking_ticket.dto.BookingDTO(
+            b.id,
+            b.chair,
+            b.totalPrice,
+            b.combo,
+            b.date,
+            m.image,
+            m.movieName,
+            s.startTime,
+            r.roomName,
+            t.name,
+            t.location
+        )
+            FROM Booking b
+            JOIN b.showTime s
+            JOIN s.movie m
+            JOIN s.room r
+            JOIN r.theater t
+            WHERE b.user.id = :userId
+        """)
+    List<BookingDTO> findBookingByUserId(@Param("userId") Integer userId);
 
-            List<Booking> findByShowTime_Id(Integer showTimeId);
+    List<Booking> findByShowTime_Id(Integer showTimeId);
 
-            @Query("SELECT new com.booking.booking_ticket.dto.BookingSimpleDTO(" +
-            "b.id, b.chair, b.totalPrice, b.combo, b.date, b.user.id, b.showTime.id) " +
-            "FROM Booking b WHERE b.showTime.id = :showTimeId")
-            List<BookingSimpleDTO> findBookingSimpleDTOByShowTimeId(@Param("showTimeId") Integer showTimeId);
-
-
+    @Query("SELECT new com.booking.booking_ticket.dto.BookingSimpleDTO(" +
+    "b.id, b.chair, b.totalPrice, b.combo, b.date, b.user.id, b.showTime.id) " +
+    "FROM Booking b WHERE b.showTime.id = :showTimeId")
+    List<BookingSimpleDTO> findBookingSimpleDTOByShowTimeId(@Param("showTimeId") Integer showTimeId);
 }
 

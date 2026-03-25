@@ -1,6 +1,6 @@
 package com.booking.booking_ticket.entity;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,8 +15,9 @@ public class Ranking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Movie movie;
 
-    @Column(name = "rank", nullable = false)
-    private Integer rank;
+    @Column(name = "rank_number", nullable = false)
+    private Integer rankNumber;
 }

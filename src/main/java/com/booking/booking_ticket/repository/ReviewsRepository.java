@@ -7,14 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.booking.booking_ticket.entity.Reviews;
+import com.booking.booking_ticket.entity.Review;
 
 @Repository
-public interface ReviewsRepository extends JpaRepository<Reviews, Integer>{
-    Optional<Reviews> findByMovie_IdAndUser_Id(Integer movieId, Integer userId);
+public interface ReviewsRepository extends JpaRepository<Review, Integer>{
+    Optional<Review> findByMovie_IdAndUser_Id(Integer movieId, Integer userId);
 
     @Query("SELECT r.movie.id, r.movie.image, r.movie.movieName, AVG(r.point) AS avgRating, COUNT(r.id) AS reviewCount " +
-           "FROM Reviews r " +
+           "FROM Review r " +
            "GROUP BY r.movie.id, r.movie.image, r.movie.movieName " +
            "ORDER BY avgRating DESC")
     List<Object[]> findTop10MoviesByAverageRating(org.springframework.data.domain.Pageable pageable);

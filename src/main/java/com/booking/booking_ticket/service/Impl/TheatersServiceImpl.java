@@ -1,8 +1,7 @@
 package com.booking.booking_ticket.service.Impl;
 
-import com.booking.booking_ticket.dto.request.MovieRequestDTO;
 import com.booking.booking_ticket.dto.request.ThearterRequestDTO;
-import com.booking.booking_ticket.entity.Theaters;
+import com.booking.booking_ticket.entity.Theater;
 import com.booking.booking_ticket.repository.TheaterRepository;
 import com.booking.booking_ticket.service.TheatersService;
 import lombok.RequiredArgsConstructor;
@@ -24,21 +23,21 @@ public class TheatersServiceImpl implements TheatersService {
     }
 
     @Override
-    public List<Theaters> getTheatersByLocation(String location) {
+    public List<Theater> getTheatersByLocation(String location) {
         return theaterRepository.getTheatersByTheaterLocation(location);
     }
 
     @Override
-    public List<Theaters> getAllTheater() {
+    public List<Theater> getAllTheater() {
         return theaterRepository.findAll();
     }
 
     @Override
     public int addTheater(ThearterRequestDTO movieRequestDTO) {
 
-        Theaters theaters = Theaters.builder()
-                .theaterName(movieRequestDTO.getTheaterName())
-                .theaterLocation(movieRequestDTO.getLocation())
+        Theater theaters = Theater.builder()
+                .name((movieRequestDTO.getTheaterName()))
+                .location(movieRequestDTO.getLocation())
                 .build();
         theaterRepository.save(theaters);
 
@@ -47,9 +46,9 @@ public class TheatersServiceImpl implements TheatersService {
 
     @Override
     public int editTheater(int id, ThearterRequestDTO movieRequestDTO) {
-        Theaters theaters = theaterRepository.findById(id).get();
-        theaters.setTheaterName(movieRequestDTO.getTheaterName());
-        theaters.setTheaterLocation(movieRequestDTO.getLocation());
+        Theater theaters = theaterRepository.findById(id).get();
+        theaters.setName(movieRequestDTO.getTheaterName());
+        theaters.setLocation(movieRequestDTO.getLocation());
 
         theaterRepository.save(theaters);
         return theaters.getId();
@@ -57,7 +56,7 @@ public class TheatersServiceImpl implements TheatersService {
 
     @Override
     public int deleteTheater(int id) {
-        Theaters theaters = theaterRepository.findById(id).get();
+        Theater theaters = theaterRepository.findById(id).get();
         theaterRepository.delete(theaters);
         return theaters.getId();
     }

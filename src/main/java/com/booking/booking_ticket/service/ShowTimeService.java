@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import com.booking.booking_ticket.dto.RoomDTO;
 import com.booking.booking_ticket.dto.ShowTimeDTO;
 import com.booking.booking_ticket.dto.TheaterDTO;
-import com.booking.booking_ticket.entity.Rooms;
-import com.booking.booking_ticket.entity.Show_time;
-import com.booking.booking_ticket.entity.Theaters;
+import com.booking.booking_ticket.entity.Room;
+import com.booking.booking_ticket.entity.ShowTime;
+import com.booking.booking_ticket.entity.Theater;
 import com.booking.booking_ticket.repository.ShowTimeRepository;
 
 @Service
@@ -28,16 +28,16 @@ public class ShowTimeService {
     private final RoomRepository roomRepository;
 
     public List<ShowTimeDTO> getByMovieId(int movieId) {
-        List<Show_time> entities = showTimeRepository.findByMovie_Id(movieId);
+        List<ShowTime> entities = showTimeRepository.findByMovie_Id(movieId);
 
         return entities.stream().map(show -> {
-            Rooms room = show.getRoom();
-            Theaters theater = room.getTheater(); // ⚠ Nếu lazy, cần gọi đủ để nó load
+            Room room = show.getRoom();
+            Theater theater = room.getTheater();
 
             TheaterDTO theaterDTO = new TheaterDTO(
                     theater.getId(),
-                    theater.getTheaterName(),
-                    theater.getTheaterLocation());
+                    theater.getName(),
+                    theater.getLocation());
 
             RoomDTO roomDTO = new RoomDTO(
                     room.getId(),
@@ -57,7 +57,7 @@ public class ShowTimeService {
     }
 
     public int addShowtime(ShowTimeRequestDTO showTimeRequestDTO) {
-        Show_time show_time = Show_time.builder()
+        ShowTime show_time = ShowTime.builder()
                 .startTime(showTimeRequestDTO.getStartTime())
                 .movie(moviesRepository.findById(showTimeRequestDTO.getMovieId()).get())
                 .room(roomRepository.findById(showTimeRequestDTO.getRoomId()).get())
@@ -69,7 +69,7 @@ public class ShowTimeService {
     }
 
     public int editShowtime(int id, ShowTimeRequestDTO showTimeRequestDTO) {
-        Show_time show_time = showTimeRepository.findById(id).get();
+        ShowTime show_time = showTimeRepository.findById(id).get();
         show_time.setStartTime(showTimeRequestDTO.getStartTime());
         show_time.setRoom(roomRepository.findById(showTimeRequestDTO.getRoomId()).get());
         show_time.setMovie(moviesRepository.findById(showTimeRequestDTO.getMovieId()).get());
