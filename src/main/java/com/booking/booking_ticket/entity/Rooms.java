@@ -14,11 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Rooms {
-    @Id
-    @Column(name = "room_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer roomId;
+public class Rooms extends BaseEntity {
 
     @Column(name = "room_name", nullable = false)
     private String roomName;

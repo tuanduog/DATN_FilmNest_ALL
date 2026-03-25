@@ -15,12 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment_likes {
-
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class Comment_likes extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")

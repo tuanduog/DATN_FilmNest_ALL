@@ -57,7 +57,7 @@ public class UserService {
         .orElseThrow(() -> new RuntimeException("User not found"));
 
         return new MembershipDTO(
-            users.getUserId(),
+            users.getId(),
             users.getMembership(),
             users.getStartDate(),
             users.getExpired()

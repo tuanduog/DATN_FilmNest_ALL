@@ -2,27 +2,27 @@ package com.booking.booking_ticket.dto.request;
 
 import com.booking.booking_ticket.utils.Role;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRequestDTO implements Serializable {
 
-    private Integer userId;
+    Integer userId;
 
-    private String username;
+    String username;
 
-    private String password;
+    String password;
 
-    private String email;
+    String email;
 
-    private String phone;
+    String phone;
 
-    private String membership;
+    String membership;
 
-    private Role role;
-
+    Role role;
 }

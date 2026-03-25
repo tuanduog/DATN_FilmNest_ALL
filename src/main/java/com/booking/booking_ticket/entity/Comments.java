@@ -14,12 +14,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comments {
-
-    @Id
-    @Column(name = "comment_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer commentId;
+public class Comments extends BaseEntity {
 
     @Column(name = "parent_id", nullable = false)
     private Integer parentId;

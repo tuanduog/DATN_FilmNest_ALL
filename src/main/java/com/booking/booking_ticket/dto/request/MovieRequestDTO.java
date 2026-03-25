@@ -2,26 +2,37 @@ package com.booking.booking_ticket.dto.request;
 
 import jakarta.persistence.Column;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MovieRequestDTO  implements Serializable {
-    private String image;
-    private String trailerUrl;
-    private String movieName;
-    private String movieDescription;
-    private String director;
-    private String cast;
-    private String genre;
-    private String duration;
-    private LocalDate releaseDate;
-    private String showing;
-    private int dateShow;
 
+    String image;
+
+    String trailerUrl;
+
+    String movieName;
+
+    String movieDescription;
+
+    String director;
+
+    String cast;
+
+    String genre;
+
+    String duration;
+
+    LocalDate releaseDate;
+
+    String showing;
+
+    int dateShow;
 }

@@ -1,10 +1,8 @@
 package com.booking.booking_ticket.dto.request;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.time.LocalTime;
@@ -12,15 +10,13 @@ import java.time.LocalTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShowTimeRequestDTO implements Serializable {
 
+    LocalTime startTime;
 
-    private LocalTime startTime;
+    Integer movieId;
 
-    private Integer movieId;
-
-    private Integer roomId;
-
-
+    Integer roomId;
 }

@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .claim("scope", role)
-                .claim("user_id", account.getUserId())
+                .claim("user_id", account.getId())
                 .claim("email", account.getEmail())
                 .claim("phone_number", account.getPhone())
                 .claim("membership", account.getMembership())
@@ -157,7 +157,7 @@ public class AuthServiceImpl implements AuthService {
 
         Users customer = usersRepository.save(a);
 
-        return customer.getUserId();
+        return customer.getId();
     }
 
     @Override

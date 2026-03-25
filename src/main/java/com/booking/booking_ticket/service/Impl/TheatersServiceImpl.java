@@ -42,7 +42,7 @@ public class TheatersServiceImpl implements TheatersService {
                 .build();
         theaterRepository.save(theaters);
 
-        return theaters.getTheaterId();
+        return theaters.getId();
     }
 
     @Override
@@ -52,14 +52,14 @@ public class TheatersServiceImpl implements TheatersService {
         theaters.setTheaterLocation(movieRequestDTO.getLocation());
 
         theaterRepository.save(theaters);
-        return theaters.getTheaterId();
+        return theaters.getId();
     }
 
     @Override
     public int deleteTheater(int id) {
         Theaters theaters = theaterRepository.findById(id).get();
         theaterRepository.delete(theaters);
-        return theaters.getTheaterId();
+        return theaters.getId();
     }
 
 

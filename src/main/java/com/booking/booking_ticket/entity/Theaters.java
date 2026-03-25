@@ -13,18 +13,11 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Theaters {
-
-
-    @Id
-    @Column(name = "theater_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer theaterId;
+public class Theaters extends BaseEntity {
 
     @Column(name = "theater_name", nullable = false)
     private String theaterName;
 
     @Column(name = "location", nullable = false)
     private String theaterLocation;
-
 }

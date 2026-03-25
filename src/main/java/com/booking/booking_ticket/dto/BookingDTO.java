@@ -3,25 +3,38 @@ package com.booking.booking_ticket.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingDTO {
-    private Integer bookingId;
-    private String chair;
-    private Double totalPrice;
-    private String combo;
-    private LocalDate date;
-    private String movieImage;
-    private String movieName;
-    private LocalTime startTime;
-    private String roomName;
-    private String theaterName;
-    private String theaterLocation;
 
-    // Constructor Hibernate cần
+    Integer bookingId;
+
+    String chair;
+
+    Double totalPrice;
+
+    String combo;
+
+    LocalDate date;
+
+    String movieImage;
+
+    String movieName;
+
+    LocalTime startTime;
+
+    String roomName;
+
+    String theaterName;
+
+    String theaterLocation;
+
     public BookingDTO(Integer bookingId, String chair, Double totalPrice, String combo,
                       LocalDate date, String movieImage, String movieName,
                       LocalTime startTime, String roomName, String theaterName,

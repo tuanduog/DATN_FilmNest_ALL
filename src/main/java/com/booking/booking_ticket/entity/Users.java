@@ -18,12 +18,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-public class Users {
-
-    @Id
-    @Column(name = "user_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId;
+public class Users extends BaseEntity {
 
     @Column(name = "username", length = 255, nullable = false)
     private String username;
@@ -58,5 +53,4 @@ public class Users {
     @Column(name = "role", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
-
 }

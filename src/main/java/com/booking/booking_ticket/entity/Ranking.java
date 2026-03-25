@@ -11,12 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ranking {
-
-    @Id
-    @Column(name = "ranking_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer rankingId;
+public class Ranking extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
@@ -24,9 +19,4 @@ public class Ranking {
 
     @Column(name = "rank", nullable = false)
     private Integer rank;
-
-
-
-
-
 }

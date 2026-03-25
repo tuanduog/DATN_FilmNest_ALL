@@ -11,12 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cart {
-
-    @Id
-    @Column(name = "cartid")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer cartId;
+public class Cart extends BaseEntity {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
@@ -28,6 +23,4 @@ public class Cart {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users user;
-
-
 }
