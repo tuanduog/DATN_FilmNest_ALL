@@ -1,10 +1,9 @@
 package com.booking.booking_ticket.controller;
 
-import com.booking.booking_ticket.dto.request.ShowTimeRequestDTO;
 import com.booking.booking_ticket.dto.request.ThearterRequestDTO;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
-import com.booking.booking_ticket.entity.Theaters;
+import com.booking.booking_ticket.entity.Theater;
 import com.booking.booking_ticket.service.Impl.TheatersServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +45,7 @@ public class TheatersController {
     public ResponseData<?> getGenres(@RequestParam String Location)
     {
         try{
-            List<Theaters> result = theatersService.getTheatersByLocation(Location);
+            List<Theater> result = theatersService.getTheatersByLocation(Location);
             System.out.println(result.size());
             if(!result.isEmpty())
                 return new ResponseData<>(HttpStatus.OK.value(),"Có theater",result);
@@ -65,7 +64,7 @@ public class TheatersController {
     public ResponseData<?> getTheaters()
     {
         try{
-            List<Theaters> result = theatersService.getAllTheater();
+            List<Theater> result = theatersService.getAllTheater();
             if(!result.isEmpty())
                 return new ResponseData<>(HttpStatus.OK.value(),"Có theater",result);
             else
@@ -91,6 +90,7 @@ public class TheatersController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+
     @PutMapping("/edit-Theater")
     public ResponseData<?> editShowtime(@RequestParam int id, @RequestBody ThearterRequestDTO showTimeRequestDTO) {
         try{
@@ -102,6 +102,7 @@ public class TheatersController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+
     @DeleteMapping("/delete-Theater")
     public ResponseData<?> deleteShowtime(@RequestParam int id) {
         try{

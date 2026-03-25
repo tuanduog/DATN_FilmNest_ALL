@@ -1,6 +1,6 @@
 package com.booking.booking_ticket.dto.request;
 
-import com.booking.booking_ticket.entity.Theaters;
+import com.booking.booking_ticket.entity.Theater;
 import com.booking.booking_ticket.entity.Users;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,9 +20,9 @@ public class BookingRequestDTO implements Serializable {
 
     Double totalPrice;
 
-    String commbo;
+    String combo;
 
-    Theaters theater;
+    Theater theater;
 
     Users user;
 

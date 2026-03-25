@@ -5,10 +5,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import com.booking.booking_ticket.dto.CommentDTO;
-import com.booking.booking_ticket.entity.Comments;
+import com.booking.booking_ticket.entity.Comment;
 import com.booking.booking_ticket.service.CommentService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ public class CommentController {
     @MessageMapping("/push-cmt")
     public void sendCmt(@Payload CommentDTO cmt) {
         System.out.println("Received WS comment: " + cmt.getContent());
-        Comments saved = commentService.saveCmt(cmt);
+        Comment saved = commentService.saveCmt(cmt);
 
         CommentDTO dto = new CommentDTO(
                 saved.getId(),
