@@ -18,7 +18,6 @@ public class MovieService {
     }
 
     public Movies getMovieById(int id) {
-        return movieRepository.findByMovieId(id);
+        return movieRepository.findAllById(id);
     }
-
 }

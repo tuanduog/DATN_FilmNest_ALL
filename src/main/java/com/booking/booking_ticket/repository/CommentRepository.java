@@ -10,5 +10,5 @@ import com.booking.booking_ticket.entity.Comments;
 @Repository
 public interface CommentRepository extends JpaRepository<Comments, Integer> {
 
-    List<Comments> findByMovie_MovieIdOrderByCreatedAtAsc(Integer movieId);
+    List<Comments> findByMovie_IdOrderByCreatedAtAsc(Integer movieId);
 }

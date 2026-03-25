@@ -28,7 +28,7 @@ public class ReviewsService {
     private MovieRepository movieRepository;
 
     public Reviews updateOrCreateReviews(Integer movieId, Integer userId, Integer newPoint){
-        return reviewsRepository.findByMovie_MovieIdAndUser_UserId(movieId, userId)
+        return reviewsRepository.findByMovie_IdAndUser_Id(movieId, userId)
         .map(review -> {
             review.setPoint(newPoint);
             review.setUpdated_at(Instant.now());
@@ -51,7 +51,7 @@ public class ReviewsService {
     }
 
     public Reviews getReview(Integer movieId, Integer userId){
-        Optional<Reviews> review = reviewsRepository.findByMovie_MovieIdAndUser_UserId(movieId, userId);
+        Optional<Reviews> review = reviewsRepository.findByMovie_IdAndUser_Id(movieId, userId);
         if(review.isPresent()){
             return review.get();
         }
