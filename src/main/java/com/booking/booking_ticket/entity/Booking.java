@@ -34,7 +34,7 @@ public class Booking extends BaseEntity {
     @Column(name = "created_at")
     LocalDateTime created_at;
 
-    @Column(name = "status")
+    @Column(name = "ticket_status")
     @Enumerated(EnumType.STRING)
     TicketStatus ticketStatus;
 

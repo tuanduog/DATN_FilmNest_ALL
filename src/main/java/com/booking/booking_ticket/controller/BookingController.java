@@ -48,8 +48,8 @@ public class BookingController {
     public ResponseEntity<?> addBooking(@RequestBody Booking booking) {
         try {
             String[] newChairs = booking.getChair().split(",");
-            List<Booking> existingBookings = bookingRepository.findByShowTime_ShowTimeId(
-                    booking.getShowTime().getShowTimeId());
+            List<Booking> existingBookings = bookingRepository.findByShowTime_Id(
+                    booking.getShowTime().getId());
 
             for (Booking existing : existingBookings) {
                 String[] bookedChairs = existing.getChair().split(",");
@@ -81,7 +81,7 @@ public class BookingController {
         try {
             String[] requestedChairs = chair.split(",");
 
-            List<Booking> bookings = bookingRepository.findByShowTime_ShowTimeId(showTimeId);
+            List<Booking> bookings = bookingRepository.findByShowTime_Id(showTimeId);
 
             for (Booking booking : bookings) {
                 String[] bookedChairs = booking.getChair().split(",");
@@ -89,7 +89,6 @@ public class BookingController {
                 for (String req : requestedChairs) {
                     for (String booked : bookedChairs) {
                         if (req.trim().equalsIgnoreCase(booked.trim())) {
-                            // Nếu tìm thấy ghế bị trùng → trả về true
                             return ResponseEntity.ok(true);
                         }
                     }
@@ -102,7 +101,6 @@ public class BookingController {
                     .body("Error checking booking: " + e.getMessage());
         }
     }
-
 
     @GetMapping("/get-userbooking/{userId}")
     public ResponseEntity<?> getUserBooking(@PathVariable Integer userId) {
@@ -200,5 +198,4 @@ public class BookingController {
                     .body("Failed to get locked seats: " + e.getMessage());
         }
     }
-    
 }

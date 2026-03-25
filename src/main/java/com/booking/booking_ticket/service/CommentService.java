@@ -26,10 +26,9 @@ public class CommentService {
         private UsersRepository usersRepository;
 
         public Comments saveCmt(CommentDTO cmt) {
-                Movies movie = movieRepository.findById(cmt.getMovieId())
-                                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                Movies movie = movieRepository.findAllById(cmt.getMovieId());
 
-                Users user = usersRepository.findByUserId(cmt.getUserId())
+                Users user = usersRepository.findById(cmt.getUserId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
                 Comments comments = Comments.builder()
@@ -46,16 +45,16 @@ public class CommentService {
         }
 
         public List<CommentDTO> getAllComment(Integer movieId) {
-                List<Comments> comments = commentRepository.findByMovie_MovieIdOrderByCreatedAtAsc(movieId);
+                List<Comments> comments = commentRepository.findByMovie_IdOrderByCreatedAtAsc(movieId);
                 return comments.stream() // stream thay the cho for
                                 .map(c -> new CommentDTO(
-                                                c.getCommentId(),
+                                                c.getId(),
                                                 c.getParentId(),
                                                 c.getContent(),
                                                 c.getLevel(),
                                                 c.getCreatedAt(),
-                                                c.getMovie().getMovieId(),
-                                                c.getUser().getUserId(),
+                                                c.getMovie().getId(),
+                                                c.getUser().getId(),
                                                 c.getUser().getUsername()))
                                 .toList();
         }

@@ -29,15 +29,15 @@ public class CommentController {
         Comments saved = commentService.saveCmt(cmt);
 
         CommentDTO dto = new CommentDTO(
-                saved.getCommentId(),
+                saved.getId(),
                 saved.getParentId(),
                 saved.getContent(),
                 saved.getLevel(),
                 saved.getCreatedAt(),
-                saved.getMovie().getMovieId(),
-                saved.getUser().getUserId(),
+                saved.getMovie().getId(),
+                saved.getUser().getId(),
                 saved.getUser().getUsername());
 
-        simpMessagingTemplate.convertAndSend("/topic/comment/" + saved.getMovie().getMovieId(), dto);
+        simpMessagingTemplate.convertAndSend("/topic/comment/" + saved.getMovie().getId(), dto);
     };
 }

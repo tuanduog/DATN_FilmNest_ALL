@@ -44,7 +44,7 @@ public class UserService {
     }
 
     public Users updateMembership (Integer userId, MembershipRequest membership){
-        return usersRepository.findByUserId(userId).map(u -> {
+        return usersRepository.findById(userId).map(u -> {
             u.setMembership(membership.getVip());
             u.setStartDate(membership.getStartDate());
             u.setExpired(membership.getExpire());
@@ -53,7 +53,7 @@ public class UserService {
     }
 
     public MembershipDTO getUserMembership(Integer userId){
-        Users users = usersRepository.findByUserId(userId)
+        Users users = usersRepository.findById(userId)
         .orElseThrow(() -> new RuntimeException("User not found"));
 
         return new MembershipDTO(
@@ -63,7 +63,6 @@ public class UserService {
             users.getExpired()
         );
     }
-
 
     public List<Users> getAllUser(){
         return usersRepository.findAll();

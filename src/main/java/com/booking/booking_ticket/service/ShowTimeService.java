@@ -28,7 +28,7 @@ public class ShowTimeService {
     private final RoomRepository roomRepository;
 
     public List<ShowTimeDTO> getByMovieId(int movieId) {
-        List<Show_time> entities = showTimeRepository.findByMovie_MovieId(movieId);
+        List<Show_time> entities = showTimeRepository.findByMovie_Id(movieId);
 
         return entities.stream().map(show -> {
             Rooms room = show.getRoom();

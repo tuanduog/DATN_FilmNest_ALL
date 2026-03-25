@@ -68,7 +68,7 @@ public interface BookingRepository extends JpaRepository<Booking,Integer> {
 
     @Query("""
             SELECT new com.booking.booking_ticket.dto.BookingDTO(
-                b.bookingId,
+                b.id,
                 b.chair,
                 b.totalPrice,
                 b.combo,
@@ -85,15 +85,15 @@ public interface BookingRepository extends JpaRepository<Booking,Integer> {
                 JOIN s.movie m
                 JOIN s.room r
                 JOIN r.theater t
-                WHERE b.user.userId = :userId
+                WHERE b.user.id = :userId
             """)
             List<BookingDTO> findBookingByUserId(@Param("userId") Integer userId);
 
-            List<Booking> findByShowTime_ShowTimeId(Integer showTimeId);
+            List<Booking> findByShowTime_Id(Integer showTimeId);
 
             @Query("SELECT new com.booking.booking_ticket.dto.BookingSimpleDTO(" +
-            "b.bookingId, b.chair, b.totalPrice, b.combo, b.date, b.user.userId, b.showTime.showTimeId) " +
-            "FROM Booking b WHERE b.showTime.showTimeId = :showTimeId")
+            "b.id, b.chair, b.totalPrice, b.combo, b.date, b.user.id, b.showTime.id) " +
+            "FROM Booking b WHERE b.showTime.id = :showTimeId")
             List<BookingSimpleDTO> findBookingSimpleDTOByShowTimeId(@Param("showTimeId") Integer showTimeId);
 
 

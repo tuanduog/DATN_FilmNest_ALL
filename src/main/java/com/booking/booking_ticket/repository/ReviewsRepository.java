@@ -11,11 +11,11 @@ import com.booking.booking_ticket.entity.Reviews;
 
 @Repository
 public interface ReviewsRepository extends JpaRepository<Reviews, Integer>{
-    Optional<Reviews> findByMovie_MovieIdAndUser_UserId(Integer movieId, Integer userId);
+    Optional<Reviews> findByMovie_IdAndUser_Id(Integer movieId, Integer userId);
 
-    @Query("SELECT r.movie.movieId, r.movie.image, r.movie.movieName, AVG(r.point) AS avgRating, COUNT(r.reviewId) AS reviewCount " +
+    @Query("SELECT r.movie.id, r.movie.image, r.movie.movieName, AVG(r.point) AS avgRating, COUNT(r.id) AS reviewCount " +
            "FROM Reviews r " +
-           "GROUP BY r.movie.movieId, r.movie.image, r.movie.movieName " +
+           "GROUP BY r.movie.id, r.movie.image, r.movie.movieName " +
            "ORDER BY avgRating DESC")
     List<Object[]> findTop10MoviesByAverageRating(org.springframework.data.domain.Pageable pageable);
 }
