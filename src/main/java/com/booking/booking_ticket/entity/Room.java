@@ -8,13 +8,13 @@ import java.time.Instant;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "rooms")
+@Table(name = "room")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Rooms extends BaseEntity {
+public class Room extends BaseEntity {
 
     @Column(name = "room_name", nullable = false)
     private String roomName;
@@ -22,5 +22,5 @@ public class Rooms extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theater_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Theaters theater;
+    private Theater theater;
 }

@@ -1,8 +1,7 @@
 package com.booking.booking_ticket.repository;
 
-
 import com.booking.booking_ticket.dto.response.PageResponse;
-import com.booking.booking_ticket.entity.Movies;
+import com.booking.booking_ticket.entity.Movie;
 import com.booking.booking_ticket.repository.criteria.SearchCriteria;
 import com.booking.booking_ticket.repository.criteria.SearchQueryConsumer;
 import jakarta.persistence.EntityManager;
@@ -19,14 +18,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 @Repository
 @RequiredArgsConstructor
 public class SearchRepository {
 
     private static final Logger log = LoggerFactory.getLogger(SearchRepository.class);
-
-    private final MoviesRepository productRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -34,7 +30,7 @@ public class SearchRepository {
     public PageResponse searchingProductWithMultipleColumns(int pageNo, int pageSize, String sortBy, String... search) {
         //Xu ly search:
         List<SearchCriteria> orderColumn = new ArrayList<>();
-        List<Movies> result = new ArrayList<>();
+        List<Movie> result = new ArrayList<>();
         if (search != null) {
 
             for (String s : search) {
@@ -59,13 +55,13 @@ public class SearchRepository {
                 .build();
     }
 
-    private List<Movies> getProducts(int pageNo, int pageSize, List<SearchCriteria> orderColumn, String sortBy) {
+    private List<Movie> getProducts(int pageNo, int pageSize, List<SearchCriteria> orderColumn, String sortBy) {
         //tao builder
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         //Xac dinh kieu du lieu tra ve
-        CriteriaQuery<Movies> criteriaQuery = criteriaBuilder.createQuery(Movies.class).distinct(true);
+        CriteriaQuery<Movie> criteriaQuery = criteriaBuilder.createQuery(Movie.class).distinct(true);
         //tao doi tuong truy van
-        Root<Movies> root = criteriaQuery.from(Movies.class);
+        Root<Movie> root = criteriaQuery.from(Movie.class);
         //xu ly dieu kien tim kiem
 
         //tao predicate
@@ -95,6 +91,5 @@ public class SearchRepository {
 
         }
         return entityManager.createQuery(criteriaQuery).setFirstResult(pageNo).setMaxResults(pageSize).getResultList();
-
     }
 }

@@ -3,7 +3,7 @@ package com.booking.booking_ticket.service.Impl;
 import com.booking.booking_ticket.dto.request.MovieRequestDTO;
 import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO;
 import com.booking.booking_ticket.dto.response.PageResponse;
-import com.booking.booking_ticket.entity.Movies;
+import com.booking.booking_ticket.entity.Movie;
 import com.booking.booking_ticket.repository.MoviesRepository;
 import com.booking.booking_ticket.repository.SearchRepository;
 import com.booking.booking_ticket.service.MoviesService;
@@ -29,7 +29,7 @@ public class MoviesServiceImpl implements MoviesService {
     }
 
     @Override
-    public List<Movies> getAllMovies() {
+    public List<Movie> getAllMovies() {
         return moviesRepository.findAll();
     }
 
@@ -40,7 +40,7 @@ public class MoviesServiceImpl implements MoviesService {
 
     @Override
     public int addMovie(MovieRequestDTO movieRequestDTO) {
-        Movies v = Movies.builder()
+        Movie v = Movie.builder()
                 .cast(movieRequestDTO.getCast())
                 .movieDescription(movieRequestDTO.getMovieDescription())
                 .genre(movieRequestDTO.getGenre())
@@ -52,16 +52,14 @@ public class MoviesServiceImpl implements MoviesService {
                 .releaseDate(movieRequestDTO.getReleaseDate())
                 .showing(movieRequestDTO.getShowing())
                 .build();
-        moviesRepository.save(
-                v
-        );
+        moviesRepository.save(v);
 
         return v.getId();
     }
 
     @Override
     public int editMovie(int id, MovieRequestDTO movieRequestDTO) {
-        Movies m = moviesRepository.findById(id).get();
+        Movie m = moviesRepository.findById(id).get();
 
         m.setMovieDescription(movieRequestDTO.getMovieDescription());
         m.setGenre(movieRequestDTO.getGenre());

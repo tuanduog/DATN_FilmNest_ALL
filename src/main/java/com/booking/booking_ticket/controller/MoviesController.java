@@ -2,13 +2,11 @@ package com.booking.booking_ticket.controller;
 
 
 import com.booking.booking_ticket.dto.request.MovieRequestDTO;
-import com.booking.booking_ticket.dto.response.IntrospectiveResponse;
 import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
-import com.booking.booking_ticket.entity.Movies;
+import com.booking.booking_ticket.entity.Movie;
 import com.booking.booking_ticket.service.Impl.MoviesServiceImpl;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +49,7 @@ public class MoviesController {
     public ResponseData<?> getMovies()
     {
         try{
-            List<Movies> result = moviesService.getAllMovies();
+            List<Movie> result = moviesService.getAllMovies();
             System.out.println(result.size());
             if(!result.isEmpty())
                 return new ResponseData<>(HttpStatus.OK.value(),"Có movies",result);

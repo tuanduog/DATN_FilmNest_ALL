@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.entity;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,31 +10,30 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "comment_likes")
+@Table(name = "review")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment_likes extends BaseEntity {
+public class Review extends BaseEntity {
+
+    @Column(name = "point", nullable = false)
+    private Integer point;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    private Comments comment;
+    @JoinColumn(name = "movie_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Users user;
-
-    @Column(name = "is_like", nullable = false)
-    private Boolean is_like;
 
     @Column(name = "created_at", nullable = false)
     private Instant created_at;
 
-    @Column(name = "like_count", nullable = false)
-    private Integer likeCount;
-
-    @Column(name = "dislike_count", nullable = false)
-    private Integer dislikeCount;
+    @Column(name = "updated_at", nullable = false)
+    private Instant updated_at;
 }

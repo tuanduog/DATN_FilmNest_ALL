@@ -2,10 +2,8 @@ package com.booking.booking_ticket.controller;
 
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
-import com.booking.booking_ticket.entity.Movies;
-import com.booking.booking_ticket.entity.Rooms;
+import com.booking.booking_ticket.entity.Room;
 import com.booking.booking_ticket.service.Impl.RoomServiceImpl;
-import com.booking.booking_ticket.service.Impl.TheatersServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,7 +28,7 @@ public class RoomController {
     public ResponseData<?> getRoomByTheaterId(@RequestParam int theaterId)
     {
         try{
-            List<Rooms> result = roomService.getRoomByTheaterId(theaterId);
+            List<Room> result = roomService.getRoomByTheaterId(theaterId);
             System.out.println(result.size());
             if(!result.isEmpty())
                 return new ResponseData<>(HttpStatus.OK.value(),"Có phonòng",result);
