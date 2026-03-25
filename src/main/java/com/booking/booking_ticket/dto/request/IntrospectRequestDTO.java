@@ -10,7 +10,5 @@ import java.io.Serializable;
 @Builder
 public class IntrospectRequestDTO  implements Serializable {
 
-
     String token;
-
 }

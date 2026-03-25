@@ -1,18 +1,27 @@
 package com.booking.booking_ticket.dto;
 
 import com.booking.booking_ticket.utils.Role;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDTO {
-    private Integer userId;
-    private String username;
-    private String email;
-    private String phone;
-    private String membership;
-    private Role role;
+
+    Integer userId;
+
+    String username;
+
+    String email;
+
+    String phone;
+
+    String membership;
+
+    Role role;
 }

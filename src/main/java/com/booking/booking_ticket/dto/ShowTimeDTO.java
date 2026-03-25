@@ -3,14 +3,18 @@ package com.booking.booking_ticket.dto;
 import java.time.LocalTime;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShowTimeDTO {
-    private Integer showTimeId;
-    private LocalTime startTime;
-    private RoomDTO roomName;
+
+    Integer showTimeId;
+
+    LocalTime startTime;
+
+    RoomDTO roomName;
 }

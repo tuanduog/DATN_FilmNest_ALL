@@ -1,28 +1,22 @@
 package com.booking.booking_ticket.dto.request;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 import java.time.OffsetDateTime;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MembershipRequest {
-    private String vip;
-    private OffsetDateTime startDate;
-    private Integer expire;
 
-    public String getVip() {
-        return vip;
-    }
-    public void setVip(String vip) {
-        this.vip = vip;
-    }
-    public OffsetDateTime getStartDate() {
-        return startDate;
-    }
-    public void setStartDate(OffsetDateTime startDate) {
-        this.startDate = startDate;
-    }
-    public Integer getExpire() {
-        return expire;
-    }
-    public void setExpire(Integer expire) {
-        this.expire = expire;
-    }
+    String vip;
+
+    OffsetDateTime startDate;
+
+    Integer expire;
 }

@@ -17,11 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Booking {
-    @Id
-    @Column(name = "booking_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer bookingId;
+public class Booking extends BaseEntity {
 
     @Column(name = "chair", nullable = false)
     String chair;

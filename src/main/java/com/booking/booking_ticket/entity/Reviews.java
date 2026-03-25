@@ -16,12 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reviews {
-
-    @Id
-    @Column(name = "review_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer reviewId;
+public class Reviews extends BaseEntity {
 
     @Column(name = "point", nullable = false)
     private Integer point;
@@ -41,11 +36,4 @@ public class Reviews {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updated_at;
-
-
-
-
-
-
-
 }

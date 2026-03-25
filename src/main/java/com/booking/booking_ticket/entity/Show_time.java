@@ -19,12 +19,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // THÊM VÀO ĐÂY
-public class Show_time {
-
-    @Id
-    @Column(name = "showtime_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer showTimeId;
+public class Show_time extends BaseEntity {
 
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;

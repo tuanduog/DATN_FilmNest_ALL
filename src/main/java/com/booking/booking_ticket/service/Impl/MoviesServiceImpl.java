@@ -56,7 +56,7 @@ public class MoviesServiceImpl implements MoviesService {
                 v
         );
 
-        return v.getMovieId();
+        return v.getId();
     }
 
     @Override
@@ -75,7 +75,7 @@ public class MoviesServiceImpl implements MoviesService {
         m.setTrailerUrl(movieRequestDTO.getTrailerUrl());
         m.setCast(movieRequestDTO.getCast());
         moviesRepository.save(m);
-        return m.getMovieId();
+        return m.getId();
     }
 
     @Override
@@ -88,6 +88,4 @@ public class MoviesServiceImpl implements MoviesService {
     public List<MoviesWithRevenuesResponseDTO> getTopMovies() {
         return moviesRepository.topMovies();
     }
-
-
 }

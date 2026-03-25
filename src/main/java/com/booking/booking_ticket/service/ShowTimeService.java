@@ -35,17 +35,17 @@ public class ShowTimeService {
             Theaters theater = room.getTheater(); // ⚠ Nếu lazy, cần gọi đủ để nó load
 
             TheaterDTO theaterDTO = new TheaterDTO(
-                    theater.getTheaterId(),
+                    theater.getId(),
                     theater.getTheaterName(),
                     theater.getTheaterLocation());
 
             RoomDTO roomDTO = new RoomDTO(
-                    room.getRoomId(),
+                    room.getId(),
                     room.getRoomName(),
                     theaterDTO);
 
             return new ShowTimeDTO(
-                    show.getShowTimeId(),
+                    show.getId(),
                     show.getStartTime(),
                     roomDTO);
         }).toList();
@@ -65,7 +65,7 @@ public class ShowTimeService {
 
         showTimeRepository.save(show_time);
 
-        return show_time.getShowTimeId();
+        return show_time.getId();
     }
 
     public int editShowtime(int id, ShowTimeRequestDTO showTimeRequestDTO) {
@@ -74,7 +74,7 @@ public class ShowTimeService {
         show_time.setRoom(roomRepository.findById(showTimeRequestDTO.getRoomId()).get());
         show_time.setMovie(moviesRepository.findById(showTimeRequestDTO.getMovieId()).get());
         showTimeRepository.save(show_time);
-        return show_time.getShowTimeId();
+        return show_time.getId();
     }
 
     public int deleteMovie(int id) {

@@ -18,12 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Movies {
-
-    @Id
-    @Column(name = "movie_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer movieId;
+public class Movies extends BaseEntity {
 
     @Column(name = "image", nullable = false)
     private String image;
