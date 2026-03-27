@@ -32,13 +32,13 @@ function Homepage() {
     const [showChoseLocation, setShowChoseLocation] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState(""); // địa điểm đã chọn
     const [selectedTheater, setselectedTheater] = useState(""); // thông tin các rạp
-    const[theater, setTheater] = useState([]);
-    const[locations, setLocation] = useState([]);
+    const [theater, setTheater] = useState([]);
+    const [locations, setLocation] = useState([]);
     const handleCloseModal = () => {
         setShowModal1(false);
     }
     const handleOpenModal = (movie) => {
-        if(localStorage.getItem('theater') === null){
+        if (localStorage.getItem('theater') === null) {
             setShowChoseLocation(true);
             return;
         }
@@ -57,7 +57,7 @@ function Homepage() {
         setConfirmPopup(true);
     }
     const handleMovieDetails = (id) => {
-        navigate("/Movie_detail", { state : { id }});
+        navigate("/Movie_detail", { state: { id } });
     }
 
     const handleBooking = (movieInfo, date, time) => {
@@ -67,7 +67,7 @@ function Homepage() {
             movieInfo, date, time
         };
         localStorage.setItem('bookingInfo', JSON.stringify(bookingInfo));
-        if(!user){
+        if (!user) {
             navigate('/Login');
         } else {
             localStorage.removeItem('timeLeft');
@@ -78,21 +78,21 @@ function Homepage() {
     }
 
     const handleTheater = async (location) => {
-            const url = `http://localhost:8099/theaters/getTheaterByLocation?Location=${encodeURIComponent(location)}`;
-            try {
-                const res = await axios.get(url, {
-                    withCredentials: true
-                });
-                if (res.data.status === 200) {
-                    setTheater(res.data.data);
-                    // thông tin rạp
-                } else {
-                    setTheater([]);
-                }
-            } catch (err) {
+        const url = `http://localhost:8099/theaters/getTheaterByLocation?Location=${encodeURIComponent(location)}`;
+        try {
+            const res = await axios.get(url, {
+                withCredentials: true
+            });
+            if (res.data.status === 200) {
+                setTheater(res.data.data);
+                // thông tin rạp
+            } else {
                 setTheater([]);
-                console.error("Fetch theaters failed:", err);
             }
+        } catch (err) {
+            setTheater([]);
+            console.error("Fetch theaters failed:", err);
+        }
     };
     const handleLocations = async () => {
         try {
@@ -112,7 +112,7 @@ function Homepage() {
     };
 
     useEffect(() => {
-            handleLocations();
+        handleLocations();
     }, [location.pathname]);
 
     const generateAvailableShowDates = (releasedDateStr, numberOfDays) => {
@@ -128,8 +128,8 @@ function Homepage() {
         let count = 0;
         while (current <= endDate && count < 7) {
             const formatted = `${current.getDate().toString().padStart(2, '0')}/${(current.getMonth() + 1)
-            .toString()
-            .padStart(2, '0')}`;
+                .toString()
+                .padStart(2, '0')}`;
             showDates.push(formatted);
             current.setDate(current.getDate() + 1);
             count++;
@@ -139,26 +139,26 @@ function Homepage() {
     };
 
     const banners = [
-    {
-      id: 1,
-      url: banner1,
-    },
-    {
-      id: 2,
-      url: banner2,
-    },
-    {
-      id: 3,
-      url: banner3,
-    },
-    {
-        id: 4,
-        url: banner4,
-    }
-    ,{
-        id: 6,
-        url: banner6,
-    }
+        {
+            id: 1,
+            url: banner1,
+        },
+        {
+            id: 2,
+            url: banner2,
+        },
+        {
+            id: 3,
+            url: banner3,
+        },
+        {
+            id: 4,
+            url: banner4,
+        }
+        , {
+            id: 6,
+            url: banner6,
+        }
     ];
 
     const settings = {
@@ -177,15 +177,15 @@ function Homepage() {
 
             console.log(res.data);
             setShowTime(res.data);
-        } catch (error){
+        } catch (error) {
             console.error("Lỗi khi lấy phim", error);
         }
     }
     const fetchMovies = async () => {
         try {
             const res = await axios.get("http://localhost:8099/movie/getAll-movies");
-            const movies = res.data; 
-            
+            const movies = res.data;
+
             console.log(movies);
             console.log("API response type:", typeof res.data);
 
@@ -206,106 +206,104 @@ function Homepage() {
 
 
     return (
-        <div>
+        <div style={{ backgroundColor: '#fdfdfd', paddingBottom: '3rem' }}>
             {showChoseLocation && (
                 <div className={styles.overlay}>
                     <div className={styles.popup}>
                         {/* Nút đóng */}
                         <button className={styles.closeBtn} onClick={() => setShowChoseLocation(false)}>
-                        &times;
+                            &times;
                         </button>
 
                         {/* Nội dung */}
                         <div className={styles.content}>
-                        <div className={styles.formRow} style={{ marginBottom: '35px', marginLeft: '20px', marginRight: '20px' }}>
-                            <div className={styles.formGroup}>
-                            <label>Tỉnh/ Thành phố</label>
-                            <select
-                            style={{ fontSize: '14px'}}
-                            value={selectedLocation}
-                            onChange={e => {
-                                const loc = e.target.value;
-                                setSelectedLocation(loc);
-                                handleTheater(loc);
-                            }}
-                            >
-                                <option value="">Chọn Tỉnh/ Thành phố</option>
-                                {Array.isArray(locations) &&
-                                    locations.map((loc, idx) => (
-                                    <option key={idx} value={loc}>
-                                        {loc}
-                                    </option>
-                                    ))}
-                            </select>
+                            <h4 className="fw-bold mb-4 text-center">Chọn Khu Vực & Rạp</h4>
+                            <div className={styles.formRow}>
+                                <div className={styles.formGroup}>
+                                    <label>Tỉnh/ Thành phố</label>
+                                    <select
+                                        value={selectedLocation}
+                                        onChange={e => {
+                                            const loc = e.target.value;
+                                            setSelectedLocation(loc);
+                                            handleTheater(loc);
+                                        }}
+                                    >
+                                        <option value="">Chọn Tỉnh/ Thành phố</option>
+                                        {Array.isArray(locations) &&
+                                            locations.map((loc, idx) => (
+                                                <option key={idx} value={loc}>
+                                                    {loc}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+
+                                <div className={styles.formGroup}>
+                                    <label>Tên rạp</label>
+                                    <select
+                                        value={selectedTheater}
+                                        onChange={e => {
+                                            const selectedValue = e.target.value;
+                                            setselectedTheater(selectedValue);
+
+                                            const selectedObj = theater.find(t => t.theaterId.toString() === selectedValue);
+                                            if (selectedObj) {
+                                                localStorage.setItem('theater', JSON.stringify({
+                                                    theaterId: selectedObj.theaterId,
+                                                    theaterName: selectedObj.theaterName,
+                                                    theaterLocation: selectedObj.theaterLocation
+                                                }));
+                                                setShowChoseLocation(false);
+                                                window.location.reload();
+                                            }
+
+                                        }}>
+                                        <option value="">Chọn rạp</option>
+                                        {Array.isArray(theater) &&
+                                            theater.map((theaterItem, idx) => (
+                                                <option key={idx} value={theaterItem.theaterId}>
+                                                    {theaterItem.theaterName}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
                             </div>
-
-                            <div className={styles.formGroup}>
-                            <label>Tên rạp</label>
-                            <select style={{ fontSize: '14px' }}
-                            value={selectedTheater}
-                            onChange={e => {
-                                const selectedValue = e.target.value;
-                                setselectedTheater(selectedValue);
-
-                                const selectedObj = theater.find(t => t.theaterId.toString() === selectedValue);
-                                if(selectedObj){
-                                    localStorage.setItem('theater', JSON.stringify({
-                                        theaterId: selectedObj.theaterId,
-                                        theaterName: selectedObj.theaterName,
-                                        theaterLocation: selectedObj.theaterLocation
-                                    }));
-                                    setShowChoseLocation(false);
-                                    window.location.reload();
-                                }
-
-                            }}>
-                                <option value="">Chọn rạp</option>
-                                {Array.isArray(theater) &&
-                                theater.map((theaterItem, idx) => (
-                                    <option key={idx} value={theaterItem.theaterId}>
-                                    {theaterItem.theaterName}
-                                    </option>
-                                ))}
-                            </select>
-                            </div>
-                        </div>
                         </div>
                     </div>
                 </div>
             )}
             {showModal1 && (
-                <div className="modal-overlay" onClick={handleCloseModal}>
-                    <div className="modal-box p-4 rounded shadow" onClick={(e) => e.stopPropagation()}>
-                        <span className="close-btn fs-3" onClick={handleCloseModal}>&times;</span>
+                <div className={styles.overlay} onClick={handleCloseModal}>
+                    <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+                        <button className={styles.closeBtn} onClick={handleCloseModal}>&times;</button>
 
-                        <h3 className="text-uppercase text-center fw-bold mb-3" style={{ color: '#0d6efd' }}>
-                        LỊCH CHIẾU - {movieInfo.movieName}
+                        <h3 className="text-uppercase text-center fw-bold mb-2" style={{ color: '#0d6efd' }}>
+                            LỊCH CHIẾU - {movieInfo.movieName}
                         </h3>
 
-                        <h5 className="text-center mb-4 text-secondary">{savedTheater.theaterName}</h5>
+                        <h6 className="text-center mb-4 text-secondary fw-semibold">{savedTheater.theaterName}</h6>
 
-                        <div className="date-list d-flex justify-content-center gap-2 flex-wrap mb-4">
-                        {showDates.map((dateStr, i) => (
-                            <div
-                            key={i}
-                            onClick={() => {
-                                setSelectedIndex(i);
-                                setSelectedDate(dateStr);
-                            }}
-                            className={`date-item px-3 py-2 rounded ${i === selectedIndex ? 'bg-primary text-white' : 'bg-light text-dark'}`}
-                            style={{ cursor: 'pointer', minWidth: '60px', textAlign: 'center' }}
-                            >
-                            {dateStr}
-                            </div>
-                        ))}
+                        <div className="d-flex justify-content-center gap-2 flex-wrap mb-4">
+                            {showDates.map((dateStr, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => {
+                                        setSelectedIndex(i);
+                                        setSelectedDate(dateStr);
+                                    }}
+                                    className={`${styles.dateItem} px-3 py-2 rounded ${i === selectedIndex ? styles.activeDate : 'text-dark'}`}
+                                >
+                                    {dateStr}
+                                </div>
+                            ))}
                         </div>
 
+                        <h6 className="text-uppercase fw-bold mb-3 text-muted text-center" style={{ letterSpacing: '1px' }}>2D Phụ Đề</h6>
 
-                        <h6 className="text-uppercase fw-bold mb-3 text-muted text-center">2D Phụ Đề</h6>
-
-                        <div className="showtimes d-flex flex-wrap gap-3 justify-content-center">
+                        <div className="d-flex flex-wrap gap-3 justify-content-center">
                             {showTime.length === 0 ? (
-                                <div>Không có lịch chiếu</div>
+                                <div className="text-muted fst-italic">Không có lịch chiếu</div>
                             ) : (
                                 showTime.map((time, index) => (
                                     <div
@@ -316,10 +314,10 @@ function Homepage() {
                                             setSelectedTime(time);
                                         }}
                                     >
-                                        <div className="time fw-bold fs-5 mb-1">
-                                            {time.startTime.slice(0, 5)} {/* Format HH:mm */}
+                                        <div className="fw-bold fs-5 mb-1" style={{ color: '#1a1a1a' }}>
+                                            {time.startTime.slice(0, 5)}
                                         </div>
-                                        <div className="seats text-muted" style={{fontSize: '13px'}}>91 ghế ngồi</div>
+                                        <div className="seats text-secondary" style={{ fontSize: '12px', fontWeight: '500' }}>91 ghế ngồi</div>
                                     </div>
                                 ))
                             )}
@@ -328,61 +326,62 @@ function Homepage() {
                 </div>
             )}
             {confirmPopup && (
-            <div className="modal-overlay" onClick={handleCloseConfirm}>
-                <div className="modal-box p-4 rounded shadow" onClick={(e) => e.stopPropagation()}>
-                    <span className="close-btn fs-3" onClick={handleCloseConfirm}>&times;</span>
+                <div className={styles.overlay} onClick={handleCloseConfirm}>
+                    <div className={styles.popup} style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+                        <button className={styles.closeBtn} onClick={handleCloseConfirm}>&times;</button>
 
-                    <h5 className="text-center text-uppercase mt-3 mb-2 text-muted">
-                    Bạn đang đặt vé xem phim
-                    </h5>
-                    <h3 className="text-center text-primary fw-bold mb-4">
-                    {movieInfo.movieName || "Tên phim"}
-                    </h3>
+                        <h6 className="text-center text-uppercase mt-2 mb-2 text-muted fw-bold" style={{ letterSpacing: '0.5px' }}>
+                            Xác nhận đặt vé
+                        </h6>
+                        <h4 className="text-center text-primary fw-bold mb-4">
+                            {movieInfo.movieName || "Tên phim"}
+                        </h4>
 
-                    <table className="table table-bordered text-center align-middle shadow-sm mb-4">
-                    <thead className="table-light">
-                        <tr>
-                        <th>Rạp chiếu</th>
-                        <th>Ngày chiếu</th>
-                        <th>Giờ chiếu</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                        <td><strong>{savedTheater.theaterName}</strong></td>
-                        <td><strong>{selectedDate}/2025</strong></td>
-                        <td><strong>{selectedTime.startTime.slice(0, 5)}</strong></td>
-                        </tr>
-                    </tbody>
-                    </table>
+                        <div className="table-responsive rounded shadow-sm mb-4 border">
+                            <table className="table table-hover text-center align-middle mb-0">
+                                <thead className={styles.tableHeader}>
+                                    <tr>
+                                        <th className="py-3">Rạp chiếu</th>
+                                        <th className="py-3">Ngày chiếu</th>
+                                        <th className="py-3">Giờ chiếu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td className="py-3 text-dark fw-bold">{savedTheater.theaterName}</td>
+                                        <td className="py-3 text-dark fw-bold">{selectedDate}/2025</td>
+                                        <td className="py-3 text-primary fw-bold">{selectedTime.startTime.slice(0, 5)}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-                    <div className="text-center">
-                    <button
-                        className="btn btn-success px-5 py-2 fw-bold"
-                        onClick={() => handleBooking(movieInfo, selectedDate, selectedTime)}
-                    >
-                        ĐỒNG Ý
-                    </button>
+                        <div className="text-center">
+                            <button
+                                className={`btn btn-success px-5 py-2 w-100 ${styles.btnBook}`}
+                                onClick={() => handleBooking(movieInfo, selectedDate, selectedTime)}
+                            >
+                                ĐỒNG Ý
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
             )}
             <div className={styles.banner}>
-            <Slider {...settings}>
-                {banners.map((item) => (
-                <div key={item.id}>
-                    <img
-                    src={item.url}
-                    alt={`Banner ${item.id}`}
-                    className="img-fluid w-100"
-                    />
-                </div>
-                ))}
-            </Slider>
+                <Slider {...settings}>
+                    {banners.map((item) => (
+                        <div key={item.id} style={{ outline: 'none' }}>
+                            <img
+                                src={item.url}
+                                alt={`Banner ${item.id}`}
+                            />
+                        </div>
+                    ))}
+                </Slider>
             </div>
 
-            <div className="container mt-5">
-                <div className={styles['tab-wrapper']}>
+            <div className="container-fluid px-3 px-md-5 mt-4">
+                <div className={styles.tabWrapper}>
                     <div
                         className={`${styles.tab} ${nowShowing ? styles.active : ''}`}
                         onClick={() => setNowShowing(true)}
@@ -398,92 +397,64 @@ function Homepage() {
                 </div>
 
                 {nowShowing ? (
-                    <div className="row d-flex justify-content-center" style={{ maxWidth: '1400px', gap: '24px'}}>
-                    {showingNow.map((movie) => (
-                        <div className="col-md-2 mb-4" key={movie.movieId}>
-                            <div
-                                className="card h-100 shadow-sm border-0"
-                                style={{
-                                borderRadius: '12px',
-                                overflow: 'hidden',
-                                transition: 'transform 0.3s ease',
-                                }}
-                            >
-                                <img
-                                src={movie.image}
-                                className="card-img-top"
-                                alt={movie.movieName}
-                                style={{
-                                    height: '320px',
-                                    objectFit: 'cover',
-                                    borderRadius: '12px',
-                                    cursor: 'pointer'
-                                }}
-                                onClick={() => handleMovieDetails(movie.movieId)}
-                                />
-                                <div className="card-body px-3 py-2 ps-0 pe-0">
-                                <h6 className={`card-title pb-2 fw-bold ${styles.ellipsis} `} style={{color: '#0d6efd', cursor: 'pointer'}} onClick={() => handleMovieDetails(movie.movieId)}>
-                                    {movie.movieName}
-                                </h6>
-                                <p className={`mb-1 ${styles.ellipsis}`} style={{ fontSize: '14px' }}>
-                                    <strong>Thể loại:</strong> {movie.genre}
-                                </p>
-                                <p className={`mb-2 ${styles.ellipsis}`} style={{ fontSize: '14px' }}>
-                                    <strong>Thời lượng:</strong> {movie.duration}
-                                </p>
-                                <button className="btn btn-primary btn-sm w-100 rounded" onClick={() => handleOpenModal(movie)}>
-                                    Đặt vé
-                                </button>
+                    <div className="row g-4 justify-content-center mx-auto" style={{ maxWidth: '1440px' }}>
+                        {showingNow.map((movie) => (
+                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={movie.movieId}>
+                                <div className={styles.movieCard}>
+                                    <img
+                                        src={movie.image}
+                                        alt={movie.movieName}
+                                        onClick={() => handleMovieDetails(movie.movieId)}
+                                    />
+                                    <div className={styles.cardBody}>
+                                        <h6 className={`${styles.cardTitleCustom} ${styles.ellipsis}`} onClick={() => handleMovieDetails(movie.movieId)} title={movie.movieName}>
+                                            {movie.movieName}
+                                        </h6>
+                                        <p className={`mb-1 text-secondary ${styles.ellipsis}`} style={{ fontSize: '13.5px' }}>
+                                            <span className="fw-semibold">Thể loại:</span> {movie.genre}
+                                        </p>
+                                        <p className={`mb-3 text-secondary ${styles.ellipsis}`} style={{ fontSize: '13.5px' }}>
+                                            <span className="fw-semibold">Thời lượng:</span> {movie.duration}
+                                        </p>
+                                        <button className={`btn btn-primary w-100 ${styles.btnBook}`} onClick={() => handleOpenModal(movie)}>
+                                            Đặt vé
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                     </div>
-                ): (
-                    <div className="row d-flex justify-content-center" style={{ maxWidth: '1400px', gap: '24px' }}>
-                    {commingSoon.map((movie) => (
-                        <div className="col-md-2 mb-4" key={movie.movieId}>
-                            <div
-                                className="card h-100 shadow-sm border-0"
-                                style={{
-                                borderRadius: '12px',
-                                overflow: 'hidden',
-                                transition: 'transform 0.3s ease',
-                                }}
-                            >
-                                <img
-                                src={movie.image}
-                                className="card-img-top"
-                                alt={movie.movieName}
-                                style={{
-                                    height: '300px',
-                                    objectFit: 'cover',
-                                    borderRadius: '12px',
-                                    cursor: 'pointer'
-                                }}
-                                onClick={() => handleMovieDetails(movie.movieId)}
-                                />
-                                <div className="card-body px-3 py-2 pe-0 ps-0" style={{ minWidth: 0 }}>
-                                <h6 className={`card-title pb-2 fw-bold ${styles.ellipsis} `} style={{color: '#0d6efd', cursor: 'pointer'}} onClick={() => handleMovieDetails(movie.movieId)}>
-                                    {movie.movieName}
-                                </h6>
-                                <p className={`mb-1 ${styles.ellipsis}`} style={{ fontSize: '14px' }}>
-                                    <strong>Thể loại:</strong> {movie.genre}
-                                </p>
-                                <p className={`mb-2 ${styles.ellipsis}`} style={{ fontSize: '14px' }}>
-                                    <strong>Ngày khởi chiếu:</strong> {new Date(movie.releaseDate).toLocaleDateString("vi-VN", {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric'
-                                    })}
-                                </p>
-                                <button className="btn btn-primary btn-sm w-100 rounded" onClick={() => handleOpenModal(movie)}>
-                                    Đặt vé
-                                </button>
+                ) : (
+                    <div className="row g-4 justify-content-center mx-auto" style={{ maxWidth: '1440px' }}>
+                        {commingSoon.map((movie) => (
+                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={movie.movieId}>
+                                <div className={styles.movieCard}>
+                                    <img
+                                        src={movie.image}
+                                        alt={movie.movieName}
+                                        onClick={() => handleMovieDetails(movie.movieId)}
+                                    />
+                                    <div className={styles.cardBody}>
+                                        <h6 className={`${styles.cardTitleCustom} ${styles.ellipsis}`} onClick={() => handleMovieDetails(movie.movieId)} title={movie.movieName}>
+                                            {movie.movieName}
+                                        </h6>
+                                        <p className={`mb-1 text-secondary ${styles.ellipsis}`} style={{ fontSize: '13.5px' }}>
+                                            <span className="fw-semibold">Thể loại:</span> {movie.genre}
+                                        </p>
+                                        <p className={`mb-3 text-secondary ${styles.ellipsis}`} style={{ fontSize: '13.5px' }}>
+                                            <span className="fw-semibold">Khởi chiếu:</span> {new Date(movie.releaseDate).toLocaleDateString("vi-VN", {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric'
+                                            })}
+                                        </p>
+                                        <button className={`btn btn-primary w-100 ${styles.btnBook}`} onClick={() => handleOpenModal(movie)}>
+                                            Đặt vé
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                     </div>
                 )}
             </div>

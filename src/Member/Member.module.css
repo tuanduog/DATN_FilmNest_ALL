@@ -2,258 +2,390 @@
 .container {
   text-align: center;
   padding: 60px 20px;
-  background: linear-gradient(135deg, #f0f4f9 0%, #ffffff 70%);
-  min-height: 100vh;
-  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 150px);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .title {
-  font-size: 2.5rem;
-  margin-bottom: 32px;
-  font-weight: 700;
-  color: #1f2d3a;
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  font-weight: 800;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 50px;
 }
 
 .cardContainer {
   display: flex;
   justify-content: center;
-  gap: 32px;
+  align-items: center;
+  gap: 40px;
   flex-wrap: wrap;
-  max-width: 1100px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 .card {
   position: relative;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 28px 22px 34px;
-  width: 300px;
-  box-shadow: 0 16px 40px -5px rgba(31, 45, 58, 0.15);
-  transition: transform .35s ease, box-shadow .35s ease;
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 30px;
+  width: 360px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
+  border: 1px solid #eaeaea;
 }
 
 .card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 24px 50px -5px rgba(31, 45, 58, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.vipMonth {
+  background: linear-gradient(145deg, #ffffff, #f0f4f8);
+  border-top: 4px solid #0d6efd;
+}
+
+.vipYear {
+  background: linear-gradient(145deg, #1f2123, #2f3236);
+  color: #fff;
+  border-top: 4px solid #f5b041;
+  transform: scale(1.05);
+  /* slightly larger to emphasize */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.vipYear:hover {
+  transform: scale(1.05) translateY(-8px);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
 }
 
 .name {
-  font-size: 1.6rem;
-  margin-bottom: 8px;
+  font-size: 1.4rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+}
+
+.vipMonth .name {
+  color: #0d6efd;
+}
+
+.vipYear .name {
+  color: #f5b041;
 }
 
 .price {
-  font-size: 1.1rem;
-  margin: 6px 0 16px;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.priceCurrency {
+  font-size: 1.2rem;
   font-weight: 600;
+}
+
+.vipMonth .price {
+  color: #111;
+}
+
+.vipYear .price {
+  color: #fff;
+}
+
+.duration {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+.vipYear .duration {
+  color: #bbb;
 }
 
 .benefitList {
   list-style: none;
   padding: 0;
-  margin: 0 0 22px;
+  margin: 0 0 35px;
   text-align: left;
-  line-height: 1.5;
-  font-size: .95rem;
-  color: #4e5d6c;
-}
-
-.benefitList li {
-  margin-bottom: 8px;
-  position: relative;
-  padding-left: 22px;
-}
-
-.benefitList li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #10b981;
-  font-weight: bold;
+  line-height: 1.6;
   font-size: 1rem;
-  line-height: 1;
-}
-
-.buttonWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 80px; /* Giữ nút luôn ở cùng vị trí */
-  justify-content: flex-start;
-}
-
-.buttonWrapper p {
-  padding-top: 8px;
-  font-size: 14px;
-}
-
-.subscribeBtn {
-  background: linear-gradient(135deg, #ff6b6b, #ff4757);
-  color: white;
-  border: none;
-  padding: 12px 28px;
-  font-size: 1rem;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  letter-spacing: .5px;
-  position: relative;
-  overflow: hidden;
-  transition: transform .25s ease, box-shadow .25s ease;
-}
-
-.disabled {
-  background-color: gray !important;
-  cursor: not-allowed !important;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.subscribeBtn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 28px -4px rgba(255, 71, 87, 0.6);
-}
-
-/* VIP Tháng - blue/purple glow */
-.vipMonth {
-  background: linear-gradient(135deg, #5f9df7 0%, #9b8cff 100%);
-  color: white;
-  border: 2px solid rgba(255,255,255,0.4);
-  box-shadow: 0 0 25px rgba(95,157,247,0.6), 0 10px 30px rgba(155,140,255,0.3);
-  animation: pulseMonth 3s ease-in-out infinite alternate;
-}
-
-.vipMonth .name {
-  color: #fff;
-}
-
-.vipMonth .price {
-  color: #dbe9ff;
+  flex-grow: 1;
 }
 
 .vipMonth .benefitList {
-  color: #eef3fb;
-}
-
-@keyframes pulseMonth {
-  from {
-    box-shadow: 0 0 20px rgba(95,157,247,0.5), 0 0 35px rgba(155,140,255,0.4);
-  }
-  to {
-    box-shadow: 0 0 35px rgba(95,157,247,0.8), 0 0 50px rgba(155,140,255,0.6);
-  }
-}
-
-/* VIP Năm - rực rỡ, best value ribbon */
-.vipYear {
-  background: linear-gradient(135deg, #ff9f43 0%, #f368e0 100%);
-  color: white;
-  border: 2px solid #fff;
-  box-shadow: 0 0 35px rgba(255,165,0,0.6), 0 15px 45px rgba(243,104,224,0.3);
-  animation: glowYear 2.5s ease-in-out infinite alternate;
-}
-
-.vipYear .name {
-  color: #fff;
-}
-
-.vipYear .price {
-  color: #fff9d1;
+  color: #444;
 }
 
 .vipYear .benefitList {
-  color: #ffecec;
+  color: #e0e0e0;
 }
 
-@keyframes glowYear {
-  from {
-    box-shadow: 0 0 20px rgba(255,165,0,0.6), 0 0 30px rgba(243,104,224,0.5);
-  }
-  to {
-    box-shadow: 0 0 40px rgba(255,165,0,0.9), 0 0 50px rgba(243,104,224,0.7);
-  }
+.benefitList li {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.checkIcon {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.vipMonth .checkIcon {
+  color: #0d6efd;
+}
+
+.vipYear .checkIcon {
+  color: #f5b041;
+}
+
+.buttonWrapper {
+  margin-top: auto;
+}
+
+.subscribeBtn {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.vipMonth .subscribeBtn {
+  background-color: #e7f1ff;
+  color: #0d6efd;
+}
+
+.vipMonth .subscribeBtn:hover:not(.disabled) {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.vipYear .subscribeBtn {
+  background-color: #f5b041;
+  color: #111;
+}
+
+.vipYear .subscribeBtn:hover:not(.disabled) {
+  background-color: #d4ac0d;
+  color: #111;
+}
+
+.disabled {
+  background-color: #e0e0e0 !important;
+  color: #999 !important;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.statusText {
+  margin-top: 15px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.vipMonth .statusText {
+  color: #0d6efd;
+}
+
+.vipYear .statusText {
+  color: #f5b041;
 }
 
 /* Ribbon Best Value */
-.vipYear::before {
-  content: "BEST VALUE";
+.ribbon {
   position: absolute;
-  top: -6px;
-  right: -48px;
-  background: #fff;
-  color: #f368e0;
-  font-size: 0.55rem;
-  font-weight: 700;
-  padding: 6px 60px;
+  top: 25px;
+  right: -35px;
+  background: #f5b041;
+  color: #111;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 40px;
   transform: rotate(45deg);
   letter-spacing: 1px;
-  border-radius: 4px;
-  box-shadow: 0 6px 20px rgba(243,104,224,0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
 }
 
+/* Modal and Overlays */
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1050;
+  animation: fadeIn 0.3s ease;
 }
 
 .confirmBox {
   background: white;
-  padding: 24px;
-  border-radius: 10px;
+  padding: 35px 30px;
+  border-radius: 16px;
   width: 650px;
-  max-width: 90%;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  max-width: 95%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+  text-align: left;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirmBox h4 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.confirmBox p {
+  color: #555;
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.05rem;
 }
 
 .terms {
-  margin-top: 16px;
-  font-size: 14px;
+  background: #f8f9fa;
+  border: 1px solid #eaeaea;
+  padding: 20px;
+  border-radius: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.terms ul {
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+.terms li {
+  margin-bottom: 8px;
+}
+
+.agreeContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #111;
+}
+
+.agreeContainer input {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .buttonGroup {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  justify-content: center;
+  gap: 15px;
 }
 
+.cancelBtn,
 .confirmBtn {
-  padding: 6px 12px;
-  background-color: #0d6efd;
-  color: white;
-  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
-  border-radius: 4px;
-}
-
-.confirmBtn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  transition: all 0.2s ease;
+  border: none;
 }
 
 .cancelBtn {
-  padding: 6px 12px;
-  background-color: #dc3545;
+  background-color: #f1f3f5;
+  color: #333;
+}
+
+.cancelBtn:hover {
+  background-color: #e9ecef;
+}
+
+.confirmBtn {
+  background-color: #0d6efd;
   color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
+}
+
+.confirmBtn:hover:not(:disabled) {
+  background-color: #0b5ed7;
+}
+
+.confirmBtn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .cardContainer {
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+  }
+
+  .vipYear {
+    transform: scale(1);
+  }
+
+  .vipYear:hover {
+    transform: translateY(-5px);
+  }
 }

@@ -4,11 +4,11 @@ import styles from "../Footer/Footer.module.css";
 
 function Footer() {
   return (
-    <footer className="text-dark mt-5 pt-4 pb-3 px-3 shadow" style={{backgroundColor: '#e4e4e4ff', borderTop: '1px solid black'}}>
+    <footer className="text-dark pt-4 pb-3 px-3 shadow" style={{ backgroundColor: '#e4e4e4ff', borderTop: '1px solid black' }}>
       <div className="container">
         <div className="row">
           <div className="col-12 col-md-10 mx-auto">
-            <div className="row text-start mt-3" style={{paddingLeft: '130px'}}>
+            <div className="row text-start mt-3" style={{ paddingLeft: '130px' }}>
               {/* Cột trái */}
               <div className="col-md-6 mb-4 ps-md-5">
                 <h5 className={styles.footerTitle}>🎬 LUCKY CINEMA</h5>
@@ -19,7 +19,7 @@ function Footer() {
               </div>
 
               {/* Cột phải */}
-              <div className="col-md-6 mb-4" style={{paddingLeft: '90px'}}>
+              <div className="col-md-6 mb-4" style={{ paddingLeft: '90px' }}>
                 <h5 className={styles.footerTitle}>Liên kết & Mạng xã hội</h5>
                 <div className="mb-3">
                   <a href="" className={styles.linkHoverEffect}>Điều khoản</a>
@@ -30,10 +30,10 @@ function Footer() {
                   <a href="" className={styles.socialIcon}>
                     <i className="fab fa-facebook-f"></i>
                   </a>
-                  <a href=""  className={styles.socialIcon}>
+                  <a href="" className={styles.socialIcon}>
                     <i className="fab fa-instagram"></i>
                   </a>
-                  <a href=""  className={styles.socialIcon}>
+                  <a href="" className={styles.socialIcon}>
                     <i className="fab fa-youtube"></i>
                   </a>
                 </div>

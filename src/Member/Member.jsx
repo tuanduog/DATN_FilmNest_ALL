@@ -88,61 +88,61 @@ function Member() {
   };
 
   const fetchMember = async () => {
-        try {
-            const res = await axios.get(`http://localhost:8099/auth/get-Membership/${user.userId}`, 
-                { withCredentials: true}
-            )
-            setMembership(res.data.membership);
-            setStartDate(res.data.startDate);
-            setTotalDay(res.data.expired);
-        } catch (error) {   
-            console.error("Khong lay duoc membership", error);
-        }
+    try {
+      const res = await axios.get(`http://localhost:8099/auth/get-Membership/${user.userId}`,
+        { withCredentials: true }
+      )
+      setMembership(res.data.membership);
+      setStartDate(res.data.startDate);
+      setTotalDay(res.data.expired);
+    } catch (error) {
+      console.error("Khong lay duoc membership", error);
     }
+  }
 
-    useEffect(() => {
-        if(user){
-            fetchMember();
-        }
-    },[user]);
+  useEffect(() => {
+    if (user) {
+      fetchMember();
+    }
+  }, [user]);
 
-    useEffect(() => {
-      if(startDate && totalDay){
-        const today = new Date();
-        const start = new Date(startDate);
-        const passDay = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-        const dayLeft = totalDay - passDay;
+  useEffect(() => {
+    if (startDate && totalDay) {
+      const today = new Date();
+      const start = new Date(startDate);
+      const passDay = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+      const dayLeft = totalDay - passDay;
 
-          if(dayLeft <= 0){
-            setMembership("no membership");
-            
-            axios.put(`http://localhost:8099/auth/update-Membership/${user.userId}`,
-            {
-              vip: 'no membership',
-              startDate: null,
-              expired: null
-            }, { withCredentials: true})
-            .then(() => {
-              console.log("Cập nhật trạng thái membership về no membership");
-            })
-            .catch((error) => {
-              console.error("Lỗi cập nhật membership:", error);
-            });
+      if (dayLeft <= 0) {
+        setMembership("no membership");
 
-          } else {
-            setDayLeft(dayLeft); 
-          }
-        }
-      },[startDate])
+        axios.put(`http://localhost:8099/auth/update-Membership/${user.userId}`,
+          {
+            vip: 'no membership',
+            startDate: null,
+            expired: null
+          }, { withCredentials: true })
+          .then(() => {
+            console.log("Cập nhật trạng thái membership về no membership");
+          })
+          .catch((error) => {
+            console.error("Lỗi cập nhật membership:", error);
+          });
+
+      } else {
+        setDayLeft(dayLeft);
+      }
+    }
+  }, [startDate])
 
   useEffect(() => {
     const updateMembership = async () => {
-      if(status === "PAID" && cancel === "false" && code === "00"){
+      if (status === "PAID" && cancel === "false" && code === "00") {
         try {
           const member = JSON.parse(localStorage.getItem('member'));
-          const res = await axios.put(`http://localhost:8099/auth/update-Membership/${user.userId}`, 
+          const res = await axios.put(`http://localhost:8099/auth/update-Membership/${user.userId}`,
             member,
-          {withCredentials: true}
+            { withCredentials: true }
           )
           console.log(res.data);
           toast.success(`Đăng ký gói ${member.vip} thành công`);
@@ -152,57 +152,63 @@ function Member() {
       }
     }
     updateMembership();
-  },[]);
+  }, []);
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title} style={{ paddingBottom: "5px" }}>
-        Các gói hội viên
+      <h2 className={styles.title}>
+        TRỞ THÀNH HỘI VIÊN
       </h2>
+      <p className={styles.subtitle}>Tận hưởng trọn vẹn đặc quyền dành riêng cho bạn</p>
       <div className={styles.cardContainer}>
         {/* Gói VIP Tháng */}
         <div className={`${styles.card} ${styles.vipMonth}`}>
-          <h3 className={styles.name}>Gói VIP Tháng</h3>
-          <p className={styles.price}>99.000đ/30 ngày</p>
+          <h3 className={styles.name}>THÀNH VIÊN BẠC</h3>
+          <p className={styles.price}>99.000<span className={styles.priceCurrency}>đ</span></p>
+          <p className={styles.duration}>/ 30 ngày</p>
           <ul className={styles.benefitList}>
-            <li>✓ Xem không giới hạn</li>
-            <li>✓ Ưu tiên đặt vé</li>
-            <li>✓ Combo bắp nước giảm 15%</li>
+            <li><span className={styles.checkIcon}>✓</span> Xem không giới hạn phim 2D</li>
+            <li><span className={styles.checkIcon}>✓</span> Quầy thanh toán ưu tiên</li>
+            <li><span className={styles.checkIcon}>✓</span> Giảm 15% khi mua bắp nước</li>
+            <li><span className={styles.checkIcon}>✓</span> Tích luỹ điểm thưởng</li>
           </ul>
           <div className={styles.buttonWrapper}>
-          <button
-            className={`${styles.subscribeBtn} ${membership === "vip tháng" ? styles.disabled : ""}`}
-            onClick={membership === "vip tháng" ? null : handleVipThang}
-            disabled={membership === "vip tháng"}
-            style={{display: 'inline'}}
-          >
-            Đăng ký
-          </button>
-          {membership === "vip tháng" && <p>Còn {dayLeft} ngày</p>}
-        </div>
+            <button
+              className={`${styles.subscribeBtn} ${membership === "vip tháng" ? styles.disabled : ""}`}
+              onClick={membership === "vip tháng" ? null : handleVipThang}
+              disabled={membership === "vip tháng"}
+              style={{ display: 'inline' }}
+            >
+              Đăng ký
+            </button>
+            {membership === "vip tháng" && <p>Còn {dayLeft} ngày</p>}
+          </div>
         </div>
 
         {/* Gói VIP Năm */}
         <div className={`${styles.card} ${styles.vipYear}`}>
-          <h3 className={styles.name}>Gói VIP Năm</h3>
-          <p className={styles.price}>899.000đ/365 ngày</p>
+          <div className={styles.ribbon}>Đáng giá nhất</div>
+          <h3 className={styles.name}>THÀNH VIÊN VIP</h3>
+          <p className={styles.price}>899.000<span className={styles.priceCurrency}>đ</span></p>
+          <p className={styles.duration}>/ 365 ngày</p>
           <ul className={styles.benefitList}>
-            <li>✓ Tất cả quyền lợi VIP Tháng</li>
-            <li>✓ Miễn phí vé gửi xe 2 tháng</li>
-            <li>✓ Giảm 20% combo bắp nước</li>
-            <li>✓ Quà sinh nhật đặc biệt</li>
+            <li><span className={styles.checkIcon}>✓</span> Toàn quyền của Thành viên Bạc</li>
+            <li><span className={styles.checkIcon}>✓</span> Tặng 4 vé xem phim miễn phí 2D</li>
+            <li><span className={styles.checkIcon}>✓</span> Giảm 20% khi mua bắp nước</li>
+            <li><span className={styles.checkIcon}>✓</span> Quà tặng bất ngờ dịp sinh nhật</li>
+            <li><span className={styles.checkIcon}>✓</span> Trải nghiệm phòng chiếu cao cấp</li>
           </ul>
           <div className={styles.buttonWrapper}>
-          <button
-            className={`${styles.subscribeBtn} ${membership === "vip năm" ? styles.disabled : ""}`}
-            onClick={membership === "vip năm" ? null : handleVipNam}
-            disabled={membership === "vip năm"}
-            style={{display: 'inline'}}
-          >
-            Đăng ký
-          </button>
-          {membership === "vip năm" && <p>Còn {dayLeft} ngày</p>}
-        </div>
+            <button
+              className={`${styles.subscribeBtn} ${membership === "vip năm" ? styles.disabled : ""}`}
+              onClick={membership === "vip năm" ? null : handleVipNam}
+              disabled={membership === "vip năm"}
+              style={{ display: 'inline' }}
+            >
+              Đăng ký
+            </button>
+            {membership === "vip năm" && <p>Còn {dayLeft} ngày</p>}
+          </div>
         </div>
       </div>
 
@@ -250,13 +256,13 @@ function Member() {
                   Vui lòng đọc kỹ các điều khoản trên trước khi xác nhận. Bằng việc nhấn <strong>“Tôi đồng ý”</strong>, bạn xác nhận đã hiểu và chấp nhận toàn bộ điều kiện sử dụng dịch vụ.
                 </p>
               </div>
-              <label style={{display: 'flex', justifyContent: 'left'}}>
+              <label className={styles.agreeContainer}>
                 <input
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
                 />
-                <span style={{ marginLeft: "8px" }}>Tôi đồng ý với điều khoản dịch vụ</span>
+                Tôi đồng ý với điều khoản dịch vụ
               </label>
             </div>
             <div className={styles.buttonGroup}>

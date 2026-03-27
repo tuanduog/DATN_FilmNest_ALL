@@ -1,21 +1,36 @@
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 
 }
 
 .topblack {
-    height: 40px;
-    width: 100%;
-    background-color: black;
+  height: 40px;
+  width: 100%;
+  background-color: black;
 }
 
 .nav-link {
   transition: all 0.3s ease;
+  font-weight: 600;
 }
 
 .nav-link:hover {
-  color: #ff5722 !important;    /* đổi màu chữ khi hover */
+  color: #0d6efd !important;
+  /* đổi màu chữ khi hover */
+}
+
+.active-nav {
+  color: #0d6efd !important;
+  font-weight: 600;
+}
+
+.top-link {
+  transition: color 0.2s;
+}
+
+.top-link:hover {
+  color: #0d6efd !important;
 }
 
 .navbar-brand:hover {
@@ -28,7 +43,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
