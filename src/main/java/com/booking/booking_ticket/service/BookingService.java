@@ -1,27 +1,33 @@
 package com.booking.booking_ticket.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.booking.booking_ticket.dto.BookingDTO;
 import com.booking.booking_ticket.dto.BookingSimpleDTO;
-import com.booking.booking_ticket.entity.Booking;
-import com.booking.booking_ticket.repository.BookingRepository;
+import com.booking.booking_ticket.dto.response.BookingByCategoryStats;
+import com.booking.booking_ticket.dto.response.BookingResponse;
 
-@Service
-public class BookingService {
-    @Autowired
-    private BookingRepository bookingRepository;
+import java.util.List;
+import java.util.Map;
 
-    public List<BookingDTO> getUserBooking(Integer userId){
-        List<BookingDTO> bookings = bookingRepository.findBookingByUserId(userId);
-        return bookings;
-    }
+public interface BookingService {
 
-    public List<BookingSimpleDTO> getByShowTimeId (Integer showTimeId){
-        List<BookingSimpleDTO> bookingSimpleDTOs = bookingRepository.findBookingSimpleDTOByShowTimeId(showTimeId);
-        return bookingSimpleDTOs;
-    }
+    public List<BookingDTO> getUserBooking(Integer userId);
+
+    public List<BookingSimpleDTO> getByShowTimeId(Integer showTimeId);
+
+    public Double getRevenueThisMonth();
+
+    public Long getCustomersThisMonth();
+
+    public Long getCustomersThisyear();
+
+    public Double getRevenueThisYear();
+
+    Map<String, List<Number>> getMonthlyChartData(int year);
+
+    Map<String, List<Number>> getYearlyChartData(int month);
+
+    public List<BookingByCategoryStats> getBookingStatsByCategory();
+
+    public List<BookingResponse> getAllBookingResponses();
 }

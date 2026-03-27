@@ -4,9 +4,9 @@ import com.booking.booking_ticket.dto.request.MovieRequestDTO;
 import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO;
 import com.booking.booking_ticket.dto.response.PageResponse;
 import com.booking.booking_ticket.entity.Movie;
-import com.booking.booking_ticket.repository.MoviesRepository;
+import com.booking.booking_ticket.repository.MovieRepository;
 import com.booking.booking_ticket.repository.SearchRepository;
-import com.booking.booking_ticket.service.MoviesService;
+import com.booking.booking_ticket.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,21 +16,22 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MoviesServiceImpl implements MoviesService {
+public class MovieServiceImpl implements MovieService {
 
-    private final MoviesRepository moviesRepository;
+    private final MovieRepository movieRepository;
+
     private final SearchRepository searchRepository;
 
     @Override
     public List<String> getGenres() {
-        List<String> genres = moviesRepository.collectGenre().stream().toList();
+        List<String> genres = movieRepository.collectGenre().stream().toList();
 
         return genres;
     }
 
     @Override
     public List<Movie> getAllMovies() {
-        return moviesRepository.findAll();
+        return movieRepository.findAll();
     }
 
     @Override
@@ -52,14 +53,14 @@ public class MoviesServiceImpl implements MoviesService {
                 .releaseDate(movieRequestDTO.getReleaseDate())
                 .showing(movieRequestDTO.getShowing())
                 .build();
-        moviesRepository.save(v);
+        movieRepository.save(v);
 
         return v.getId();
     }
 
     @Override
     public int editMovie(int id, MovieRequestDTO movieRequestDTO) {
-        Movie m = moviesRepository.findById(id).get();
+        Movie m = movieRepository.findById(id).get();
 
         m.setMovieDescription(movieRequestDTO.getMovieDescription());
         m.setGenre(movieRequestDTO.getGenre());
@@ -72,18 +73,23 @@ public class MoviesServiceImpl implements MoviesService {
         m.setShowing(movieRequestDTO.getShowing());
         m.setTrailerUrl(movieRequestDTO.getTrailerUrl());
         m.setCast(movieRequestDTO.getCast());
-        moviesRepository.save(m);
+        movieRepository.save(m);
         return m.getId();
     }
 
     @Override
     public int deleteMovie(int id) {
-        moviesRepository.deleteById(id);
+        movieRepository.deleteById(id);
         return id;
     }
 
     @Override
     public List<MoviesWithRevenuesResponseDTO> getTopMovies() {
-        return moviesRepository.topMovies();
+        return movieRepository.topMovies();
+    }
+
+    @Override
+    public Movie getMovieById(int id) {
+        return movieRepository.findAllById(id);
     }
 }

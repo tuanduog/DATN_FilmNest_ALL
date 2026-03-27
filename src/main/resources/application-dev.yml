@@ -3,14 +3,13 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/film_nest?useSSL=false&serverTimezone=UTC}
-    username: ${MYSQL_USER:tuanduog}
-    password: ${MYSQL_PASSWORD:abc123!@#}
-
+    url: ${POSTGRESQL_URL:jdbc:postgresql://localhost:5432/filmnest}
+    username: ${POSTGRESQL_USER:film_nest}
+    password: ${POSTGRESQL_PASSWORD:abc123!@#}
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     hibernate:
       ddl-auto: update

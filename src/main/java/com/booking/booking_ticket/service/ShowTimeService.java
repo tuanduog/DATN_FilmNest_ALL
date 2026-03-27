@@ -1,88 +1,22 @@
 package com.booking.booking_ticket.service;
 
-import java.util.List;
-
+import com.booking.booking_ticket.dto.ShowTimeDTO;
 import com.booking.booking_ticket.dto.request.ShowTimeRequestDTO;
 import com.booking.booking_ticket.dto.response.ShowtimeResponse;
-import com.booking.booking_ticket.repository.MoviesRepository;
-import com.booking.booking_ticket.repository.RoomRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import com.booking.booking_ticket.dto.RoomDTO;
-import com.booking.booking_ticket.dto.ShowTimeDTO;
-import com.booking.booking_ticket.dto.TheaterDTO;
-import com.booking.booking_ticket.entity.Room;
-import com.booking.booking_ticket.entity.ShowTime;
-import com.booking.booking_ticket.entity.Theater;
-import com.booking.booking_ticket.repository.ShowTimeRepository;
+import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class ShowTimeService {
+public interface ShowTimeService {
 
-    private final ShowTimeRepository showTimeRepository;
+    public List<ShowTimeDTO> getByMovieId(int movieId);
 
-    private final MoviesRepository moviesRepository;
+    public List<ShowtimeResponse> getShowTime();
 
-    private final RoomRepository roomRepository;
+    public int addShowtime(ShowTimeRequestDTO showTimeRequestDTO);
 
-    public List<ShowTimeDTO> getByMovieId(int movieId) {
-        List<ShowTime> entities = showTimeRepository.findByMovie_Id(movieId);
+    public int editShowtime(int id, ShowTimeRequestDTO showTimeRequestDTO);
 
-        return entities.stream().map(show -> {
-            Room room = show.getRoom();
-            Theater theater = room.getTheater();
+    public int deleteMovie(int id);
 
-            TheaterDTO theaterDTO = new TheaterDTO(
-                    theater.getId(),
-                    theater.getName(),
-                    theater.getLocation());
-
-            RoomDTO roomDTO = new RoomDTO(
-                    room.getId(),
-                    room.getRoomName(),
-                    theaterDTO);
-
-            return new ShowTimeDTO(
-                    show.getId(),
-                    show.getStartTime(),
-                    roomDTO);
-        }).toList();
-    }
-
-    public List<ShowtimeResponse> getShowTime() {
-
-        return showTimeRepository.findAllShowtimes();
-    }
-
-    public int addShowtime(ShowTimeRequestDTO showTimeRequestDTO) {
-        ShowTime show_time = ShowTime.builder()
-                .startTime(showTimeRequestDTO.getStartTime())
-                .movie(moviesRepository.findById(showTimeRequestDTO.getMovieId()).get())
-                .room(roomRepository.findById(showTimeRequestDTO.getRoomId()).get())
-                .build();
-
-        showTimeRepository.save(show_time);
-
-        return show_time.getId();
-    }
-
-    public int editShowtime(int id, ShowTimeRequestDTO showTimeRequestDTO) {
-        ShowTime show_time = showTimeRepository.findById(id).get();
-        show_time.setStartTime(showTimeRequestDTO.getStartTime());
-        show_time.setRoom(roomRepository.findById(showTimeRequestDTO.getRoomId()).get());
-        show_time.setMovie(moviesRepository.findById(showTimeRequestDTO.getMovieId()).get());
-        showTimeRepository.save(show_time);
-        return show_time.getId();
-    }
-
-    public int deleteMovie(int id) {
-        showTimeRepository.deleteById(id);
-        return id;
-    }
-    public List<ShowtimeResponse> getShowtimeByRoomId(int id){
-        return showTimeRepository.findShow_timeByRooms(id);
-    }
-
+    public List<ShowtimeResponse> getShowtimeByRoomId(int id);
 }

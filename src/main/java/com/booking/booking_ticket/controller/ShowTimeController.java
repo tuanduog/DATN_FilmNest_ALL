@@ -1,19 +1,16 @@
 package com.booking.booking_ticket.controller;
 
 import java.util.List;
-
 import com.booking.booking_ticket.dto.request.ShowTimeRequestDTO;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
+import com.booking.booking_ticket.service.ShowTimeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.booking.booking_ticket.dto.ShowTimeDTO;
-import com.booking.booking_ticket.service.ShowTimeService;
-
 
 @RestController
 @RequestMapping("/auth")

@@ -1,22 +1,27 @@
 package com.booking.booking_ticket.service;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.booking.booking_ticket.dto.request.MovieRequestDTO;
+import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO;
+import com.booking.booking_ticket.dto.response.PageResponse;
 import com.booking.booking_ticket.entity.Movie;
-import com.booking.booking_ticket.repository.MovieRepository;
 
-@Service
-public class MovieService {
+import java.util.List;
 
-    @Autowired
-    private MovieRepository movieRepository;
+public interface MovieService {
 
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
-    }
+    List<String> getGenres();
 
-    public Movie getMovieById(int id) {
-        return movieRepository.findAllById(id);
-    }
+    List<Movie> getAllMovies();
+
+    PageResponse<?> getProductsWithMultipleSearchingColumns(int pageNo, int pageSize, String sortBy, String... search);
+
+    public int addMovie(MovieRequestDTO movieRequestDTO);
+
+    public int editMovie(int id, MovieRequestDTO movieRequestDTO);
+
+    public int deleteMovie(int id);
+
+    public List<MoviesWithRevenuesResponseDTO> getTopMovies();
+
+    public Movie getMovieById(int id);
 }
