@@ -2,14 +2,12 @@ package com.booking.booking_ticket.controller;
 
 import java.util.List;
 
+import com.booking.booking_ticket.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.booking.booking_ticket.dto.CommentDTO;
-import com.booking.booking_ticket.service.CommentService;
-
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -17,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/comments")
 public class CmtRestController {
+
     @Autowired
     private CommentService commentService;
 

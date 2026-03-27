@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties.Redis;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @CrossOrigin(origins = "http://localhost:5173")
 public class BookingController {
 
-    public final BookingServiceImpl bookingService;
-
-    private final BookingService bookingService1;
+    private final BookingService bookingService;
 
     private final BookingRepository bookingRepository;
 
@@ -105,7 +102,7 @@ public class BookingController {
     @GetMapping("/get-userbooking/{userId}")
     public ResponseEntity<?> getUserBooking(@PathVariable Integer userId) {
         try {
-            List<BookingDTO> bookings = bookingService1.getUserBooking(userId);
+            List<BookingDTO> bookings = bookingService.getUserBooking(userId);
             return ResponseEntity.ok(bookings);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -150,7 +147,6 @@ public class BookingController {
         return ResponseEntity.ok(chartData);
     }
 
-
     @GetMapping("/bookings-by-category")
     public ResponseEntity<List<Map<String, Object>>> getBookingStatsByCategory() {
         List<BookingByCategoryStats> stats = bookingService.getBookingStatsByCategory();
@@ -166,18 +162,15 @@ public class BookingController {
         return ResponseEntity.ok(result);
     }
 
-
     @GetMapping("/responses")
     public ResponseEntity<List<BookingResponse>> getAllBookingResponses() {
         return ResponseEntity.ok(bookingService.getAllBookingResponses());
     }
 
-
-
     @GetMapping("/get-byshowtime/{showTimeId}")
     public ResponseEntity<?> getBookingByShowTime(@PathVariable Integer showTimeId) {
         try {
-            List<BookingSimpleDTO> bookings = bookingService1.getByShowTimeId(showTimeId);
+            List<BookingSimpleDTO> bookings = bookingService.getByShowTimeId(showTimeId);
             return ResponseEntity.ok(bookings);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

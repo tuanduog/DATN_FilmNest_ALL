@@ -2,16 +2,17 @@ package com.booking.booking_ticket.controller;
 
 import java.util.List;
 
+import com.booking.booking_ticket.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.booking.booking_ticket.entity.Movie;
-import com.booking.booking_ticket.service.MovieService;
 
 @RestController
 @RequestMapping("/movie")
 @CrossOrigin(origins = "http://localhost:5173")
 public class MovieController {
+
     @Autowired
     private MovieService movieService;
 

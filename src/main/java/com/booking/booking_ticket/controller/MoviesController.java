@@ -6,7 +6,7 @@ import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.entity.Movie;
-import com.booking.booking_ticket.service.Impl.MoviesServiceImpl;
+import com.booking.booking_ticket.service.Impl.MovieServiceImpl;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/movies")
 public class MoviesController {
 
-    private final MoviesServiceImpl moviesService;
+    private final MovieServiceImpl moviesService;
 
 
     @GetMapping("/getGenres")

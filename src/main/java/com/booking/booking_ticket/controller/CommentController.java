@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.controller;
 
+import com.booking.booking_ticket.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Controller;
 
 import com.booking.booking_ticket.dto.CommentDTO;
 import com.booking.booking_ticket.entity.Comment;
-import com.booking.booking_ticket.service.CommentService;
 
 import lombok.extern.slf4j.Slf4j;
 

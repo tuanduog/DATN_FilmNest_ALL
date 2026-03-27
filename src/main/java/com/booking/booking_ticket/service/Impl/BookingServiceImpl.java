@@ -1,12 +1,13 @@
 package com.booking.booking_ticket.service.Impl;
 
+import com.booking.booking_ticket.dto.BookingDTO;
+import com.booking.booking_ticket.dto.BookingSimpleDTO;
 import com.booking.booking_ticket.dto.response.BookingByCategoryStats;
 import com.booking.booking_ticket.dto.response.BookingResponse;
 import com.booking.booking_ticket.repository.BookingRepository;
-import com.booking.booking_ticket.service.BookingsService;
+import com.booking.booking_ticket.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -17,9 +18,22 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BookingServiceImpl implements BookingsService {
+public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
+
+    @Override
+    public List<BookingDTO> getUserBooking(Integer userId){
+        List<BookingDTO> bookings = bookingRepository.findBookingByUserId(userId);
+        return bookings;
+    }
+
+    @Override
+    public List<BookingSimpleDTO> getByShowTimeId (Integer showTimeId){
+        List<BookingSimpleDTO> bookingSimpleDTOs = bookingRepository.findBookingSimpleDTOByShowTimeId(showTimeId);
+        return bookingSimpleDTOs;
+    }
+
     @Override
     public Double getRevenueThisMonth() {
         return bookingRepository.getCurrentMonthRevenue();
@@ -65,6 +79,7 @@ public class BookingServiceImpl implements BookingsService {
         data.put("revenues", Arrays.asList(revenues));
         return data;
     }
+
     @Override
     public Map<String, List<Number>> getYearlyChartData(int year) {
         List<Object[]> result = bookingRepository.findYearlyBookingStats(year);
@@ -90,9 +105,13 @@ public class BookingServiceImpl implements BookingsService {
         data.put("revenues", Arrays.asList(revenues));
         return data;
     }
+
+    @Override
     public List<BookingByCategoryStats> getBookingStatsByCategory() {
         return bookingRepository.countBookingsByMovieCategory();
     }
+
+    @Override
     public List<BookingResponse> getAllBookingResponses() {
         return bookingRepository.getAllBookingResponse();
     }
