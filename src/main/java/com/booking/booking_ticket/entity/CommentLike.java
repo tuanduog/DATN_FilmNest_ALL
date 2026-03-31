@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Table(name = "comment_like")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentLike extends BaseEntity {
@@ -27,9 +26,6 @@ public class CommentLike extends BaseEntity {
 
     @Column(name = "is_like", nullable = false)
     private Boolean is_like;
-
-    @Column(name = "created_at", nullable = false)
-    private Instant created_at;
 
     @Column(name = "like_count", nullable = false)
     private Integer likeCount;

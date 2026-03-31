@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Table(name = "user_membership")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsersMembership extends BaseEntity{

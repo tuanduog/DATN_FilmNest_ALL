@@ -10,11 +10,10 @@ import java.time.LocalDate;
 @Table(name = "employee")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Employee extends Users{
+public class Employee extends BaseEntity{
 
     @OneToOne
     @JoinColumn(name = "user_id")

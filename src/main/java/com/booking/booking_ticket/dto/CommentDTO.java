@@ -1,6 +1,6 @@
 package com.booking.booking_ticket.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class CommentDTO {
 
     Integer level;
 
-    LocalDateTime createdAt;
+    Instant createdAt;
 
     Integer movieId;
 

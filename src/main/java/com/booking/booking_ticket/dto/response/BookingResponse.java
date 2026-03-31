@@ -9,7 +9,10 @@ import lombok.Getter;
 public class BookingResponse {
 
         private String username;
+
         private Double totalPrice;
+
         private String movieName;
+
         private PaymentStatus paymentStatus;
 }

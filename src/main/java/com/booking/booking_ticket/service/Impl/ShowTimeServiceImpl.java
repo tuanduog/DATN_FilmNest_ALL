@@ -39,11 +39,13 @@ public class ShowTimeServiceImpl implements ShowTimeService {
             TheaterDTO theaterDTO = new TheaterDTO(
                     theater.getId(),
                     theater.getName(),
-                    theater.getLocation());
+                    theater.getAddress());
 
             RoomDTO roomDTO = new RoomDTO(
                     room.getId(),
-                    room.getRoomName(),
+                    room.getName(),
+                    room.getCapacity(),
+                    room.getType(),
                     theaterDTO);
 
             return new ShowTimeDTO(
@@ -60,15 +62,14 @@ public class ShowTimeServiceImpl implements ShowTimeService {
 
     @Override
     public int addShowtime(ShowTimeRequest showTimeRequest) {
-        ShowTime show_time = ShowTime.builder()
-                .startTime(showTimeRequest.getStartTime())
-                .movie(movieRepository.findById(showTimeRequest.getMovieId()).get())
-                .room(roomRepository.findById(showTimeRequest.getRoomId()).get())
-                .build();
+        ShowTime showTime = new ShowTime();
+        showTime.setStartTime(showTimeRequest.getStartTime());
+        showTime.setMovie(movieRepository.findById(showTimeRequest.getMovieId()).get());
+        showTime.setRoom(roomRepository.findById(showTimeRequest.getRoomId()).get());
 
-        showTimeRepository.save(show_time);
+        showTimeRepository.save(showTime);
 
-        return show_time.getId();
+        return showTime.getId();
     }
 
     @Override

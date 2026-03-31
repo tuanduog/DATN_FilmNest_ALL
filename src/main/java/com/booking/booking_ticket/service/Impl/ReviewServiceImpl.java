@@ -4,7 +4,7 @@ import com.booking.booking_ticket.entity.Movie;
 import com.booking.booking_ticket.entity.Review;
 import com.booking.booking_ticket.entity.Users;
 import com.booking.booking_ticket.repository.MovieRepository;
-import com.booking.booking_ticket.repository.ReviewsRepository;
+import com.booking.booking_ticket.repository.ReviewRepository;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class ReviewServiceImpl implements ReviewService {
 
     @Autowired
-    private ReviewsRepository reviewsRepository;
+    private ReviewRepository reviewRepository;
 
     @Autowired
     private UsersRepository usersRepository;
@@ -33,16 +33,16 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review updateOrCreateReviews(Integer movieId, Integer userId, Integer newPoint){
-        return reviewsRepository.findByMovie_IdAndUser_Id(movieId, userId)
+        return reviewRepository.findByMovie_IdAndUser_Id(movieId, userId)
                 .map(review -> {
                     review.setPoint(newPoint);
-                    review.setUpdated_at(Instant.now());
-                    return reviewsRepository.save(review);
+                    review.setUpdatedAt(Instant.now());
+                    return reviewRepository.save(review);
                 }).orElseGet(() -> {
                     Review newReviews = new Review();
                     newReviews.setPoint(newPoint);
-                    newReviews.setCreated_at(Instant.now());
-                    newReviews.setUpdated_at(Instant.now());
+                    newReviews.setCreatedAt(Instant.now());
+                    newReviews.setUpdatedAt(Instant.now());
 
                     Users user = usersRepository.findById(userId)
                             .orElseThrow(() -> new RuntimeException("User không tồn tại"));
@@ -51,13 +51,13 @@ public class ReviewServiceImpl implements ReviewService {
 
                     newReviews.setUser(user);
                     newReviews.setMovie(movie);
-                    return reviewsRepository.save(newReviews);
+                    return reviewRepository.save(newReviews);
                 });
     }
 
     @Override
     public Review getReview(Integer movieId, Integer userId){
-        Optional<Review> review = reviewsRepository.findByMovie_IdAndUser_Id(movieId, userId);
+        Optional<Review> review = reviewRepository.findByMovie_IdAndUser_Id(movieId, userId);
         if(review.isPresent()){
             return review.get();
         }
@@ -66,6 +66,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<Object[]> getTop5Movies(){
-        return reviewsRepository.findTop10MoviesByAverageRating(PageRequest.of(0, 5));
+        return reviewRepository.findTop10MoviesByAverageRating(PageRequest.of(0, 5));
     }
 }

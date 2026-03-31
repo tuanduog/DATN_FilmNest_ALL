@@ -31,22 +31,20 @@ public class TheatersServiceImpl implements TheatersService {
     }
 
     @Override
-    public int addTheater(ThearterRequest movieRequestDTO) {
+    public int addTheater(ThearterRequest request) {
+        Theater theater = new Theater();
+        theater.setName((request.getTheaterName()));
+        theater.setAddress(request.getAddress());
 
-        Theater theaters = Theater.builder()
-                .name((movieRequestDTO.getTheaterName()))
-                .location(movieRequestDTO.getLocation())
-                .build();
-        theaterRepository.save(theaters);
-
-        return theaters.getId();
+        theaterRepository.save(theater);
+        return theater.getId();
     }
 
     @Override
-    public int editTheater(int id, ThearterRequest movieRequestDTO) {
+    public int editTheater(int id, ThearterRequest request) {
         Theater theaters = theaterRepository.findById(id).get();
-        theaters.setName(movieRequestDTO.getTheaterName());
-        theaters.setLocation(movieRequestDTO.getLocation());
+        theaters.setName(request.getTheaterName());
+        theaters.setAddress(request.getAddress());
 
         theaterRepository.save(theaters);
         return theaters.getId();

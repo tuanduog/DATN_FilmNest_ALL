@@ -19,8 +19,6 @@ public class BookingDTO {
 
     Double totalPrice;
 
-    String combo;
-
     LocalDate date;
 
     String movieImage;
@@ -35,14 +33,13 @@ public class BookingDTO {
 
     String theaterLocation;
 
-    public BookingDTO(Integer bookingId, String chair, Double totalPrice, String combo,
+    public BookingDTO(Integer bookingId, String chair, Double totalPrice,
                       LocalDate date, String movieImage, String movieName,
                       LocalTime startTime, String roomName, String theaterName,
                       String theaterLocation) {
         this.bookingId = bookingId;
         this.chair = chair;
         this.totalPrice = totalPrice;
-        this.combo = combo;
         this.date = date;
         this.movieImage = movieImage;
         this.movieName = movieName;

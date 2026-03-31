@@ -11,7 +11,6 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "booking")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)

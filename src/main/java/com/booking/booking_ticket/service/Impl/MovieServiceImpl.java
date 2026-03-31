@@ -41,21 +41,20 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public int addMovie(MovieRequest movieRequest) {
-        Movie v = Movie.builder()
-                .cast(movieRequest.getCast())
-                .description(movieRequest.getMovieDescription())
-                .genre(movieRequest.getGenre())
-                .image(movieRequest.getImage())
-                .name(movieRequest.getMovieName())
-                .endDate(movieRequest.getEndDate())
-                .duration(movieRequest.getDuration())
-                .director(movieRequest.getDirector())
-                .releaseDate(movieRequest.getReleaseDate())
-                .showingStatus(movieRequest.getShowingStatus())
-                .build();
-        movieRepository.save(v);
+        Movie movie = new Movie();
+        movie.setActor(movieRequest.getActor());
+        movie.setDescription(movieRequest.getMovieDescription());
+        movie.setGenre(movieRequest.getGenre());
+        movie.setImage(movieRequest.getImage());
+        movie.setName(movieRequest.getMovieName());
+        movie.setEndDate(movieRequest.getEndDate());
+        movie.setDuration(movieRequest.getDuration());
+        movie.setDirector(movieRequest.getDirector());
+        movie.setReleaseDate(movieRequest.getReleaseDate());
+        movie.setShowingStatus(movieRequest.getShowingStatus());
 
-        return v.getId();
+        movieRepository.save(movie);
+        return movie.getId();
     }
 
     @Override
@@ -72,7 +71,7 @@ public class MovieServiceImpl implements MovieService {
         m.setReleaseDate(movieRequest.getReleaseDate());
         m.setShowingStatus(movieRequest.getShowingStatus());
         m.setTrailerUrl(movieRequest.getTrailerUrl());
-        m.setCast(movieRequest.getCast());
+        m.setActor(movieRequest.getActor());
         movieRepository.save(m);
         return m.getId();
     }

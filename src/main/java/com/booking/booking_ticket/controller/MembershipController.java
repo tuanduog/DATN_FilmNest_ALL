@@ -15,26 +15,26 @@ public class MembershipController {
 
     @Autowired
     private MembershipService membershipService;
-
-    @PutMapping("/add/{userId}")
-    public ResponseEntity<?> addMembership(@PathVariable Integer userId, @RequestBody MembershipRequest membership) {
-        try {
-            Users user = userService.addMem(userId, membership);
-            return ResponseEntity.ok(user);
-        } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to getbooking byshowtime: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/get-Membership/{userId}")
-    public ResponseEntity<?> getMembership(@PathVariable Integer userId) {
-        try {
-            MembershipDTO mem = userService.getUserMembership(userId);
-            return ResponseEntity.ok(mem);
-        } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to getuser membership: " + e.getMessage());
-        }
-    }
+//
+//    @PutMapping("/add/{userId}")
+//    public ResponseEntity<?> addMembership(@PathVariable Integer userId, @RequestBody MembershipRequest membership) {
+//        try {
+//            Users user = userService.addMem(userId, membership);
+//            return ResponseEntity.ok(user);
+//        } catch(Exception e){
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Failed to getbooking byshowtime: " + e.getMessage());
+//        }
+//    }
+//
+//    @GetMapping("/get-Membership/{userId}")
+//    public ResponseEntity<?> getMembership(@PathVariable Integer userId) {
+//        try {
+//            MembershipDTO mem = userService.getUserMembership(userId);
+//            return ResponseEntity.ok(mem);
+//        } catch(Exception e){
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Failed to getuser membership: " + e.getMessage());
+//        }
+//    }
 }

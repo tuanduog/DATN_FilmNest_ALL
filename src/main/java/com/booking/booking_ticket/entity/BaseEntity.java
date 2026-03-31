@@ -21,8 +21,8 @@ public class BaseEntity {
     int status;
 
     @Column(name = "created_at", nullable = false)
-    private Instant created_at;
+    private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private Instant updated_at;
+    private Instant updatedAt;
 }

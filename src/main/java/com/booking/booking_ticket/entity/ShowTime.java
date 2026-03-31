@@ -13,7 +13,6 @@ import lombok.*;
 @Table(name = "show_time")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
