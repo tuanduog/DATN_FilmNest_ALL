@@ -175,7 +175,6 @@ function Homepage() {
         try {
             const res = await axios.get(`http://localhost:8099/auth/get-showtime/${movieId}`);
 
-            console.log(res.data);
             setShowTime(res.data);
         } catch (error) {
             console.error("Lỗi khi lấy phim", error);
@@ -185,10 +184,6 @@ function Homepage() {
         try {
             const res = await axios.get("http://localhost:8099/movie/getAll-movies");
             const movies = res.data;
-
-            console.log(movies);
-            console.log("API response type:", typeof res.data);
-
 
             const s1 = movies.filter(movie => movie.showing === "Đang chiếu");
             const c1 = movies.filter(movie => movie.showing === "Sắp chiếu");
@@ -203,7 +198,6 @@ function Homepage() {
     useEffect(() => {
         fetchMovies();
     }, []);
-
 
     return (
         <div style={{ backgroundColor: '#fdfdfd', paddingBottom: '3rem' }}>

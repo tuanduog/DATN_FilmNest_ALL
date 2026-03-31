@@ -63,8 +63,6 @@ function Header() {
             });
             if (res.data.status === 200) {
                 setLocation(Array.isArray(res.data.data) ? res.data.data : []);
-                // địa điểm rạp
-                console.log(res.data.data);
             } else {
                 setLocation([]);
             }

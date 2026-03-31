@@ -39,7 +39,7 @@ function Login() {
         const verify = await axios.get("http://localhost:8099/auth/introspect", {
           withCredentials: true
         });
-        if (verify.data.data.role === "Customer") {
+        if (verify.data.data.role === "User") {
           toast.success("Đăng nhập thành công");
           navigate('/');
         } else {

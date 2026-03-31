@@ -6,7 +6,7 @@ import axios from "axios";
 import { Client } from "@stomp/stompjs";
 import { toast } from "react-toastify";
 
-function Booking () {
+function Booking() {
     const navigate = useNavigate();
     const [movieInfo, setMovieInfo] = useState({});
     const [time, setTime] = useState({});
@@ -51,12 +51,12 @@ function Booking () {
         try {
             console.log('time', time.showTimeId);
             const res = await axios.get(`http://localhost:8099/booking/get-byshowtime/${time.showTimeId}`,
-                {withCredentials: true}
+                { withCredentials: true }
             );
             const filterbook = res.data.filter(book => book.date === formattedDate);
             console.log('booked', filterbook)
             setBookeds(filterbook);
-        } catch(error){
+        } catch (error) {
             console.error("Không lấy được booking theo showtimeId", error);
         }
     }
@@ -65,7 +65,7 @@ function Booking () {
         const chairString = selectedSeat.join(', ');
         localStorage.setItem('chairString', chairString);
     }, [selectedSeat]);
-    
+
     useEffect(() => {
         window.scrollTo(0, 0);
         const data = JSON.parse(localStorage.getItem("bookingInfo"));
@@ -75,7 +75,6 @@ function Booking () {
             setDate(data.date);
         }
     }, []);
-
 
     useEffect(() => {
         if (time?.showTimeId) {
@@ -96,7 +95,7 @@ function Booking () {
             setTimeLeft(prev => prev - 1);
         }, 1000);
 
-        return () => clearInterval(interval); 
+        return () => clearInterval(interval);
     }, [timeLeft]);
 
     const seatTypes = {
@@ -111,43 +110,43 @@ function Booking () {
     };
 
     useEffect(() => {
-    if (!time?.showTimeId || !movieInfo.movieId) return;
+        if (!time?.showTimeId || !movieInfo.movieId) return;
 
-    if (client.current) {
-        client.current.deactivate();
-    }
-
-    client.current = new Client({
-        brokerURL: "ws://localhost:8099/wsocket",
-        debug: (str) => console.log("STOMP:", str),
-        reconnectDelay: 5000,
-        heartbeatIncoming: 4000,
-        heartbeatOutgoing: 4000,
-        onConnect: () => {
-            console.log("Connected to WS!");
-            client.current.subscribe(
-                `/topic/seats/${movieInfo.movieId}/${time.showTimeId}/${formattedDate}`,
-                (message) => {
-                    const seatSelecting = JSON.parse(message.body);
-                    console.log("Seat selecting:", seatSelecting);
-                    const [userId, seats] = Object.entries(seatSelecting)[0];
-                    const seatList = seats ? seats.split(',').map(s => s.trim()) : [];
-                    setOthersSelecting(prev => ({
-                        ...prev,
-                        [userId]: userId === String(user.userId) ? [] : seatList
-                    }));
-                }
-            );
-        }
-    });
-
-    client.current.activate();
-
-    return () => {
         if (client.current) {
             client.current.deactivate();
         }
-    };
+
+        client.current = new Client({
+            brokerURL: "ws://localhost:8099/wsocket",
+            debug: (str) => console.log("STOMP:", str),
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+            onConnect: () => {
+                console.log("Connected to WS!");
+                client.current.subscribe(
+                    `/topic/seats/${movieInfo.movieId}/${time.showTimeId}/${formattedDate}`,
+                    (message) => {
+                        const seatSelecting = JSON.parse(message.body);
+                        console.log("Seat selecting:", seatSelecting);
+                        const [userId, seats] = Object.entries(seatSelecting)[0];
+                        const seatList = seats ? seats.split(',').map(s => s.trim()) : [];
+                        setOthersSelecting(prev => ({
+                            ...prev,
+                            [userId]: userId === String(user.userId) ? [] : seatList
+                        }));
+                    }
+                );
+            }
+        });
+
+        client.current.activate();
+
+        return () => {
+            if (client.current) {
+                client.current.deactivate();
+            }
+        };
     }, [movieInfo.movieId, time.showTimeId, formattedDate]);
 
 
@@ -155,14 +154,14 @@ function Booking () {
         if (!time?.showTimeId || !movieInfo.movieId) return;
         if (!client.current) return;
 
-        axios.get(`http://localhost:8099/booking/seats-locking/${movieInfo.movieId}/${time.showTimeId}/${formattedDate}`, 
+        axios.get(`http://localhost:8099/booking/seats-locking/${movieInfo.movieId}/${time.showTimeId}/${formattedDate}`,
             { withCredentials: true })
             .then(response => {
                 const data = response.data || {};
                 console.log("Ghế đang bị giữ:", data);
                 // Lấy ghế mình đang giữ
                 const mySeats = data[String(user.userId)]
-                ? data[String(user.userId)].split(',').map(s => s.trim()) : [];
+                    ? data[String(user.userId)].split(',').map(s => s.trim()) : [];
 
                 // Lấy ghế người khác giữ
                 const filtered = Object.fromEntries(
@@ -177,7 +176,7 @@ function Booking () {
             .catch(error => {
                 console.error("Không lấy được ghế đang bị giữ", error);
             });
-        
+
     }, [movieInfo.movieId, time.showTimeId, formattedDate]); // chạy lại khi movieId, showTimeId hoặc formattedDate thay đổi
 
 
@@ -189,7 +188,7 @@ function Booking () {
                 return prev;
             }
             const allOtherSeats = Object.values(othersSelecting).flat();
-            if(allOtherSeats.includes(seatNumber)){
+            if (allOtherSeats.includes(seatNumber)) {
                 toast.warning("Ghế này đang được người khác chọn trước rồi, vui lòng chọn ghế khác.");
                 return prev;
             }
@@ -204,7 +203,7 @@ function Booking () {
                 }
                 newSeats = [...prev, seatNumber]; // add ghế mới vào
             }
-            
+
             // newSeats là ds ghế đang chọn -> lấy ném vào ws
             // xác định ngày đang đặt, giờ đặt, phim, user, ghế -> showtime, user, date
 
@@ -216,9 +215,9 @@ function Booking () {
                 seats: newSeats.join(', '), // ghế đang chọn
                 created_at: new Date().toISOString()
             }
-            
-            if(client.current && client.current.connected) {
-                client.current.publish({ destination: "/app/seat-selecting", body: JSON.stringify(seatInfo)});
+
+            if (client.current && client.current.connected) {
+                client.current.publish({ destination: "/app/seat-selecting", body: JSON.stringify(seatInfo) });
             }
 
             return newSeats;
@@ -226,17 +225,17 @@ function Booking () {
     };
 
     const handlePaymentInfo = () => {
-        if(selectedSeat.length > 0){
+        if (selectedSeat.length > 0) {
             const seatTypeList = selectedSeat.map(seat => getSeatType(seat));
             navigate("/Payment_info", {
-            state: {
-                total: calculateTotal(),
-                // formattedTotal: calculateTotal().toLocaleString('vi-VN'),
-                selectedSeats: selectedSeat,
-                seatTypes: seatTypeList
-            }
-        });
-        window.scrollTo(0, 0);
+                state: {
+                    total: calculateTotal(),
+                    // formattedTotal: calculateTotal().toLocaleString('vi-VN'),
+                    selectedSeats: selectedSeat,
+                    seatTypes: seatTypeList
+                }
+            });
+            window.scrollTo(0, 0);
         } else {
             toast.warning("Vui lòng chọn ít nhất 1 ghế");
         }
@@ -245,7 +244,7 @@ function Booking () {
     return (
         <div className="container mt-4">
             <div className="d-flex flex-wrap p-4 ticket-booking-container gap-5 justify-content-center">
-                
+
                 {/* Khu vực chọn ghế */}
                 <div className="seating-layout">
                     <div className="screen text-center mb-4">MÀN HÌNH CHIẾU</div>
@@ -256,7 +255,7 @@ function Booking () {
                                 {Array.from({ length: 14 }, (_, i) => {
                                     const seatNumber = `${row}${i + 1}`;
                                     const seatIndex = i + 1;
-                                    const isSold = bookeds.some(booking => 
+                                    const isSold = bookeds.some(booking =>
                                         booking.chair?.split(', ').includes(seatNumber)
                                     );
                                     const type = getSeatType(seatNumber);
@@ -266,13 +265,12 @@ function Booking () {
                                     return (
                                         <div
                                             key={seatNumber}
-                                            className={`seat ${type} ${
-                                                isSold ? 'sold' :
-                                                selectedSeat.includes(seatNumber) // ghế mình chọn -> màu xanh dương
-                                                ? 'selected'
-                                                : allowSelect.includes(seatNumber) // ghế người khác chọn -> màu xanh nhajt
-                                                ? 'selecting'
-                                                : ''}`}
+                                            className={`seat ${type} ${isSold ? 'sold' :
+                                                    selectedSeat.includes(seatNumber) // ghế mình chọn -> màu xanh dương
+                                                        ? 'selected'
+                                                        : allowSelect.includes(seatNumber) // ghế người khác chọn -> màu xanh nhajt
+                                                            ? 'selecting'
+                                                            : ''}`}
                                             onClick={() => handleSeatSelection(seatNumber)}
                                             style={{ cursor: 'pointer', ...(type === 'couple' ? { width: '80px' } : {}) }}
                                         >
@@ -288,15 +286,15 @@ function Booking () {
                         <h6 className="mb-2 fw-bold col-2">Loại ghế:</h6>
                         <div className="d-flex flex-wrap gap-4">
                             <div>
-                                <span className="seat normal me-2"></span> 
+                                <span className="seat normal me-2"></span>
                                 Ghế thường  <span className="text">( 70.000 VNĐ )</span>
                             </div>
                             <div>
-                                <span className="seat vip me-2"></span> 
+                                <span className="seat vip me-2"></span>
                                 Ghế VIP <span className="text">( 100.000 VNĐ )</span>
                             </div>
                             <div>
-                                <span className="seat couple me-2"></span> 
+                                <span className="seat couple me-2"></span>
                                 Ghế đôi <span className="text">( 130.000 VNĐ )</span>
                             </div>
                         </div>
@@ -335,27 +333,27 @@ function Booking () {
                         <li><strong className="text-dark">Ngày chiếu:</strong> {date}/2025</li>
                         <li><strong className="text-dark">Giờ chiếu:</strong> {time?.startTime?.slice(0, 5)}</li>
                         <li><strong className="text-dark">Phòng chiếu:</strong> {time?.roomName?.roomName}</li>
-                        <li><strong className="text-dark">Ghế ngồi:</strong> 
+                        <li><strong className="text-dark">Ghế ngồi:</strong>
                             {selectedSeat.length === 0 ? (
                                 <span className="badge bg-secondary"></span>
                             ) : (
                                 <div className="mt-2">
-                            {[...Array(Math.ceil(selectedSeat.length / 4))].map((_, rowIndex) => (
-                                <div className="d-flex flex-wrap mb-1" key={rowIndex}>
-                                {selectedSeat
-                                    .slice(rowIndex * 4, rowIndex * 4 + 4)
-                                    .map((seat) => (
-                                    <span
-                                        key={seat}
-                                        className="badge bg-secondary me-2"
-                                        style={{ width: '45px', textAlign: 'center' }}
-                                    >
-                                        {seat}
-                                    </span>
+                                    {[...Array(Math.ceil(selectedSeat.length / 4))].map((_, rowIndex) => (
+                                        <div className="d-flex flex-wrap mb-1" key={rowIndex}>
+                                            {selectedSeat
+                                                .slice(rowIndex * 4, rowIndex * 4 + 4)
+                                                .map((seat) => (
+                                                    <span
+                                                        key={seat}
+                                                        className="badge bg-secondary me-2"
+                                                        style={{ width: '45px', textAlign: 'center' }}
+                                                    >
+                                                        {seat}
+                                                    </span>
+                                                ))}
+                                        </div>
                                     ))}
                                 </div>
-                            ))}
-                            </div>
                             )}
                         </li>
                     </ul>
