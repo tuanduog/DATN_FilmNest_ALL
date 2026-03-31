@@ -10,7 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "combo")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)

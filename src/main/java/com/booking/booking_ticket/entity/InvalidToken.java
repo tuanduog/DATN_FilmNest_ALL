@@ -12,7 +12,6 @@ import java.time.Instant;
 @Table(name = "invalid_token")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvalidToken {

@@ -16,5 +16,5 @@ public class TheaterDTO {
 
     String theaterName;
 
-    String location;
+    String address;
 }

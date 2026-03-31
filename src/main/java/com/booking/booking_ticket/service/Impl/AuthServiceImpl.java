@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
                 .claim("user_id", account.getId())
                 .claim("email", account.getEmail())
                 .claim("phone_number", account.getPhone())
-                .claim("membership", account.getMembership())
+//                .claim("membership", account.getMembership())
                 .subject(account.getUsername())
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
@@ -145,15 +145,14 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void registerCustomer(RegisterRequest registerRequest) {
 
-        Users a = Users.builder()
-                .username(registerRequest.getUsername())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .email(registerRequest.getEmail())
-                .phone(registerRequest.getPhone())
-                .role(Role.USER)
-                .build();
+        Users user = new Users();
+        user.setUsername(registerRequest.getUsername());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setEmail(registerRequest.getEmail());
+        user.setPhone(registerRequest.getPhone());
+        user.setRole(Role.USER);
 
-        usersRepository.save(a);
+        usersRepository.save(user);
     }
 
     @Override
@@ -165,14 +164,13 @@ public class AuthServiceImpl implements AuthService {
                     .findFirst()
                     .orElse(null);
 
-            System.out.println(token);
             SignedJWT jwt = SignedJWT.parse(token);
-            System.out.println(token);
 
-            invalidTokenRepsitory.save(InvalidToken.builder()
-                    .token_id(token)
-                    .expired_at(jwt.getJWTClaimsSet().getExpirationTime().toInstant())
-                    .build());
+            InvalidToken invalidToken = new InvalidToken();
+            invalidToken.setToken_id(token);
+            invalidToken.setExpired_at(jwt.getJWTClaimsSet().getExpirationTime().toInstant());
+
+            invalidTokenRepsitory.save(invalidToken);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

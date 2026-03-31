@@ -1,6 +1,5 @@
 package com.booking.booking_ticket.entity;
 
-
 import com.booking.booking_ticket.utils.ShowingStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +15,6 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "movie")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -38,8 +36,8 @@ public class Movie extends BaseEntity {
     @Column(name = "director", nullable = false)
     String director;
 
-    @Column(name = "cast", nullable = false)
-    String cast;
+    @Column(name = "actor", nullable = false)
+    String actor;
 
     @Column(name = "genre", nullable = false)
     String genre;
@@ -59,9 +57,9 @@ public class Movie extends BaseEntity {
 
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude
-    Set<Ranking> setRank = new HashSet();
+    Set<Ranking> setRank = new HashSet<>();
 
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude
-    Set<Comment> setComments = new HashSet();
+    Set<Comment> setComments = new HashSet<>();
 }

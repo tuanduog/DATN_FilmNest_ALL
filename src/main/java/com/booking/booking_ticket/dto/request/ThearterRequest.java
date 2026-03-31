@@ -17,5 +17,5 @@ public class ThearterRequest implements Serializable {
 
     String theaterName;
 
-    String location;
+    String address;
 }

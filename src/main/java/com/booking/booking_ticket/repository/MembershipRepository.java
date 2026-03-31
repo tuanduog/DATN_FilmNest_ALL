@@ -11,11 +11,11 @@ import java.util.List;
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, Integer> {
 
-    @Query("""
-        SELECT new com.booking.booking_ticket.dto.response.MembershipResponse(m.type, m.startDate, m.expiredDate)
-        FROM Membership m
-        WHERE m.user.id = :userId
-        AND m.status = :status
-    """)
-    List<MembershipResponse> findByUserIdAndStatus(Integer userId, int status);
+//    @Query("""
+//        SELECT new com.booking.booking_ticket.dto.response.MembershipResponse(m.type, m.startDate, m.expiredDate)
+//        FROM Membership m
+//        WHERE m.user.id = :userId
+//        AND m.status = :status
+//    """)
+//    List<MembershipResponse> findByUserIdAndStatus(Integer userId, int status);
 }

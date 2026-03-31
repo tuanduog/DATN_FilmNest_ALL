@@ -8,7 +8,6 @@ import lombok.*;
 @Table(name = "ranking")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Ranking extends BaseEntity {

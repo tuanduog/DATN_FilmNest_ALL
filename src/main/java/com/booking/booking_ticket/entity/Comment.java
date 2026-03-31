@@ -1,17 +1,15 @@
 package com.booking.booking_ticket.entity;
 
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "comment")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment extends BaseEntity {
@@ -24,9 +22,6 @@ public class Comment extends BaseEntity {
 
     @Column(name = "level", nullable = false)
     private Integer level;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")

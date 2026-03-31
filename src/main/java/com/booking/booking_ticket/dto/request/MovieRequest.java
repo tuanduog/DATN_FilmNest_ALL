@@ -24,7 +24,7 @@ public class MovieRequest implements Serializable {
 
     String director;
 
-    String cast;
+    String actor;
 
     String genre;
 

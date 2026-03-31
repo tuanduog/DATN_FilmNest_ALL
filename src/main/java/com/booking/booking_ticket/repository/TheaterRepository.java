@@ -11,9 +11,9 @@ import java.util.List;
 @Repository
 public interface TheaterRepository extends JpaRepository<Theater,Integer> {
 
-    @Query("Select distinct t.location from Theater t")
+    @Query("Select distinct t.address from Theater t")
     List<String> getLocations();
 
-    @Query("select t from Theater t where t.location like :location")
+    @Query("select t from Theater t where t.address like :location")
     List<Theater> getTheatersByTheaterLocation(@Param("location") String location);
 }

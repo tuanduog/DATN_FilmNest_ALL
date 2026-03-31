@@ -7,7 +7,6 @@ import lombok.*;
 @Table(name = "membership")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Membership extends BaseEntity{

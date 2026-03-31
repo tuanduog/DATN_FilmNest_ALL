@@ -19,8 +19,6 @@ public class BookingSimpleDTO {
     String chair;
 
     Double totalPrice;
-    
-    String combo;
 
     LocalDate date;
 

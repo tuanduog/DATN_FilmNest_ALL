@@ -11,6 +11,7 @@ import com.booking.booking_ticket.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,17 +34,16 @@ public class CommentServiceImpl implements CommentService {
         Users user = usersRepository.findById(cmt.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Comment comments = Comment.builder()
-                .parentId(cmt.getParentId() != 0 || cmt.getParentId() != null ? cmt.getParentId()
-                        : null)
-                .content(cmt.getContent())
-                .level(cmt.getLevel())
-                .createdAt(LocalDateTime.now())
-                .movie(movie)
-                .user(user)
-                .build();
+        Comment comment = new Comment();
+        comment.setParentId(cmt.getParentId() != 0 || cmt.getParentId() != null ? cmt.getParentId()
+                : null);
+        comment.setContent(cmt.getContent());
+        comment.setLevel(cmt.getLevel());
+        comment.setCreatedAt(Instant.now());
+        comment.setMovie(movie);
+        comment.setUser(user);
 
-        return commentRepository.save(comments);
+        return commentRepository.save(comment);
     }
 
     @Override
