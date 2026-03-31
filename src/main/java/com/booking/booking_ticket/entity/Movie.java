@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Table(name = "movie")
@@ -19,47 +20,48 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Movie extends BaseEntity {
 
     @Column(name = "image", nullable = false)
-    private String image;
+    String image;
 
     @Column(name = "trailer_url", nullable = false)
-    private String trailerUrl;
+    String trailerUrl;
 
     @Column(name = "movie_name", nullable = false)
-    private String movieName;
+    String movieName;
 
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
-    private String movieDescription;
+    String movieDescription;
 
     @Column(name = "director", nullable = false)
-    private String director;
+    String director;
 
     @Column(name = "cast", nullable = false)
-    private String cast;
+    String cast;
 
     @Column(name = "genre", nullable = false)
-    private String genre;
+    String genre;
 
     @Column(name = "duration", nullable = false)
-    private Integer duration;
+    Integer duration;
 
     @Column(name = "release_date", nullable = false)
-    private LocalDate releaseDate;
+    LocalDate releaseDate;
 
     @Column(name = "showing_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ShowingStatus showingStatus;
+    ShowingStatus showingStatus;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    LocalDate endDate;
 
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude
-    private Set<Ranking> setRank = new HashSet();
+    Set<Ranking> setRank = new HashSet();
 
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude
-    private Set<Comment> setComments = new HashSet();
+    Set<Comment> setComments = new HashSet();
 }

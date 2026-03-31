@@ -4,9 +4,6 @@ package com.booking.booking_ticket.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity

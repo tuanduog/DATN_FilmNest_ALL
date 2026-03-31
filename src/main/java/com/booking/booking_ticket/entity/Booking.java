@@ -2,12 +2,10 @@ package com.booking.booking_ticket.entity;
 
 import java.time.LocalDate;
 
-import com.booking.booking_ticket.utils.TicketStatus;
+import com.booking.booking_ticket.utils.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "booking")
@@ -25,18 +23,12 @@ public class Booking extends BaseEntity {
     @Column(name = "total_price", nullable = false)
     Double totalPrice;
 
-    @Column(name = "combo", nullable = false)
-    String combo;
-
     @Column(name = "date", nullable = false)
     LocalDate date;
 
-    @Column(name = "created_at")
-    LocalDateTime created_at;
-
-    @Column(name = "ticket_status")
+    @Column(name = "payment_status")
     @Enumerated(EnumType.STRING)
-    TicketStatus ticketStatus;
+    PaymentStatus paymentStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
