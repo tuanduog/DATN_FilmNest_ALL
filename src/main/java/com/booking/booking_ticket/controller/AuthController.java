@@ -41,8 +41,8 @@ public class AuthController {
             var result = authService.isAuthenticated(authRequestDTO);
             if (result.getIsAuthenticated() == true) {
                 ResponseCookie cookie = ResponseCookie.from("jwt", result.getToken())
-                        .httpOnly(true) // chống JavaScript đọc được (bảo mật hơn)
-                        .secure(false) // nếu dùng HTTPS → nên đặt true
+                        .httpOnly(true)
+                        .secure(false)
                         .path("/")
                         .maxAge(Duration.ofHours(1))
                         .build();
@@ -57,21 +57,6 @@ public class AuthController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
-
-    // @GetMapping("/introspect")
-    // public ResponseData<IntrospectiveResponse> isValid(HttpServletRequest
-    // request) {
-    // try {
-    // var result = authService.introspect(request);
-    // if (result.getIsValid())
-    // return new ResponseData<>(HttpStatus.OK.value(), "Token valid", result);
-    // else
-    // return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Token Invalid");
-    // } catch (Exception e) {
-    // log.error("there is an error of introspect: {}", e.getMessage());
-    // return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-    // }
-    // }
 
     @GetMapping("/introspect")
     public ResponseData<IntrospectiveResponse> verify(HttpServletRequest request) {
@@ -98,12 +83,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseData<Long> login(@RequestBody RegisterRequestDTO registerRequestDTO) {
         try {
-            System.out.println(registerRequestDTO.getPassword());
-            ;
-            Long result = authService.registerCustomer(registerRequestDTO);
-            return new ResponseData<>(HttpStatus.OK.value(), "Customer Register Done!", result);
+            authService.registerCustomer(registerRequestDTO);
+            return new ResponseData<>(HttpStatus.OK.value(), "Register successful!");
         } catch (Exception e) {
-            log.error("there is an error : {}", e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }

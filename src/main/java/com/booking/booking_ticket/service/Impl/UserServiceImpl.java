@@ -1,7 +1,5 @@
 package com.booking.booking_ticket.service.Impl;
 
-import com.booking.booking_ticket.dto.MembershipDTO;
-import com.booking.booking_ticket.dto.request.MembershipRequest;
 import com.booking.booking_ticket.entity.Users;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.service.UserService;
@@ -44,29 +42,6 @@ public class UserServiceImpl implements UserService {
             u.setNationality(new_User.getNationality());
             return usersRepository.save(u);
         }).orElseThrow(() -> new UsernameNotFoundException("Khong tim thay user!"));
-    }
-
-    @Override
-    public Users updateMembership (Integer userId, MembershipRequest membership){
-        return usersRepository.findById(userId).map(u -> {
-            u.setMembership(membership.getVip());
-            u.setStartDate(membership.getStartDate());
-            u.setExpired(membership.getExpire());
-            return usersRepository.save(u);
-        }).orElseThrow(() -> new UsernameNotFoundException("Khong tim thay user!"));
-    }
-
-    @Override
-    public MembershipDTO getUserMembership(Integer userId){
-        Users users = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return new MembershipDTO(
-                users.getId(),
-                users.getMembership(),
-                users.getStartDate(),
-                users.getExpired()
-        );
     }
 
     @Override

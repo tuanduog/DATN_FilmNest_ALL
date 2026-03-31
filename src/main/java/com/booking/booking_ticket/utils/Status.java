@@ -2,7 +2,7 @@ package com.booking.booking_ticket.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum AccountStatus {
+public enum Status {
 
     @JsonProperty("active")
     ACTIVE,

@@ -42,7 +42,7 @@ public class Movie extends BaseEntity {
     private String genre;
 
     @Column(name = "duration", nullable = false)
-    private String duration;
+    private Integer duration;
 
     @Column(name = "release_date", nullable = false)
     private LocalDate releaseDate;
@@ -50,16 +50,12 @@ public class Movie extends BaseEntity {
     @Column(name = "showing", nullable = false)
     private String showing;
 
-    @Column(name = "date_show", nullable = false)
-    private int dateShow;
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
 
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude
     private Set<Ranking> setRank = new HashSet();
-
-    @OneToMany(mappedBy = "movie")
-    @ToString.Exclude
-    private Set<Cart> setCart = new HashSet();
 
     @OneToMany(mappedBy = "movie")
     @ToString.Exclude

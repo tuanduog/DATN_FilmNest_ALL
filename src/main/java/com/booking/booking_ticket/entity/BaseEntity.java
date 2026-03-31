@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,4 +19,12 @@ public class BaseEntity {
     int id;
 
     int status;
+
+    LocalDateTime createdAt;
+
+    int createdBy;
+
+    LocalDateTime updatedAt;
+
+    int updatedBy;
 }

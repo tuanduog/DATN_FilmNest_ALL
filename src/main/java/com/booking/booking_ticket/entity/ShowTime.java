@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.entity;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,8 +19,13 @@ import lombok.*;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ShowTime extends BaseEntity {
 
+    @Column(name = "show_date", nullable = false)
+    private LocalDate showDate;
+
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
+
+    private Integer price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")

@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.dto.request;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,7 +13,9 @@ import java.io.Serializable;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthRequestDTO implements Serializable {
 
+    @NotEmpty(message = "Username is required")
     String username;
 
+    @NotEmpty(message = "Password is required")
     String password;
 }

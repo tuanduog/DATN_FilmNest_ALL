@@ -13,5 +13,4 @@ public enum TicketStatus {
     DONE,
     @JsonProperty("refunded")
     REFUNDED;
-
 }

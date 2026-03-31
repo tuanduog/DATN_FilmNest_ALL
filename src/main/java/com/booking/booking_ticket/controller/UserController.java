@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.booking.booking_ticket.dto.MembershipDTO;
-import com.booking.booking_ticket.dto.request.MembershipRequest;
 import com.booking.booking_ticket.entity.Users;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,27 +46,6 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update-Membership/{userId}")
-    public ResponseEntity<?> updateMembership(@PathVariable Integer userId, @RequestBody MembershipRequest membership) {
-        try {
-            Users user = userService.updateMembership(userId, membership);
-            return ResponseEntity.ok(user);
-        } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to getbooking byshowtime: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/get-Membership/{userId}")
-    public ResponseEntity<?> getMembership(@PathVariable Integer userId) {
-        try {
-            MembershipDTO mem = userService.getUserMembership(userId);
-            return ResponseEntity.ok(mem);
-        } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to getuser membership: " + e.getMessage());
-        }
-    }
     @GetMapping("/getAllUser")
     public ResponseEntity<?> getUsers() {
         try {

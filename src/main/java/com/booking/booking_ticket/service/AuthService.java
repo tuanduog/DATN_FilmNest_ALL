@@ -18,7 +18,7 @@ public interface AuthService {
     AuthResponse isAuthenticated(AuthRequestDTO authRequestDTO);
     String generateToken(Users users);
     IntrospectiveResponse introspect(HttpServletRequest request) throws JOSEException, ParseException;
-    long registerCustomer(RegisterRequestDTO registerRequestDTO);
+    void registerCustomer(RegisterRequestDTO registerRequestDTO);
     boolean logout(HttpServletRequest request);
 
 }

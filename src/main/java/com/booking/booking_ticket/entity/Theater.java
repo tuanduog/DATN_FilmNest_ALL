@@ -19,5 +19,25 @@ public class Theater extends BaseEntity {
 
     String name;
 
-    String location;
+    String address;
+
+    String city;
+
+    @Column(columnDefinition = "TEXT")
+    String description;
+
+    String hotline;
+
+    Double latitude;
+
+    Double longitude;
+
+    @Column(name = "place_id")
+    Integer placeId;
+
+    @Column(name = "open_time")
+    String openTime;
+
+    @Column(name = "close_time")
+    String closeTime;
 }

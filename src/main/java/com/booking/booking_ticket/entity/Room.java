@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.entity;
 
+import com.booking.booking_ticket.utils.RoomType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,8 +17,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @AllArgsConstructor
 public class Room extends BaseEntity {
 
-    @Column(name = "room_name", nullable = false)
-    private String roomName;
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    private Integer capacity;
+
+    @Column(name = "type", length = 50, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theater_id")

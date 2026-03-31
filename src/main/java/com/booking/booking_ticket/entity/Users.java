@@ -20,35 +20,26 @@ import java.time.OffsetDateTime;
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Users extends BaseEntity {
 
-    @Column(name = "username", length = 255, nullable = false)
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "password", length = 255, nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "email", length = 255, nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "phone", length = 50, nullable = false)
     private String phone;
 
-    @Column(name = "gender", length = 255, nullable = false)
+    @Column(name = "gender")
     private String gender;
 
-    @Column(name = "dob", length = 255, nullable = false)
+    @Column(name = "dob")
     private LocalDate dob;
 
-    @Column(name = "nationality", length = 255, nullable = false)
+    @Column(name = "nationality")
     private String nationality;
-
-    @Column(name = "membership", length = 50, nullable = false)
-    private String membership;
-
-    @Column(name = "start_date", nullable = false)
-    private OffsetDateTime startDate;
-
-    @Column(name = "expired", nullable = false)
-    private Integer expired;
 
     @Column(name = "role", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)

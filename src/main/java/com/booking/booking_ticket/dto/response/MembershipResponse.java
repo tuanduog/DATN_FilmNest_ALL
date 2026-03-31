@@ -1,17 +1,16 @@
-package com.booking.booking_ticket.dto.request;
+package com.booking.booking_ticket.dto.response;
 
-import lombok.AccessLevel;
+import com.booking.booking_ticket.utils.MembershipType;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
-@Data
+
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class MembershipRequest {
+public class MembershipResponse {
 
     String type;
 

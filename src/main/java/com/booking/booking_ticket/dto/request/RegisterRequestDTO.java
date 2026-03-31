@@ -1,6 +1,7 @@
 package com.booking.booking_ticket.dto.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.io.Serializable;
@@ -13,23 +14,19 @@ import java.time.Instant;
 @Getter
 public class RegisterRequestDTO implements Serializable {
 
-    private String firstName;
-
-    private String lastName;
-
-    @Email
-    private String email;
-
-    private Boolean gender;
-
-    private String phone;
-
+    @NotEmpty(message = "Username is required")
     private String username;
 
+    @Email
+    @NotEmpty(message = "Email is required")
+    private String email;
+
+    @NotEmpty(message = "Password is required")
     private String password;
 
-    private Instant createdAt;
+    @NotEmpty(message = "Confirm password is required")
+    private String retypePassword;
 
-    private String note;
-
+    @NotEmpty(message = "Phone number is required")
+    private String phone;
 }

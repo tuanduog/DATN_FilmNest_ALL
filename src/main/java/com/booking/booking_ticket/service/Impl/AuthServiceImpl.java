@@ -83,7 +83,6 @@ public class AuthServiceImpl implements AuthService {
                 .claim("phone_number", account.getPhone())
                 .claim("membership", account.getMembership())
                 .subject(account.getUsername())
-                .issuer("BetaCineplex.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
                 .build();
@@ -144,20 +143,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public long registerCustomer(RegisterRequestDTO registerRequestDTO) {
+    public void registerCustomer(RegisterRequestDTO registerRequestDTO) {
 
         Users a = Users.builder()
                 .username(registerRequestDTO.getUsername())
                 .password(passwordEncoder.encode(registerRequestDTO.getPassword()))
                 .email(registerRequestDTO.getEmail())
                 .phone(registerRequestDTO.getPhone())
-                .membership("no membership")
                 .role(Role.USER)
                 .build();
 
-        Users customer = usersRepository.save(a);
-
-        return customer.getId();
+        usersRepository.save(a);
     }
 
     @Override
