@@ -1,14 +1,14 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './Login.module.css';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 function Login() {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('login'); // 'login' | 'register'
-  
+  const [activeTab, setActiveTab] = useState('login');
+
   const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [registerData, setRegisterData] = useState({
     username: '',
@@ -17,7 +17,7 @@ function Login() {
     retypePassword: '',
     phone: ''
   });
-  
+
   let navigate = useNavigate();
 
   const handleLoginChange = e => {
@@ -33,8 +33,8 @@ function Login() {
     try {
       const res = await axios.post('http://localhost:8099/auth/login', loginData, {
         withCredentials: true
-      }); 
-      
+      });
+
       if (res.data.status === 200) {
         const verify = await axios.get("http://localhost:8099/auth/introspect", {
           withCredentials: true
@@ -49,7 +49,6 @@ function Login() {
       } else {
         toast.error("Vui lòng kiểm tra lại tài khoản hoặc mật khẩu!");
       }
-      console.log(res.data);
     } catch (err) {
       console.error(err);
     }
@@ -57,33 +56,16 @@ function Login() {
 
   const handleRegisterSubmit = async e => {
     e.preventDefault();
-    if (!registerData.email || !registerData.password || !registerData.phone || !registerData.retypePassword || !registerData.username) {
-      toast.warning("Vui lòng nhập đầy đủ thông tin!");
-      return;
-    }
-    if (registerData.password.length < 6) {
-      toast.warning("Mật khẩu phải có ít nhất 6 kí tự");
-      return;
-    }
-    if (registerData.phone.length !== 10) {
-      toast.warning("Nhập sai số điện thoại");
-      return;
-    }
-    if (registerData.password !== registerData.retypePassword) {
-      toast.warning("Mật khẩu xác nhận không khớp!");
-      return;
-    }
     try {
       const res = await axios.post('http://localhost:8099/auth/register', registerData, {
         withCredentials: true
       });
       if (res.status === 200) {
         toast.success("Đăng ký thành công!");
-        setActiveTab('login'); // Trở lại màn hình đăng nhập
+        setActiveTab('login');
       } else {
         toast.error("Đăng ký không thành công, vui lòng thử lại");
       }
-      console.log(res.data);
     } catch (err) {
       console.error(err);
     }
@@ -102,14 +84,14 @@ function Login() {
       <div className={styles.container}>
         {/* Tabs */}
         <div className={styles.tabs}>
-          <button 
+          <button
             type="button"
             className={`${styles.tab} ${activeTab === 'login' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('login')}
           >
             Đăng nhập
           </button>
-          <button 
+          <button
             type="button"
             className={`${styles.tab} ${activeTab === 'register' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('register')}
@@ -128,18 +110,18 @@ function Login() {
                 <a href="#" className={styles.social}><i className="fab fa-linkedin-in"></i></a>
               </div>
               <span className={styles.subtitle}>hoặc dùng tài khoản của bạn</span>
-              
+
               <div className={styles.inputGroup}>
                 <input type="text" name="username" placeholder="Tên đăng nhập" value={loginData.username} onChange={handleLoginChange} required />
               </div>
               <div className={styles.inputGroup}>
                 <input type="password" name="password" placeholder="Mật khẩu" value={loginData.password} onChange={handleLoginChange} required />
               </div>
-              
+
               <div className="d-flex justify-content-end mb-3">
                 <a href="#" className={styles.forgotPassword}>Quên mật khẩu?</a>
               </div>
-              
+
               <button type="submit" className={styles.btnSubmit}>Đăng nhập</button>
             </form>
           )}
@@ -153,7 +135,7 @@ function Login() {
                 <a href="#" className={styles.social}><i className="fab fa-linkedin-in"></i></a>
               </div>
               <span className={styles.subtitle}>hoặc dùng email để đăng ký</span>
-              
+
               <div className={styles.inputGroup}>
                 <input type="text" name="username" placeholder="Tên đăng nhập" value={registerData.username} onChange={handleRegisterChange} required />
               </div>
@@ -169,7 +151,7 @@ function Login() {
               <div className={styles.inputGroup}>
                 <input type="text" name="phone" placeholder="Số điện thoại" value={registerData.phone} onChange={handleRegisterChange} required />
               </div>
-              
+
               <button type="submit" className={styles.btnSubmit}>Đăng ký</button>
             </form>
           )}

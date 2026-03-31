@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './Header.css';
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo.png';
 
 function Header() {
     const navigate = useNavigate();
@@ -93,7 +93,7 @@ function Header() {
             console.log("Auth response:", res.data);
 
             if (res.data.status === 200) {
-                setUser(res.data); // Dữ liệu user nằm ngay trong res.data
+                setUser(res.data);
                 sessionStorage.setItem('user', JSON.stringify(res.data.data));
             } else {
                 setUser(null);
@@ -276,8 +276,8 @@ function Header() {
             {/* Navbar */}
             <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
                 <div className="container-fluid d-flex justify-content-start">
-                    <span className="navbar-brand ms-3" style={{ cursor: 'pointer' }} onClick={handleNavigate('/')}>
-                        <img src={logo} height="50px" alt="Logo" />
+                    <span className="navbar-brand ms-3" onClick={handleNavigate('/')}>
+                        <img src={logo} className="navbar-logo" alt="Logo" />
                     </span>
 
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
@@ -344,7 +344,7 @@ function Header() {
                         )}
                     </div>
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-                        <div className="navbar-nav" style={{ gap: '8px' }}>
+                        <div className="navbar-nav" style={{ gap: '10px' }}>
                             <span className={`nav-link active ${isActive('/')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/')}>TRANG CHỦ</span>
                             <span className={`nav-link active ${isActive('/Movies')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/Movies')}>PHIM</span>
                             <span className={`nav-link active ${isActive('/Theater')}`} style={{ cursor: 'pointer' }} onClick={handleLoc}>RẠP</span>

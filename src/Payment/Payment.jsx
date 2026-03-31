@@ -1,38 +1,37 @@
 import React from "react";
-import styles from './Payment.module.css'; 
-import momoQR from '../assets/MoMo_Logo.png'; 
-import betaLogo from '../assets/vite-vite-logo.png';
+import styles from './Payment.module.css';
+import momoQR from '../assets/MoMo_Logo.png';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const Payment = () => {
-    const navigate = useNavigate();
-    const [timeLeft, setTimeLeft] = useState(() => {
-        const storedTime = localStorage.getItem('timeLeft');
-        return storedTime ? parseInt(storedTime, 10) : 600;
-    });
-    const handleBack = () => {
-        navigate(-1);
+  const navigate = useNavigate();
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const storedTime = localStorage.getItem('timeLeft');
+    return storedTime ? parseInt(storedTime, 10) : 600;
+  });
+  const handleBack = () => {
+    navigate(-1);
+  }
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      localStorage.removeItem("timeLeft");
+      navigate("/");
+    } else {
+      localStorage.setItem('timeLeft', timeLeft);
     }
-    const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-    };
-    useEffect(() => {
-              if (timeLeft <= 0) {
-                  localStorage.removeItem("timeLeft");
-                  navigate("/");
-              } else {
-                  localStorage.setItem('timeLeft', timeLeft);
-              }
-      
-              const interval = setInterval(() => {
-                  setTimeLeft(prev => prev - 1);
-              }, 1000);
-      
-              return () => clearInterval(interval); 
-        }, [timeLeft]);
+
+    const interval = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timeLeft]);
   return (
     <div className={styles.paymentContainer}>
       {/* Thông tin đơn hàng */}

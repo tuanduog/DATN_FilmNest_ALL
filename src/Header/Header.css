@@ -1,8 +1,7 @@
 * {
-  margin: 0;
-  padding: 0;
-
+  box-sizing: border-box;
 }
+
 
 .topblack {
   height: 40px;
@@ -31,6 +30,30 @@
 
 .top-link:hover {
   color: #0d6efd !important;
+}
+
+.navbar {
+  min-height: 70px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  overflow: visible;
+  padding: 0;
+}
+
+.navbar-logo {
+  height: 70px;
+  width: auto;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  /* removes white background visually */
+  margin-top: -10px;
+  margin-bottom: -10px;
+  cursor: pointer;
 }
 
 .navbar-brand:hover {
