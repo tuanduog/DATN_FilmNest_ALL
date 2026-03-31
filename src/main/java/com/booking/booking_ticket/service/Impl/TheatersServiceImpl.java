@@ -1,6 +1,6 @@
 package com.booking.booking_ticket.service.Impl;
 
-import com.booking.booking_ticket.dto.request.ThearterRequestDTO;
+import com.booking.booking_ticket.dto.request.ThearterRequest;
 import com.booking.booking_ticket.entity.Theater;
 import com.booking.booking_ticket.repository.TheaterRepository;
 import com.booking.booking_ticket.service.TheatersService;
@@ -31,7 +31,7 @@ public class TheatersServiceImpl implements TheatersService {
     }
 
     @Override
-    public int addTheater(ThearterRequestDTO movieRequestDTO) {
+    public int addTheater(ThearterRequest movieRequestDTO) {
 
         Theater theaters = Theater.builder()
                 .name((movieRequestDTO.getTheaterName()))
@@ -43,7 +43,7 @@ public class TheatersServiceImpl implements TheatersService {
     }
 
     @Override
-    public int editTheater(int id, ThearterRequestDTO movieRequestDTO) {
+    public int editTheater(int id, ThearterRequest movieRequestDTO) {
         Theater theaters = theaterRepository.findById(id).get();
         theaters.setName(movieRequestDTO.getTheaterName());
         theaters.setLocation(movieRequestDTO.getLocation());

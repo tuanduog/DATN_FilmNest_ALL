@@ -1,7 +1,7 @@
 package com.booking.booking_ticket.controller;
 
-import com.booking.booking_ticket.dto.request.AuthRequestDTO;
-import com.booking.booking_ticket.dto.request.RegisterRequestDTO;
+import com.booking.booking_ticket.dto.request.AuthRequest;
+import com.booking.booking_ticket.dto.request.RegisterRequest;
 import com.booking.booking_ticket.dto.response.AuthResponse;
 import com.booking.booking_ticket.dto.response.IntrospectiveResponse;
 import com.booking.booking_ticket.dto.response.ResponseData;
@@ -16,11 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import com.booking.booking_ticket.service.AuthService;
-import com.booking.booking_ticket.service.Impl.AuthServiceImpl;
 
 import java.time.Duration;
 
@@ -36,9 +33,9 @@ public class AuthController {
     private final AuthServiceImpl authServiceImpl;
 
     @PostMapping("/login")
-    public ResponseData<AuthResponse> login(@RequestBody AuthRequestDTO authRequestDTO, HttpServletResponse response) {
+    public ResponseData<AuthResponse> login(@RequestBody AuthRequest authRequest, HttpServletResponse response) {
         try {
-            var result = authService.isAuthenticated(authRequestDTO);
+            var result = authService.isAuthenticated(authRequest);
             if (result.getIsAuthenticated() == true) {
                 ResponseCookie cookie = ResponseCookie.from("jwt", result.getToken())
                         .httpOnly(true)
@@ -81,9 +78,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseData<Long> login(@RequestBody RegisterRequestDTO registerRequestDTO) {
+    public ResponseData<Long> login(@RequestBody RegisterRequest registerRequest) {
         try {
-            authService.registerCustomer(registerRequestDTO);
+            authService.registerCustomer(registerRequest);
             return new ResponseData<>(HttpStatus.OK.value(), "Register successful!");
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
@@ -106,5 +103,4 @@ public class AuthController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
-
 }

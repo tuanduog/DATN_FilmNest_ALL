@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class LineChartDTOResponse {
+public class LineChartResponse {
     private Double revenue;
     private Long a_cus;
 }

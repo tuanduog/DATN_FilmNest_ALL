@@ -5,14 +5,13 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.Instant;
 
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class RegisterRequestDTO implements Serializable {
+public class RegisterRequest implements Serializable {
 
     @NotEmpty(message = "Username is required")
     private String username;

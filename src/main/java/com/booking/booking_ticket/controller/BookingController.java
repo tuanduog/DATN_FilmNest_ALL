@@ -1,13 +1,11 @@
 package com.booking.booking_ticket.controller;
 
-
 import com.booking.booking_ticket.dto.BookingDTO;
 import com.booking.booking_ticket.dto.response.*;
 import com.booking.booking_ticket.dto.BookingSimpleDTO;
 import com.booking.booking_ticket.entity.Booking;
 import com.booking.booking_ticket.repository.BookingRepository;
 import com.booking.booking_ticket.service.BookingService;
-import com.booking.booking_ticket.service.Impl.BookingServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +22,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 
 @Controller
 @RestController
@@ -109,24 +106,25 @@ public class BookingController {
                     .body("Failed to save booking: " + e.getMessage());
         }
     }
+
     @GetMapping("/get-data-for-line-chart")
-    public ResponseData<LineChartDTOResponse> getProductMultipleSearchCol(@RequestParam String filter) {
-        LineChartDTOResponse l_c = null;
+    public ResponseData<LineChartResponse> getProductMultipleSearchCol(@RequestParam String filter) {
+        LineChartResponse lc = null;
         if(filter.equalsIgnoreCase("Year"))
         {
-             l_c = LineChartDTOResponse.builder()
+             lc = LineChartResponse.builder()
                     .a_cus(bookingService.getCustomersThisyear())
                     .revenue(bookingService.getRevenueThisYear())
                     .build();
         }else if(filter.equalsIgnoreCase("month")){
-             l_c = LineChartDTOResponse.builder()
+             lc = LineChartResponse.builder()
                     .a_cus(bookingService.getCustomersThisMonth())
                     .revenue(bookingService.getRevenueThisMonth())
                     .build();
         }
 
         try{
-            return new ResponseData<>(HttpStatus.OK.value(),"User found!",l_c);
+            return new ResponseData<>(HttpStatus.OK.value(),"User found!",lc);
         }
         catch (Exception e)
         {

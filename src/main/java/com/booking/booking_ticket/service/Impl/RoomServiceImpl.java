@@ -16,7 +16,6 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
 
-
     @Override
     public List<Room> getRoomByTheaterId(int theaterId) {
         return  roomRepository.getRoomsByTheater(theaterId);

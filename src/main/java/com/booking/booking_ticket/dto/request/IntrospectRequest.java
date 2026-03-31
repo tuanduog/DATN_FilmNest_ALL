@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
-public class IntrospectRequestDTO  implements Serializable {
+public class IntrospectRequest implements Serializable {
 
     String token;
 }

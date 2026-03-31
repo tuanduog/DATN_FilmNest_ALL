@@ -1,6 +1,6 @@
 package com.booking.booking_ticket.controller;
 
-import com.booking.booking_ticket.dto.request.ThearterRequestDTO;
+import com.booking.booking_ticket.dto.request.ThearterRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.entity.Theater;
@@ -41,12 +41,12 @@ public class TheatersController {
 
 
     }
+
     @GetMapping("/getTheaterByLocation")
     public ResponseData<?> getGenres(@RequestParam String Location)
     {
         try{
             List<Theater> result = theatersService.getTheatersByLocation(Location);
-            System.out.println(result.size());
             if(!result.isEmpty())
                 return new ResponseData<>(HttpStatus.OK.value(),"Có theater",result);
             else
@@ -60,6 +60,7 @@ public class TheatersController {
 
 
     }
+
     @GetMapping("/getTheaters")
     public ResponseData<?> getTheaters()
     {
@@ -75,12 +76,10 @@ public class TheatersController {
             log.error("there is an error of introspect: {}",e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
-
-
     }
 
     @PostMapping("/add-Theater")
-    public ResponseData<?> addShowtime( @RequestBody ThearterRequestDTO showTimeRequestDTO) {
+    public ResponseData<?> addShowtime( @RequestBody ThearterRequest showTimeRequestDTO) {
         try{
             return new ResponseData<>(HttpStatus.OK.value(),"Theater add!",theatersService.addTheater(showTimeRequestDTO));
         }
@@ -92,7 +91,7 @@ public class TheatersController {
     }
 
     @PutMapping("/edit-Theater")
-    public ResponseData<?> editShowtime(@RequestParam int id, @RequestBody ThearterRequestDTO showTimeRequestDTO) {
+    public ResponseData<?> editShowtime(@RequestParam int id, @RequestBody ThearterRequest showTimeRequestDTO) {
         try{
             return new ResponseData<>(HttpStatus.OK.value(),"Theater edit!",theatersService.editTheater(id,showTimeRequestDTO));
         }
@@ -114,5 +113,4 @@ public class TheatersController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
-
 }

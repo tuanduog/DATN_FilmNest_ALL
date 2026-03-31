@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ShowTimeRequestDTO implements Serializable {
+public class ShowTimeRequest implements Serializable {
 
     LocalTime startTime;
 

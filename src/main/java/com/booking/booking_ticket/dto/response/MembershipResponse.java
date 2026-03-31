@@ -1,6 +1,5 @@
 package com.booking.booking_ticket.dto.response;
 
-import com.booking.booking_ticket.utils.MembershipType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;

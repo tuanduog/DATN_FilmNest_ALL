@@ -1,8 +1,8 @@
 package com.booking.booking_ticket.controller;
 
 
-import com.booking.booking_ticket.dto.request.MovieRequestDTO;
-import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO;
+import com.booking.booking_ticket.dto.request.MovieRequest;
+import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponse;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.entity.Movie;
@@ -25,11 +25,10 @@ public class MoviesController {
 
     private final MovieServiceImpl moviesService;
 
-
     @GetMapping("/getGenres")
     public ResponseData<?> getGenres()
     {
-        try{
+        try {
             List<String> result = moviesService.getGenres();
             System.out.println(result.size());
             if(!result.isEmpty())
@@ -42,13 +41,11 @@ public class MoviesController {
             log.error("there is an error of introspect: {}",e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
-
-
     }
     @GetMapping("/getAll")
     public ResponseData<?> getMovies()
     {
-        try{
+        try {
             List<Movie> result = moviesService.getAllMovies();
             System.out.println(result.size());
             if(!result.isEmpty())
@@ -61,15 +58,13 @@ public class MoviesController {
             log.error("there is an error of introspect: {}",e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
-
-
     }
 
     @GetMapping("/getTopMovies")
     public ResponseData<?> getTopMovies()
     {
-        try{
-            List<MoviesWithRevenuesResponseDTO> result = moviesService.getTopMovies();
+        try {
+            List<MoviesWithRevenuesResponse> result = moviesService.getTopMovies();
             if(!result.isEmpty())
                 return new ResponseData<>(HttpStatus.OK.value(),"Có movies",result);
             else
@@ -80,15 +75,13 @@ public class MoviesController {
             log.error("there is an error of movies controller: {}",e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
-
-
     }
     @GetMapping("/get-products-multiple-searching-col")
     public ResponseData<?> getProductMultipleSearchCol( @RequestParam(defaultValue = "0") int pageNo,
                                                         @Min(10)@RequestParam(defaultValue = "10") int pageSize,
                                                         @RequestParam(required = false) String sortBy,
                                                         @RequestParam(required = false) String... search) {
-        try{
+        try {
             return new ResponseData<>(HttpStatus.OK.value(),"User found!",moviesService.getProductsWithMultipleSearchingColumns(pageNo,pageSize,sortBy,search));
         }
         catch (Exception e)
@@ -99,8 +92,8 @@ public class MoviesController {
     }
 
     @PostMapping("/add-Movies")
-    public ResponseData<?> addMovies( @RequestBody MovieRequestDTO movies) {
-        try{
+    public ResponseData<?> addMovies( @RequestBody MovieRequest movies) {
+        try {
             return new ResponseData<>(HttpStatus.OK.value(),"Movies add!",moviesService.addMovie(movies));
         }
         catch (Exception e)
@@ -110,8 +103,8 @@ public class MoviesController {
         }
     }
     @PostMapping("/edit-Movies")
-    public ResponseData<?> editMovies(@RequestParam int id, @RequestBody MovieRequestDTO movies) {
-        try{
+    public ResponseData<?> editMovies(@RequestParam int id, @RequestBody MovieRequest movies) {
+        try {
             return new ResponseData<>(HttpStatus.OK.value(),"Movies edit!",moviesService.editMovie(id,movies));
         }
         catch (Exception e)
@@ -122,7 +115,7 @@ public class MoviesController {
     }
     @DeleteMapping("/delete-Movies")
     public ResponseData<?> deleteMovies(@RequestParam int id) {
-        try{
+        try {
             return new ResponseData<>(HttpStatus.NO_CONTENT.value(),"Movies delete!",moviesService.deleteMovie(id));
         }
         catch (Exception e)
@@ -131,5 +124,4 @@ public class MoviesController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
-
 }

@@ -1,15 +1,16 @@
 package com.booking.booking_ticket.utils;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public enum Status {
 
-    @JsonProperty("active")
-    ACTIVE,
+    INACTIVE("inactive"), ACTIVE("active");
 
-    @JsonProperty("inactive")
-    INACTIVE,
+    private final String value;
 
-    @JsonProperty("deleted")
-    DELETED
+    Status(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

@@ -1,7 +1,7 @@
 package com.booking.booking_ticket.service.Impl;
 
-import com.booking.booking_ticket.dto.request.MovieRequestDTO;
-import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponseDTO;
+import com.booking.booking_ticket.dto.request.MovieRequest;
+import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponse;
 import com.booking.booking_ticket.dto.response.PageResponse;
 import com.booking.booking_ticket.entity.Movie;
 import com.booking.booking_ticket.repository.MovieRepository;
@@ -40,18 +40,18 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public int addMovie(MovieRequestDTO movieRequestDTO) {
+    public int addMovie(MovieRequest movieRequest) {
         Movie v = Movie.builder()
-                .cast(movieRequestDTO.getCast())
-                .movieDescription(movieRequestDTO.getMovieDescription())
-                .genre(movieRequestDTO.getGenre())
-                .image(movieRequestDTO.getImage())
-                .movieName(movieRequestDTO.getMovieName())
-                .dateShow(movieRequestDTO.getDateShow())
-                .duration(movieRequestDTO.getDuration())
-                .director(movieRequestDTO.getDirector())
-                .releaseDate(movieRequestDTO.getReleaseDate())
-                .showing(movieRequestDTO.getShowing())
+                .cast(movieRequest.getCast())
+                .description(movieRequest.getMovieDescription())
+                .genre(movieRequest.getGenre())
+                .image(movieRequest.getImage())
+                .name(movieRequest.getMovieName())
+                .endDate(movieRequest.getEndDate())
+                .duration(movieRequest.getDuration())
+                .director(movieRequest.getDirector())
+                .releaseDate(movieRequest.getReleaseDate())
+                .showingStatus(movieRequest.getShowingStatus())
                 .build();
         movieRepository.save(v);
 
@@ -59,20 +59,20 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public int editMovie(int id, MovieRequestDTO movieRequestDTO) {
+    public int editMovie(int id, MovieRequest movieRequest) {
         Movie m = movieRepository.findById(id).get();
 
-        m.setMovieDescription(movieRequestDTO.getMovieDescription());
-        m.setGenre(movieRequestDTO.getGenre());
-        m.setImage(movieRequestDTO.getImage());
-        m.setMovieName(movieRequestDTO.getMovieName());
-        m.setDateShow(movieRequestDTO.getDateShow());
-        m.setDuration(movieRequestDTO.getDuration());
-        m.setDirector(movieRequestDTO.getDirector());
-        m.setReleaseDate(movieRequestDTO.getReleaseDate());
-        m.setShowing(movieRequestDTO.getShowing());
-        m.setTrailerUrl(movieRequestDTO.getTrailerUrl());
-        m.setCast(movieRequestDTO.getCast());
+        m.setDescription(movieRequest.getMovieDescription());
+        m.setGenre(movieRequest.getGenre());
+        m.setImage(movieRequest.getImage());
+        m.setName(movieRequest.getMovieName());
+        m.setEndDate(movieRequest.getEndDate());
+        m.setDuration(movieRequest.getDuration());
+        m.setDirector(movieRequest.getDirector());
+        m.setReleaseDate(movieRequest.getReleaseDate());
+        m.setShowingStatus(movieRequest.getShowingStatus());
+        m.setTrailerUrl(movieRequest.getTrailerUrl());
+        m.setCast(movieRequest.getCast());
         movieRepository.save(m);
         return m.getId();
     }
@@ -84,7 +84,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<MoviesWithRevenuesResponseDTO> getTopMovies() {
+    public List<MoviesWithRevenuesResponse> getTopMovies() {
         return movieRepository.topMovies();
     }
 

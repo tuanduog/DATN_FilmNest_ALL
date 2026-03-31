@@ -15,8 +15,6 @@ public class ResponeSuccess extends ResponseEntity<ResponeSuccess.Payload> {
     }
     public static class Payload
     {
-
-
         private final int status;
         private final String message;
         private Object data;

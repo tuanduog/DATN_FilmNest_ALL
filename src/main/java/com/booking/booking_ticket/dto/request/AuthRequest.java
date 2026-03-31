@@ -11,7 +11,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthRequestDTO implements Serializable {
+public class AuthRequest implements Serializable {
 
     @NotEmpty(message = "Username is required")
     String username;

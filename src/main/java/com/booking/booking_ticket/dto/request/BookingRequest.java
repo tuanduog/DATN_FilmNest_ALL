@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BookingRequestDTO implements Serializable {
+public class BookingRequest implements Serializable {
 
     Integer bookingId;
 

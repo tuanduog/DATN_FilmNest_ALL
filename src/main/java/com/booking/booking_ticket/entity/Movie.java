@@ -29,11 +29,11 @@ public class Movie extends BaseEntity {
     @Column(name = "trailer_url", nullable = false)
     String trailerUrl;
 
-    @Column(name = "movie_name", nullable = false)
-    String movieName;
+    @Column(name = "name", nullable = false)
+    String name;
 
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
-    String movieDescription;
+    String description;
 
     @Column(name = "director", nullable = false)
     String director;

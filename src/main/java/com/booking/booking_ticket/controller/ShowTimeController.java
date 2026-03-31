@@ -1,7 +1,7 @@
 package com.booking.booking_ticket.controller;
 
 import java.util.List;
-import com.booking.booking_ticket.dto.request.ShowTimeRequestDTO;
+import com.booking.booking_ticket.dto.request.ShowTimeRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.service.ShowTimeService;
@@ -25,6 +25,7 @@ public class ShowTimeController {
         List<ShowTimeDTO> showTimes = showTimeService.getByMovieId(id);
         return ResponseEntity.ok(showTimes);
     }
+
     @GetMapping("/get-showtime")
     public ResponseData<?> getShowtimes() {
         try{
@@ -36,10 +37,11 @@ public class ShowTimeController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+
     @PostMapping("/add-Showtime")
-    public ResponseData<?> addShowtime( @RequestBody ShowTimeRequestDTO showTimeRequestDTO) {
+    public ResponseData<?> addShowtime( @RequestBody ShowTimeRequest showTimeRequest) {
         try{
-            return new ResponseData<>(HttpStatus.OK.value(),"Showtimes add!",showTimeService.addShowtime(showTimeRequestDTO));
+            return new ResponseData<>(HttpStatus.OK.value(),"Showtimes add!",showTimeService.addShowtime(showTimeRequest));
         }
         catch (Exception e)
         {
@@ -47,10 +49,11 @@ public class ShowTimeController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+
     @PutMapping("/edit-Showtime")
-    public ResponseData<?> editShowtime(@RequestParam int id, @RequestBody ShowTimeRequestDTO showTimeRequestDTO) {
+    public ResponseData<?> editShowtime(@RequestParam int id, @RequestBody ShowTimeRequest showTimeRequest) {
         try{
-            return new ResponseData<>(HttpStatus.OK.value(),"SHowtime edit!",showTimeService.editShowtime(id,showTimeRequestDTO));
+            return new ResponseData<>(HttpStatus.OK.value(),"SHowtime edit!",showTimeService.editShowtime(id, showTimeRequest));
         }
         catch (Exception e)
         {
@@ -58,6 +61,7 @@ public class ShowTimeController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+
     @DeleteMapping("/delete-Showtime")
     public ResponseData<?> deleteShowtime(@RequestParam int id) {
         try{
@@ -69,6 +73,7 @@ public class ShowTimeController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+
     @GetMapping("/get-showtime-ByRoomId")
     public ResponseData<?> getShowtimes(@RequestParam int roomId) {
         try{
@@ -80,5 +85,4 @@ public class ShowTimeController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
-
 }

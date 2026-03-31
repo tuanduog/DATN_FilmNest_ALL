@@ -1,15 +1,16 @@
 package com.booking.booking_ticket.utils;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public enum RoomType {
 
-    @JsonProperty("2D")
-    TWOD,
+    TWOD("2d"), THREED("3d"), IMAX("imax");
 
-    @JsonProperty("3D")
-    THREED,
+    private final String value;
 
-    @JsonProperty("IMAX")
-    IMAX
+    RoomType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

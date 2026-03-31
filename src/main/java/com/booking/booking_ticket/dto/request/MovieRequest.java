@@ -1,6 +1,6 @@
 package com.booking.booking_ticket.dto.request;
 
-import jakarta.persistence.Column;
+import com.booking.booking_ticket.utils.ShowingStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MovieRequestDTO  implements Serializable {
+public class MovieRequest implements Serializable {
 
     String image;
 
@@ -28,11 +28,11 @@ public class MovieRequestDTO  implements Serializable {
 
     String genre;
 
-    String duration;
+    Integer duration;
 
     LocalDate releaseDate;
 
-    String showing;
+    ShowingStatus showingStatus;
 
-    int dateShow;
+    LocalDate endDate;
 }

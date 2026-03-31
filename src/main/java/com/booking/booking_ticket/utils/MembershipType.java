@@ -1,15 +1,16 @@
 package com.booking.booking_ticket.utils;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public enum MembershipType {
 
-    @JsonProperty("premium")
-    PREMIUM,
+    PREMIUM("premium"), GOLD("gold"), SILVER("silver");
 
-    @JsonProperty("gold")
-    GOLD,
+    private final String value;
 
-    @JsonProperty("silver")
-    SILVER
+    MembershipType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

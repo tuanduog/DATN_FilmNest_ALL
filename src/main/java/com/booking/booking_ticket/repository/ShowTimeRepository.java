@@ -15,7 +15,7 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer>{
     @EntityGraph(attributePaths = {"room"})
     List<ShowTime> findByMovie_Id(Integer movieId);
 
-    @Query("SELECT new com.booking.booking_ticket.dto.response.ShowtimeResponse(s.id, s.startTime, m.movieName, m.id, t.name,t.id,r.roomName,r.id) " +
+    @Query("SELECT new com.booking.booking_ticket.dto.response.ShowtimeResponse(s.id, s.startTime, m.name, m.id, t.name,t.id,r.name,r.id) " +
             "FROM ShowTime s " +
             "JOIN s.room r " +
             "JOIN r.theater t " +
@@ -25,10 +25,10 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer>{
     @Query("SELECT s f from ShowTime  s where s.room.id = :roomId")
     List<ShowTime> findShowtimeByRoomId(Integer roomId);
 
-    @Query("SELECT new com.booking.booking_ticket.dto.response.ShowtimeResponse(s.id, s.startTime, m.movieName, m.id, t.name,t.id,r.roomName,r.id) " +
+    @Query("SELECT new com.booking.booking_ticket.dto.response.ShowtimeResponse(s.id, s.startTime, m.name, m.id, t.name,t.id,r.name,r.id) " +
             "FROM ShowTime s " +
             "JOIN s.room r " +
             "JOIN r.theater t " +
-            "JOIN s.movie m where m.showing like 'Đang chiếu' and s.room.id = :roomId")
-    List<ShowtimeResponse> findShow_timeByRooms(Integer roomId);
+            "JOIN s.movie m where m.showingStatus = :showingStatus and s.room.id = :roomId")
+    List<ShowtimeResponse> findShow_timeByRooms(Integer roomId, String showingStatus);
 }

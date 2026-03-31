@@ -1,7 +1,7 @@
 package com.booking.booking_ticket.service.Impl;
 
-import com.booking.booking_ticket.dto.request.AuthRequestDTO;
-import com.booking.booking_ticket.dto.request.RegisterRequestDTO;
+import com.booking.booking_ticket.dto.request.AuthRequest;
+import com.booking.booking_ticket.dto.request.RegisterRequest;
 import com.booking.booking_ticket.entity.InvalidToken;
 import com.booking.booking_ticket.entity.Users;
 import com.booking.booking_ticket.repository.InvalidTokenRepsitory;
@@ -46,10 +46,10 @@ public class AuthServiceImpl implements AuthService {
     protected String SIGNER_KEY;
 
     @Override
-    public AuthResponse isAuthenticated(AuthRequestDTO authRequestDTO) {
-        var account = usersRepository.findByUsername(authRequestDTO.getUsername()).orElseThrow();
+    public AuthResponse isAuthenticated(AuthRequest authRequest) {
+        var account = usersRepository.findByUsername(authRequest.getUsername()).orElseThrow();
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        boolean isAuth = passwordEncoder.matches(authRequestDTO.getPassword(), account.getPassword());
+        boolean isAuth = passwordEncoder.matches(authRequest.getPassword(), account.getPassword());
         if (!isAuth) {
             log.error("unauthenticated !");
             return AuthResponse.builder()
@@ -143,13 +143,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void registerCustomer(RegisterRequestDTO registerRequestDTO) {
+    public void registerCustomer(RegisterRequest registerRequest) {
 
         Users a = Users.builder()
-                .username(registerRequestDTO.getUsername())
-                .password(passwordEncoder.encode(registerRequestDTO.getPassword()))
-                .email(registerRequestDTO.getEmail())
-                .phone(registerRequestDTO.getPhone())
+                .username(registerRequest.getUsername())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .email(registerRequest.getEmail())
+                .phone(registerRequest.getPhone())
                 .role(Role.USER)
                 .build();
 

@@ -10,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserRequestDTO implements Serializable {
+public class UserRequest implements Serializable {
 
     Integer userId;
 
