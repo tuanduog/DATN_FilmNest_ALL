@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -20,11 +20,9 @@ public class BaseEntity {
 
     int status;
 
-    LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false)
+    private Instant created_at;
 
-    int createdBy;
-
-    LocalDateTime updatedAt;
-
-    int updatedBy;
+    @Column(name = "updated_at", nullable = false)
+    private Instant updated_at;
 }

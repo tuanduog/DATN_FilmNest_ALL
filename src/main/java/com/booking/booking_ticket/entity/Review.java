@@ -30,10 +30,4 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "user_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Users user;
-
-    @Column(name = "created_at", nullable = false)
-    private Instant created_at;
-
-    @Column(name = "updated_at", nullable = false)
-    private Instant updated_at;
 }

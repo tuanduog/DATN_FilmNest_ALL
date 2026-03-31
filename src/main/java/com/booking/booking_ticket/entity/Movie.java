@@ -1,6 +1,7 @@
 package com.booking.booking_ticket.entity;
 
 
+import com.booking.booking_ticket.utils.ShowingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,8 +48,9 @@ public class Movie extends BaseEntity {
     @Column(name = "release_date", nullable = false)
     private LocalDate releaseDate;
 
-    @Column(name = "showing", nullable = false)
-    private String showing;
+    @Column(name = "showing_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ShowingStatus showingStatus;
 
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;

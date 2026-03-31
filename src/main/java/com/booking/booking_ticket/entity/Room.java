@@ -4,8 +4,6 @@ import com.booking.booking_ticket.utils.RoomType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
