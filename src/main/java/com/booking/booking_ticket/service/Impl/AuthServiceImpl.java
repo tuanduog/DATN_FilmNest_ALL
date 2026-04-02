@@ -51,7 +51,6 @@ public class AuthServiceImpl implements AuthService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean isAuth = passwordEncoder.matches(authRequest.getPassword(), account.getPassword());
         if (!isAuth) {
-            log.error("unauthenticated !");
             return AuthResponse.builder()
                     .token(null)
                     .isAuthenticated(false)

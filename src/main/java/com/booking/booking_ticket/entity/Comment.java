@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class Comment extends BaseEntity {
 
-    @Column(name = "parent_id", nullable = false)
+    @Column(name = "parent_id")
     private Integer parentId;
 
     @Column(name = "content", nullable = false)
