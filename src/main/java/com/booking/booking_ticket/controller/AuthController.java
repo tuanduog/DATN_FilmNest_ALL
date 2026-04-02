@@ -43,14 +43,11 @@ public class AuthController {
                         .path("/")
                         .maxAge(Duration.ofHours(1))
                         .build();
-                System.out.println(cookie.toString());
                 response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
                 return new ResponseData<>(HttpStatus.OK.value(), "User authenticated", result);
-            } else
-                return new ResponseError(HttpStatus.BAD_REQUEST.value(), "wrong username or password");
+            } else return new ResponseError(HttpStatus.BAD_REQUEST.value(), "wrong username or password");
         } catch (Exception e) {
-            log.error("there is an error : {}", e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
