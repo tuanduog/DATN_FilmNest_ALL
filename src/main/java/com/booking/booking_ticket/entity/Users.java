@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.entity;
 
+import com.booking.booking_ticket.utils.Gender;
 import com.booking.booking_ticket.utils.Role;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -32,7 +33,8 @@ public class Users extends BaseEntity {
     private String phone;
 
     @Column(name = "gender")
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(name = "dob")
     private LocalDate dob;

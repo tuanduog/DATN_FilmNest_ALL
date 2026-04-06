@@ -1,22 +1,27 @@
-package com.booking.booking_ticket.dto.request;
+package com.booking.booking_ticket.dto.response;
 
+import com.booking.booking_ticket.utils.Status;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MembershipRequest {
+public class ComboResponse {
 
-    String type;
+    Integer id;
 
-    LocalDateTime startDate;
+    String image;
 
-    LocalDateTime expiredDate;
+    String name;
+
+    Double price;
+
+    String description;
+
+    Status status;
 }

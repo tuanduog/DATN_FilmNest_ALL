@@ -1,14 +1,15 @@
 package com.booking.booking_ticket.service.Impl;
 
 import com.booking.booking_ticket.dto.request.MovieRequest;
+import com.booking.booking_ticket.dto.response.MovieResponse;
 import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponse;
-import com.booking.booking_ticket.dto.response.PageResponse;
 import com.booking.booking_ticket.entity.Movie;
 import com.booking.booking_ticket.repository.MovieRepository;
-import com.booking.booking_ticket.repository.SearchRepository;
 import com.booking.booking_ticket.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,6 @@ import java.util.List;
 public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
-
-    private final SearchRepository searchRepository;
 
     @Override
     public List<String> getGenres() {
@@ -35,8 +34,20 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public PageResponse<?> getProductsWithMultipleSearchingColumns(int pageNo, int pageSize, String sortBy, String... search) {
-        return searchRepository.searchingProductWithMultipleColumns(pageNo,pageSize,sortBy,search) ;
+    public Page<MovieResponse> getList(Pageable pageable, String keyword, String genre, Integer status){
+        if (keyword != null) {
+            keyword = "%" + keyword.trim().toLowerCase() + "%";
+        } else {
+            keyword = "%";
+        }
+
+        if (genre != null) {
+            genre = "%" + genre.trim().toLowerCase() + "%";
+        } else {
+            genre = "%";
+        }
+
+        return movieRepository.findAllByKeyword(pageable, keyword, genre, status);
     }
 
     @Override
