@@ -35,7 +35,7 @@ public class SecurityConfig {
     public static final String[] PUBLIC_ENDPOINTS = { "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
             "/swagger-ui.html", "/webjars/**", "/auth/token", "/auth/login", "/auth/introspect", "/auth/register",
             "/auth/logout", "/product/get-product", "/discount/get-discount",
-            "/movies/**", "/movie/getAll-movies", "/wsocket/**", "/topic/**", "/app/**", "/sockjs/**", "/theaters/**",
+            "/movie/**", "/wsocket/**", "/topic/**", "/app/**", "/sockjs/**", "/theaters/**",
             "/movie/get-movie/**",
             "/auth/get-showtime/**", "/api/files/upload/image", "/booking/**", "/reviews/get-Top5Movies",
             "/comments/getAll-Comments/**" };
@@ -90,7 +90,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

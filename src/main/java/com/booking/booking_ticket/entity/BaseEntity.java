@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.entity;
 
+import com.booking.booking_ticket.utils.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +21,8 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    int status;
+    @Enumerated(EnumType.STRING)
+    Status status;
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
