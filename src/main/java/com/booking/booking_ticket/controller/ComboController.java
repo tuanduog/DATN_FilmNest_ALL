@@ -4,6 +4,7 @@ import com.booking.booking_ticket.dto.request.ComboRequest;
 import com.booking.booking_ticket.dto.response.ComboResponse;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.service.ComboService;
+import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,14 +17,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/combo")
+@RequestMapping("/api/combo")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ComboController {
 
     private final ComboService comboService;
 
     @GetMapping("/v1")
-    public ResponseData<?> getList(Pageable pageable, String keyword, String status){
+    public ResponseData<?> getList(Pageable pageable, String keyword, Status status){
         Page<ComboResponse> data = comboService.getList(pageable, keyword, status);
         return new ResponseData<>(HttpStatus.OK.value(), "Get List Successful", data);
     }

@@ -7,6 +7,7 @@ import com.booking.booking_ticket.entity.Users;
 import com.booking.booking_ticket.repository.InvalidTokenRepsitory;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.utils.Role;
+import com.booking.booking_ticket.utils.Status;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -50,6 +51,11 @@ public class AuthServiceImpl implements AuthService {
         var account = usersRepository.findByUsername(authRequest.getUsername()).orElseThrow();
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean isAuth = passwordEncoder.matches(authRequest.getPassword(), account.getPassword());
+
+        if (account.getStatus().equals(Status.INACTIVE)){
+            isAuth = false;
+        }
+
         if (!isAuth) {
             return AuthResponse.builder()
                     .token(null)

@@ -20,7 +20,7 @@ public class ComboServiceImpl implements ComboService {
     private final ComboRepository comboRepository;
 
     @Override
-    public Page<ComboResponse> getList(Pageable pageable, String keyword, String status){
+    public Page<ComboResponse> getList(Pageable pageable, String keyword, Status status){
         if (keyword != null){
             keyword = "%" + keyword.trim().toLowerCase() + "%";
         } else {
