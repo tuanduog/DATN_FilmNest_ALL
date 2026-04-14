@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/combo")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ComboController {
 
     private final ComboService comboService;
@@ -30,7 +30,7 @@ public class ComboController {
     }
 
     @PostMapping("/v1")
-    public ResponseData<?> addCombo(ComboRequest request){
+    public ResponseData<?> addCombo(@RequestBody ComboRequest request){
         comboService.addCombo(request);
         return new ResponseData<>(HttpStatus.OK.value(), "Add Combo Successful");
     }
@@ -46,8 +46,8 @@ public class ComboController {
         return new ResponseData<>(HttpStatus.OK.value(), "Update Combo Successful");
     }
 
-    @DeleteMapping("/v1")
-    public ResponseData<?> deleteCombo(Integer id){
+    @DeleteMapping("/v1/{id}")
+    public ResponseData<?> deleteCombo(@PathVariable Integer id){
         comboService.deleteCombo(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Delete Combo Successful");
     }

@@ -54,6 +54,7 @@ public class ComboServiceImpl implements ComboService {
         ComboResponse response = new ComboResponse();
         if (combo != null){
            response.setId(combo.getId());
+           response.setImage(combo.getImage());
            response.setName(combo.getName());
            response.setPrice(combo.getPrice());
            response.setDescription(combo.getDescription());

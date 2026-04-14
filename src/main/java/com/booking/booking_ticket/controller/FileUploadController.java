@@ -1,6 +1,8 @@
 package com.booking.booking_ticket.controller;
 
+import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.service.CloudinaryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,14 +24,14 @@ public class FileUploadController {
     }
 
     @PostMapping(value = "/upload/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file,
+    public ResponseData<?> uploadImage(@RequestParam("file") MultipartFile file,
                                          @RequestParam("folder") String folderName) throws IOException {
-        return ResponseEntity.ok(cloudinaryService.uploadFile(file, folderName));
+        return new ResponseData<>(HttpStatus.OK.value(), "Upload Image Successful", cloudinaryService.uploadFile(file, folderName));
     }
 
     @PostMapping("/upload/video")
-    public ResponseEntity<?> uploadVideo(@RequestParam("file") MultipartFile file,
+    public ResponseData<?> uploadVideo(@RequestParam("file") MultipartFile file,
                                          @RequestParam("folder") String folderName) throws IOException {
-        return ResponseEntity.ok(cloudinaryService.uploadVideo(file, folderName));
+        return new ResponseData<>(HttpStatus.OK.value(), "Upload Video Successful", cloudinaryService.uploadFile(file, folderName));
     }
 }
