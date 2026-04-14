@@ -13,6 +13,8 @@ import ComboPage from 'pages/combo-page';
 import AddCombo from 'sections/combo/add';
 import ComboDetail from 'sections/combo/detail';
 import EditCombo from 'sections/combo/edit';
+import TheaterPage from 'pages/theater-page';
+import AddTheater from 'sections/theater/add';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
@@ -62,6 +64,14 @@ const MainRoutes = {
         {
           path: 'admin/combo/detail/:id',
           element: <ComboDetail />
+        },
+        {
+          path: 'admin/theater',
+          element: <TheaterPage />
+        },
+        {
+          path: 'admin/theater/add',
+          element: <AddTheater />
         }
       ]
     },

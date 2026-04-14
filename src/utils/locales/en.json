@@ -44,5 +44,12 @@
   "inactive": "Inactive",
   "row-per-page": "Rows per page",
   "total": "Total",
-  "unknown-error": "Unknown error"
+  "unknown-error": "Unknown error",
+  "theater": "Theater",
+  "theater-list": "Theater List",
+  "theater-name": "Theater Name",
+  "add-theater": "Add Theater",
+  "edit-theater": "Edit Theater",
+  "delete-theater": "Delete Theater",
+  "detail-theater": "Detail Theater"
 }

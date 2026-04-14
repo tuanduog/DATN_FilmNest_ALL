@@ -46,6 +46,13 @@ const admin: NavItemType = {
       type: 'item',
       url: '/admin/combo',
       icon: icons.contactus
+    },
+    {
+      id: 'theater',
+      title: 'theater',
+      type: 'item',
+      url: '/admin/theater',
+      icon: icons.contactus
     }
   ]
 };

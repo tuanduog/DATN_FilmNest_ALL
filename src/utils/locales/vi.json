@@ -21,5 +21,12 @@
     "total": "Tổng",
     "records": "bản ghi",
     "row-per-page": "Số bản ghi trên mỗi trang",
-    "home": "Trang chủ"
+    "home": "Trang chủ",
+    "theater": "Rạp chiếu",
+    "theater-list": "Danh sách rạp chiếu",
+    "theater-name": "Tên rạp chiếu",
+    "add-theater": "Thêm rạp chiếu",
+    "edit-theater": "Sửa rạp chiếu",
+    "delete-theater": "Xóa rạp chiếu",
+    "detail-theater": "Chi tiết rạp chiếu"
 }
