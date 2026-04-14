@@ -11,7 +11,7 @@ import authReducer from 'contexts/auth-reducer/auth';
 // project-imports
 import Loader from 'components/Loader';
 import axios from 'utils/axios';
-import loginApi from 'api/auth/login';
+import loginApi from 'api/login';
 
 // types
 import { AuthInfo, AuthProps, JWTContextType } from 'types/auth';

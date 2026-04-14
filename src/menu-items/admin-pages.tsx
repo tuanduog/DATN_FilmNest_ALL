@@ -38,16 +38,14 @@ const admin: NavItemType = {
       title: 'dashboard',
       type: 'item',
       url: '/admin/dashboard',
-      icon: icons.contactus,
-      target: true
+      icon: icons.contactus
     },
     {
       id: 'combo',
       title: 'combo',
       type: 'item',
       url: '/admin/combo',
-      icon: icons.contactus,
-      target: true
+      icon: icons.contactus
     }
   ]
 };

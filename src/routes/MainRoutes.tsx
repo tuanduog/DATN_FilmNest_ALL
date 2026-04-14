@@ -11,6 +11,8 @@ import ManagerDashboard from 'pages/dashboard/manager';
 import StaffDashboard from 'pages/dashboard/staff';
 import ComboPage from 'pages/combo-page';
 import AddCombo from 'sections/combo/add';
+import ComboDetail from 'sections/combo/detail';
+import EditCombo from 'sections/combo/edit';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
@@ -53,14 +55,14 @@ const MainRoutes = {
           path: 'admin/combo/add',
           element: <AddCombo />
         },
-        // {
-        //   path: 'admin/combo/edit/:id',
-        //   element: <EditComboPage />
-        // },
-        // {
-        //   path: 'admin/combo/detail/:id',
-        //   element: <DetailComboPage />
-        // }
+        {
+          path: 'admin/combo/edit/:id',
+          element: <EditCombo />
+        },
+        {
+          path: 'admin/combo/detail/:id',
+          element: <ComboDetail />
+        }
       ]
     },
     {

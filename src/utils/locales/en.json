@@ -30,5 +30,19 @@
   "manager": "Manager",
   "staff": "Staff",
   "dashboard": "Dashboard",
-  "combo": "Combo"
+  "combo": "Combo",
+  "combo-list": "Combo List",
+  "combo-name": "Combo Name",
+  "add-combo": "Add Combo",
+  "edit-combo": "Edit Combo",
+  "delete-combo": "Delete Combo",
+  "combo-price": "Combo Price",
+  "combo-description": "Combo Description",
+  "combo-status": "Combo Status",
+  "status": "Status",
+  "active": "Active",
+  "inactive": "Inactive",
+  "row-per-page": "Rows per page",
+  "total": "Total",
+  "unknown-error": "Unknown error"
 }

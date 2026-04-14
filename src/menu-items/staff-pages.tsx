@@ -23,8 +23,7 @@ const staff: NavItemType = {
             title: 'dashboard',
             type: 'item',
             url: '/staff/dashboard',
-            icon: icons.contactus,
-            target: true
+            icon: icons.contactus
         }
     ]
 };

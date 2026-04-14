@@ -86,7 +86,6 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
-import formatDate from 'utils/formatDate';
 
 const fuzzyFilter: FilterFn<Combo> = (row, columnId, value, addMeta) => {
     // rank the item
@@ -124,14 +123,14 @@ function EditAction({
     const [openDelete, setOpenDelete] = useState(false);
 
     const handleDelete = async () => {
-        const response = await deleteById(row.original.id);
+        const response = await deleteById(Number(row.original.id));
 
-        if (response.statusCode == HttpStatusCode.Ok) {
+        if (response.status == HttpStatusCode.Ok) {
             setAlert({ open: true, message: 'Xóa combo thành công', severity: 'success' });
             setReload(!reload);
-        } else if (response.statusCode == HttpStatusCode.Unauthorized) {
+        } else if (response.status == HttpStatusCode.Unauthorized) {
             logout();
-        } else if (response.statusCode == HttpStatusCode.UnprocessableEntity) {
+        } else if (response.status == HttpStatusCode.UnprocessableEntity) {
             setAlert({ open: true, message: response.data, severity: 'error' });
         } else {
             setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
@@ -313,7 +312,7 @@ export default function ComboPage() {
             },
             {
                 id: 'name',
-                header: 'Tên combo',
+                header: intl.formatMessage({ id: 'combo-name' }),
                 accessorKey: 'name',
                 dataType: 'text',
                 enableGrouping: false,

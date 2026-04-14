@@ -20,7 +20,7 @@ const create = async (combo: Combo) => {
     }
 }
 
-const getById = async (id: string) => {
+const getById = async (id: number) => {
     try {
         const response = await axiosServices.get(`/api/combo/v1/${id}`);
         return response.data;
@@ -29,7 +29,7 @@ const getById = async (id: string) => {
     }
 }
 
-const update = async (id: number, combo: Combo) => {
+const update = async (id: number, combo: any) => {
     try {
         const response = await axiosServices.put(`/api/combo/v1/${id}`, combo);
         return response.data;
@@ -38,7 +38,7 @@ const update = async (id: number, combo: Combo) => {
     }
 }
 
-const deleteById = async (id: string) => {
+const deleteById = async (id: number) => {
     try {
         const response = await axiosServices.delete(`/api/combo/v1/${id}`);
         return response.data;

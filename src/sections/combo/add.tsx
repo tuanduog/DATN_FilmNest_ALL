@@ -35,17 +35,16 @@ export default function AddCombo() {
     const [activeStep, setActiveStep] = useState(0);
 
     // Extend Combo to hold file for upload locally
-    const initialValues: Combo & { file?: File | null, avatar?: string } = {
+    const initialValues: Combo = {
         id: '',
         name: '',
         price: 0,
         description: '',
         status: 'active',
-        file: null,
-        avatar: ''
+        image: null
     };
 
-    const [combo, setCombo] = useState<Combo & { file?: File | null, avatar?: string }>(initialValues);
+    const [combo, setCombo] = useState<Combo>(initialValues);
 
     const setNext = () => {
         setActiveStep(activeStep + 1);

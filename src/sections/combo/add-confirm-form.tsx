@@ -13,11 +13,11 @@ import { useIntl } from 'react-intl';
 import useAuth from 'hooks/useAuth';
 import { Combo } from 'types/combo';
 import AnimateButton from 'components/@extended/AnimateButton';
-// import { create as getFile } from 'api/file';
+import { uploadImage } from 'api/file';
 
 interface ConfirmProps {
     handleBack: () => void;
-    combo: Combo & { file?: File | null, avatar?: string };
+    combo: Combo;
 }
 
 export default function AddConfirmForm({ handleBack, combo }: ConfirmProps) {
@@ -34,57 +34,58 @@ export default function AddConfirmForm({ handleBack, combo }: ConfirmProps) {
     const handleSubmit = async () => {
         let imageUrl = '';
 
-        if (combo.file) {
-            // const formData = new FormData();
-            // formData.append('file', combo.file);
-            // try {
-            //     const uploadResponse = await getFile(formData);
+        if (combo.image) {
+            const formData = new FormData();
+            formData.append('file', combo.image);
+            formData.append('folder', 'combo');
+            try {
+                const uploadResponse = await uploadImage(formData);
 
-            //     if (uploadResponse.statusCode === HttpStatusCode.Ok) {
-            //         if (uploadResponse.data && uploadResponse.data.url) {
-            //             imageUrl = uploadResponse.data.url;
-            //         }
-            //     } else if (uploadResponse.statusCode === HttpStatusCode.BadRequest) {
-            //         setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
-            //         return;
-            //     } else if (uploadResponse.statusCode === HttpStatusCode.Unauthorized) {
-            //         logout();
-            //         return;
-            //     } else if (uploadResponse.statusCode === HttpStatusCode.UnprocessableEntity) {
-            //         setAlert({ open: true, message: uploadResponse.message, severity: 'error' });
-            //         return;
-            //     } else {
-            //         setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
-            //         return;
-            //     }
-            // } catch (err) {
-            //     setAlert({ open: true, message: 'Lỗi tải ảnh. Gửi form thất bại', severity: 'error' });
-            //     return;
-            // }
+                if (uploadResponse.status === HttpStatusCode.Ok) {
+                    if (uploadResponse.data.secure_url) {
+                        imageUrl = uploadResponse.data.secure_url;
+                    }
+                } else if (uploadResponse.status === HttpStatusCode.BadRequest) {
+                    setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
+                    return;
+                } else if (uploadResponse.status === HttpStatusCode.Unauthorized) {
+                    logout();
+                    return;
+                } else {
+                    setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
+                    return;
+                }
+            } catch (err) {
+                setAlert({ open: true, message: 'Lỗi tải ảnh. Gửi form thất bại', severity: 'error' });
+                return;
+            }
         }
 
         const payload = {
+            image: imageUrl,
             name: combo.name,
             price: combo.price,
             description: combo.description,
-            status: combo.status,
-            image: imageUrl // Gửi hình ảnh nếu có, server có thể sẽ nhận ảnh tại field image hoặc thumbnail tùy thiết kế BE
         };
 
-        const response = await create(payload as any);
+        try {
+            const response = await create(payload as any);
 
-        if (response.statusCode === HttpStatusCode.Ok) {
-            navigate('/admin/combo', {
-                state: { alert: { open: true, severity: 'success', message: 'Thêm combo ưu đãi thành công' } }
-            });
-        } else if (response.statusCode === HttpStatusCode.BadRequest) {
-            setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
-        } else if (response.statusCode === HttpStatusCode.Unauthorized) {
-            logout();
-        } else if (response.statusCode === HttpStatusCode.UnprocessableEntity) {
-            setAlert({ open: true, message: response.message, severity: 'error' });
-        } else {
-            setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
+            if (response.status === HttpStatusCode.Ok) {
+                navigate('/admin/combo', {
+                    state: { alert: { open: true, severity: 'success', message: 'Thêm combo ưu đãi thành công' } }
+                });
+            } else if (response.status === HttpStatusCode.BadRequest) {
+                setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
+            } else if (response.status === HttpStatusCode.Unauthorized) {
+                logout();
+            } else if (response.status === HttpStatusCode.UnprocessableEntity) {
+                setAlert({ open: true, message: response.message, severity: 'error' });
+            } else {
+                setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
+            }
+        } catch (err: any) {
+            setAlert({ open: true, message: err.message, severity: 'error' });
         }
     };
 
@@ -97,14 +98,14 @@ export default function AddConfirmForm({ handleBack, combo }: ConfirmProps) {
                     </Typography>
 
                     <Grid container spacing={3}>
-                        {combo.avatar && combo.avatar.trim() !== '' && (
+                        {combo.image && (
                             <Grid size={12} sx={{ mb: 2 }}>
                                 <Box sx={{ width: '100%' }}>
                                     <Box sx={{ position: 'relative', width: '150px' }}>
                                         <Box>
                                             <img
                                                 alt="image"
-                                                src={combo.avatar}
+                                                src={URL.createObjectURL(combo.image!)}
                                                 style={{ width: '150px', height: '150px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
                                             />
                                         </Box>
@@ -129,13 +130,6 @@ export default function AddConfirmForm({ handleBack, combo }: ConfirmProps) {
                             </Stack>
                         </Grid>
 
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Trạng thái</InputLabel>
-                                <Typography>{combo.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}</Typography>
-                            </Stack>
-                        </Grid>
-
                         <Grid size={{ xs: 12, sm: 12 }}>
                             <Stack sx={{ gap: 1 }}>
                                 <InputLabel sx={{ fontWeight: 'bold' }}>Mô tả</InputLabel>
@@ -154,7 +148,7 @@ export default function AddConfirmForm({ handleBack, combo }: ConfirmProps) {
 
                     <AnimateButton>
                         <Button variant="contained" type="button" sx={{ my: 3 }} color="primary" onClick={handleSubmit}>
-                            Xác nhận & Thêm
+                            Xác nhận
                         </Button>
                     </AnimateButton>
                 </Grid>

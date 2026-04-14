@@ -6,9 +6,7 @@ import {
     Paper,
     Snackbar,
     Alert,
-    FormControl,
-    Select,
-    MenuItem,
+
     Button,
     IconButton,
     Stack,
@@ -24,20 +22,20 @@ import ImageDropZone from 'components/ImageDropZone';
 
 interface ComboFormProps {
     handleNext: () => void;
-    setCombo: (combo: Combo & { file?: File | null, avatar?: string }) => void;
-    combo: Combo & { file?: File | null, avatar?: string };
+    setCombo: (combo: Combo) => void;
+    combo: Combo;
 }
 
 const validationSchema = Yup.object({
     name: Yup.string().required('Tên combo là bắt buộc'),
-    price: Yup.number().required('Giá tiền là bắt buộc').min(0, 'Giá tiền không được âm'),
+    price: Yup.number().required('Giá tiền là bắt buộc').min(1, 'Giá tiền phải lớn hơn 0'),
     description: Yup.string().required('Mô tả là bắt buộc'),
     status: Yup.string().required('Trạng thái là bắt buộc')
 });
 
 export default function ComboForm({ handleNext, setCombo, combo }: ComboFormProps) {
-    const [avatar, setAvatar] = useState<string | undefined>(combo.avatar);
-    const [file, setFile] = useState<File | null | undefined>(combo.file);
+    const [image, setImage] = useState<File | null>(combo.image!);
+    const [preview, setPreview] = useState<string | null>('');
 
     const [alert, setAlert] = useState({
         open: false,
@@ -49,26 +47,19 @@ export default function ComboForm({ handleNext, setCombo, combo }: ComboFormProp
         initialValues: combo,
         validationSchema: validationSchema,
         onSubmit: async (values) => {
-            setCombo({
-                ...values,
-                avatar: avatar,
-                file: file
-            });
+            setCombo({ ...values, image: image });
             handleNext();
         }
     });
 
     const handleGetFileUrl = (e: any) => {
         const selectedFile = e.target.files[0];
-        setAvatar(URL.createObjectURL(selectedFile));
-        setFile(selectedFile);
-
+        setImage(selectedFile);
         return URL.createObjectURL(selectedFile);
     };
 
-    const handleDeleteAvatar = async () => {
-        setAvatar('');
-        setFile(null);
+    const handleDeleteImage = async () => {
+        setImage(null);
     };
 
     return (
@@ -84,12 +75,12 @@ export default function ComboForm({ handleNext, setCombo, combo }: ComboFormProp
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
                                     <InputLabel sx={{ mb: 1 }}>Hình ảnh combo</InputLabel>
-                                    {!avatar ? (
+                                    {!preview ? (
                                         <ImageDropZone
-                                            value={avatar ?? ''}
+                                            value={preview ?? ''}
                                             onGetFile={(files) => handleGetFileUrl(files)}
                                             onChange={(url) => {
-                                                setAvatar(url);
+                                                setPreview(url);
                                             }}
                                             width="150px"
                                             height="150px"
@@ -99,13 +90,13 @@ export default function ComboForm({ handleNext, setCombo, combo }: ComboFormProp
                                             <Box>
                                                 <img
                                                     alt="image"
-                                                    src={avatar}
+                                                    src={preview}
                                                     style={{ width: '150px', height: '150px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
                                                 />
                                             </Box>
 
                                             <IconButton
-                                                onClick={handleDeleteAvatar}
+                                                onClick={handleDeleteImage}
                                                 sx={{
                                                     position: 'absolute',
                                                     top: 4,
@@ -168,25 +159,6 @@ export default function ComboForm({ handleNext, setCombo, combo }: ComboFormProp
                                     error={formik.touched.price && Boolean(formik.errors.price)}
                                     helperText={formik.touched.price && formik.errors.price}
                                 />
-                            </Grid>
-
-                            <Grid size={{ xs: 12, md: 12 }}>
-                                <InputLabel htmlFor="status" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Trạng thái
-                                </InputLabel>
-
-                                <FormControl fullWidth size="small" error={formik.touched.status && Boolean(formik.errors.status)}>
-                                    <Select
-                                        id="status"
-                                        name="status"
-                                        value={formik.values.status}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                    >
-                                        <MenuItem value="active">Hoạt động</MenuItem>
-                                        <MenuItem value="inactive">Không hoạt động</MenuItem>
-                                    </Select>
-                                </FormControl>
                             </Grid>
 
                             <Grid size={12}>

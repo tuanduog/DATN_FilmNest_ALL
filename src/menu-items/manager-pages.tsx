@@ -23,8 +23,7 @@ const manager: NavItemType = {
             title: 'dashboard',
             type: 'item',
             url: '/manager/dashboard',
-            icon: icons.contactus,
-            target: true
+            icon: icons.contactus
         }
     ]
 };
