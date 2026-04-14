@@ -1,12 +1,15 @@
 package com.booking.booking_ticket.controller;
 
-import com.booking.booking_ticket.dto.request.ThearterRequest;
+import com.booking.booking_ticket.dto.request.TheaterRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.entity.Theater;
 import com.booking.booking_ticket.service.Impl.TheatersServiceImpl;
+import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +20,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/theaters")
-public class TheatersController {
+@RequestMapping("api/theater")
+public class TheaterController {
 
     private final TheatersServiceImpl theatersService;
 
@@ -45,7 +48,7 @@ public class TheatersController {
     @GetMapping("/getTheaterByLocation")
     public ResponseData<?> getGenres(@RequestParam String Location)
     {
-        try{
+        try {
             List<Theater> result = theatersService.getTheatersByLocation(Location);
             if(!result.isEmpty())
                 return new ResponseData<>(HttpStatus.OK.value(),"Có theater",result);
@@ -64,7 +67,7 @@ public class TheatersController {
     @GetMapping("/getTheaters")
     public ResponseData<?> getTheaters()
     {
-        try{
+        try {
             List<Theater> result = theatersService.getAllTheater();
             if(!result.isEmpty())
                 return new ResponseData<>(HttpStatus.OK.value(),"Có theater",result);
@@ -78,39 +81,20 @@ public class TheatersController {
         }
     }
 
-    @PostMapping("/add-Theater")
-    public ResponseData<?> addShowtime( @RequestBody ThearterRequest showTimeRequestDTO) {
-        try{
-            return new ResponseData<>(HttpStatus.OK.value(),"Theater add!",theatersService.addTheater(showTimeRequestDTO));
-        }
-        catch (Exception e)
-        {
-            log.error("there is an error : {}",e.getMessage());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
+    @GetMapping("/v1")
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable, @RequestParam String keyword, @RequestParam Status status){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", theatersService.getList(pageable, keyword, status));
     }
 
-    @PutMapping("/edit-Theater")
-    public ResponseData<?> editShowtime(@RequestParam int id, @RequestBody ThearterRequest showTimeRequestDTO) {
-        try{
-            return new ResponseData<>(HttpStatus.OK.value(),"Theater edit!",theatersService.editTheater(id,showTimeRequestDTO));
-        }
-        catch (Exception e)
-        {
-            log.error("there is an error : {}",e.getMessage());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
+    @PostMapping("/v1")
+    public ResponseData<?> addTheater(@RequestBody TheaterRequest request){
+        theatersService.addTheater(request);
+        return new ResponseData<>(HttpStatus.OK.value(), "Add theater successful");
     }
 
-    @DeleteMapping("/delete-Theater")
-    public ResponseData<?> deleteShowtime(@RequestParam int id) {
-        try{
-            return new ResponseData<>(HttpStatus.OK.value(),"Theater delete!",theatersService.deleteTheater(id));
-        }
-        catch (Exception e)
-        {
-            log.error("there is an error : {}",e.getMessage());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
+    @DeleteMapping("/v1/{id}")
+    public ResponseData<?> deleteTheater(@PathVariable Integer id){
+        theatersService.deleteTheater(id);
+        return new ResponseData<>(HttpStatus.OK.value(), "Delete theater successful");
     }
 }

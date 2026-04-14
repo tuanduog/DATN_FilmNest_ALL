@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class ComboController {
     private final ComboService comboService;
 
     @GetMapping("/v1")
-    public ResponseData<?> getList(Pageable pageable, String keyword, Status status){
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable, @RequestParam(required = false) String keyword, @RequestParam(required = false) Status status){
         Page<ComboResponse> data = comboService.getList(pageable, keyword, status);
         return new ResponseData<>(HttpStatus.OK.value(), "Get List Successful", data);
     }

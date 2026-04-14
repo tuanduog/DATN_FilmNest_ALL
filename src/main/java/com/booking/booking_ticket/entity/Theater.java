@@ -4,8 +4,7 @@ package com.booking.booking_ticket.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "theater")
@@ -18,13 +17,17 @@ public class Theater extends BaseEntity {
 
     String name;
 
+    @Column(name = "province_code")
     Integer provinceCode;
 
+    @Column(name = "province_name")
     String provinceName;
 
-    Integer districtCode;
+    @Column(name = "commune_code")
+    Integer communeCode;
 
-    String districtName;
+    @Column(name = "commune_name")
+    String communeName;
 
     String address;
 
@@ -38,11 +41,11 @@ public class Theater extends BaseEntity {
     Double longitude;
 
     @Column(name = "place_id")
-    Integer placeId;
+    String placeId;
 
     @Column(name = "open_time")
-    String openTime;
+    LocalTime openTime;
 
     @Column(name = "close_time")
-    String closeTime;
+    LocalTime closeTime;
 }
