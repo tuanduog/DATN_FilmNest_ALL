@@ -2,9 +2,9 @@ export interface Theater {
     id?: number;
     name: string;
     address: string;
-    provinceCode: number;
+    provinceCode: string;
     provinceName: string;
-    communeCode: number;
+    communeCode: string;
     communeName: string;
     description: string;
     hotline: string;

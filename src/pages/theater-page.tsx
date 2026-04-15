@@ -86,6 +86,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
 import { Theater } from 'types/theater';
+import { formatTime } from 'utils/formatDateTime';
 
 const fuzzyFilter: FilterFn<Theater> = (row, columnId, value, addMeta) => {
     // rank the item
@@ -319,19 +320,29 @@ export default function TheaterPage() {
                 meta: { width: '35%' }
             },
             {
-                id: 'description',
-                header: intl.formatMessage({ id: 'description' }),
-                accessorKey: 'description',
+                id: 'hotline',
+                header: intl.formatMessage({ id: 'hotline' }),
+                accessorKey: 'hotline',
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' }
             },
             {
-                id: 'price',
-                header: intl.formatMessage({ id: 'price' }),
-                accessorKey: 'price',
+                id: 'openTime',
+                header: intl.formatMessage({ id: 'open-time' }),
+                accessorKey: 'openTime',
                 dataType: 'text',
                 enableGrouping: false,
+                cell: (cell) => formatTime(cell.row.original.openTime),
+                meta: { width: '35%' }
+            },
+            {
+                id: 'closeTime',
+                header: intl.formatMessage({ id: 'close-time' }),
+                accessorKey: 'closeTime',
+                dataType: 'text',
+                enableGrouping: false,
+                cell: (cell) => formatTime(cell.row.original.closeTime),
                 meta: { width: '35%' }
             },
             {

@@ -19,12 +19,27 @@ import * as Yup from 'yup';
 import { useState, useEffect } from 'react';
 import { Theater } from 'types/theater';
 import AnimateButton from 'components/@extended/AnimateButton';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L, { LatLng } from 'leaflet';
 
 interface TheaterFormProps {
     handleNext: () => void;
     setTheater: (theater: Theater) => void;
     theater: Theater;
+}
+
+interface MapClickHandlerProps {
+    onClick: (latlng: LatLng) => void;
+}
+
+function MapClickHandler({ onClick }: MapClickHandlerProps) {
+    useMapEvents({
+        click(e) {
+            onClick(e.latlng);
+        }
+    });
+    return null;
 }
 
 const validationSchema = Yup.object({
@@ -101,13 +116,6 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
         formik.setFieldValue('communeName', currentCommune?.name || '');
     };
 
-    const handleMapClick = (e: google.maps.MapMouseEvent) => {
-        if (e.latLng) {
-            formik.setFieldValue('latitude', e.latLng.lat());
-            formik.setFieldValue('longitude', e.latLng.lng());
-        }
-    };
-
     return (
         <Box>
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 15 }, mr: { xs: 0, lg: 15 }, borderRadius: 2 }}>
@@ -117,7 +125,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                             Thông tin rạp chiếu
                         </Typography>
 
-                        <Grid container spacing={3}>
+                        <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
                                     Tên rạp chiếu
@@ -206,25 +214,6 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                                 </FormControl>
                             </Grid>
 
-                            <Grid size={12}>
-                                <InputLabel htmlFor="address" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Địa chỉ chi tiết
-                                </InputLabel>
-
-                                <TextField
-                                    id="address"
-                                    name="address"
-                                    placeholder="Nhập địa chỉ chi tiết"
-                                    size="small"
-                                    fullWidth
-                                    value={formik.values.address}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    error={formik.touched.address && Boolean(formik.errors.address)}
-                                    helperText={formik.touched.address && formik.errors.address as string}
-                                />
-                            </Grid>
-
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="openTime" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
                                     Giờ mở cửa
@@ -266,6 +255,62 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                             </Grid>
 
                             <Grid size={12}>
+                                <MapContainer
+                                    center={
+                                        formik.values.latitude && formik.values.longitude
+                                            ? [formik.values.latitude, formik.values.longitude]
+                                            : [21.0285, 105.8542]
+                                    }
+                                    zoom={15}
+                                    style={{ width: "100%", height: "400px", borderRadius: "8px" }}
+                                >
+                                    <TileLayer
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    />
+
+                                    <MapClickHandler
+                                        onClick={async (latlng: LatLng) => {
+                                            formik.setFieldValue('latitude', latlng.lat);
+                                            formik.setFieldValue('longitude', latlng.lng);
+
+                                            try {
+                                                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`);
+                                                const data = await res.json();
+                                                if (data && data.display_name) {
+                                                    formik.setFieldValue('address', data.display_name);
+                                                }
+                                            } catch (err) {
+                                                console.error('Failed to fetch address', err);
+                                            }
+                                        }}
+                                    />
+
+                                    {formik.values.latitude && formik.values.longitude && (
+                                        <Marker position={[formik.values.latitude, formik.values.longitude]} />
+                                    )}
+                                </MapContainer>
+                            </Grid>
+
+                            <Grid size={12}>
+                                <InputLabel htmlFor="address" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Địa chỉ
+                                </InputLabel>
+
+                                <TextField
+                                    id="address"
+                                    name="address"
+                                    placeholder="Nhập địa chỉ"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.address}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.address && Boolean(formik.errors.address)}
+                                    helperText={formik.touched.address && formik.errors.address as string}
+                                />
+                            </Grid>
+
+                            <Grid size={12}>
                                 <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
                                     Mô tả
                                 </InputLabel>
@@ -284,28 +329,6 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                                     error={formik.touched.description && Boolean(formik.errors.description)}
                                     helperText={formik.touched.description && formik.errors.description as string}
                                 />
-                            </Grid>
-
-                            <Grid size={12}>
-                                <InputLabel sx={{ mb: 1 }}>
-                                    Vị trí bản đồ (Click để sửa đổi tọa độ: {formik.values.latitude}, {formik.values.longitude})
-                                </InputLabel>
-                                <LoadScript googleMapsApiKey={import.meta.env.VITE_APP_GOOGLE_MAPS_API_KEY!}>
-                                    <GoogleMap
-                                        mapContainerStyle={{ width: "100%", height: "400px", borderRadius: "8px" }}
-                                        center={
-                                            formik.values.latitude && formik.values.longitude
-                                                ? { lat: formik.values.latitude, lng: formik.values.longitude }
-                                                : { lat: 21.0285, lng: 105.8542 }
-                                        }
-                                        zoom={15}
-                                        onClick={handleMapClick}
-                                    >
-                                        {formik.values.latitude && formik.values.longitude && (
-                                            <Marker position={{ lat: formik.values.latitude, lng: formik.values.longitude }} />
-                                        )}
-                                    </GoogleMap>
-                                </LoadScript>
                             </Grid>
                         </Grid>
                     </Box>

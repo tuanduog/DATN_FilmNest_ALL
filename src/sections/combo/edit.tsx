@@ -142,7 +142,7 @@ export default function EditCombo() {
                             Thông tin combo
                         </Typography>
 
-                        <Grid container spacing={3}>
+                        <Grid container spacing={2}>
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
                                     <InputLabel sx={{ mb: 1 }}>Hình ảnh combo</InputLabel>

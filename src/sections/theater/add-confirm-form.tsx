@@ -89,13 +89,6 @@ export default function AddConfirmForm({ handleBack, theater }: ConfirmProps) {
                             </Stack>
                         </Grid>
 
-                        <Grid size={{ xs: 12 }}>
-                            <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Địa chỉ chi tiết</InputLabel>
-                                <Typography>{theater.address}</Typography>
-                            </Stack>
-                        </Grid>
-
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
                                 <InputLabel sx={{ fontWeight: 'bold' }}>Giờ mở cửa</InputLabel>
@@ -107,6 +100,13 @@ export default function AddConfirmForm({ handleBack, theater }: ConfirmProps) {
                             <Stack sx={{ gap: 1 }}>
                                 <InputLabel sx={{ fontWeight: 'bold' }}>Giờ đóng cửa</InputLabel>
                                 <Typography>{theater.closeTime}</Typography>
+                            </Stack>
+                        </Grid>
+
+                        <Grid size={{ xs: 12 }}>
+                            <Stack sx={{ gap: 1 }}>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>Địa chỉ chi tiết</InputLabel>
+                                <Typography>{theater.address}</Typography>
                             </Stack>
                         </Grid>
 

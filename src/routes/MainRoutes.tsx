@@ -15,6 +15,8 @@ import ComboDetail from 'sections/combo/detail';
 import EditCombo from 'sections/combo/edit';
 import TheaterPage from 'pages/theater-page';
 import AddTheater from 'sections/theater/add';
+import TheaterDetail from 'sections/theater/detail';
+import EditTheater from 'sections/theater/edit';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
@@ -72,6 +74,14 @@ const MainRoutes = {
         {
           path: 'admin/theater/add',
           element: <AddTheater />
+        },
+        {
+          path: 'admin/theater/edit/:id',
+          element: <EditTheater />
+        },
+        {
+          path: 'admin/theater/detail/:id',
+          element: <TheaterDetail />
         }
       ]
     },

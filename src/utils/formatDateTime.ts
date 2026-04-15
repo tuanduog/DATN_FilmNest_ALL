@@ -7,3 +7,8 @@ export default function formatDate(date: Date) {
         day: '2-digit',
     }).format(new Date(date));
 }
+
+export function formatTime(time: string) {
+    if (!time) return '';
+    return time.slice(0, 5);
+}

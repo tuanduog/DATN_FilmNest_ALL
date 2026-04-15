@@ -1,29 +1,27 @@
 import {
     Box,
     InputLabel,
-    TextField,
     Typography,
     Paper,
     Button,
-    IconButton,
     Stack,
     Grid,
     Snackbar,
     Alert
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { CloseCircle } from 'iconsax-reactjs';
 import AnimateButton from 'components/@extended/AnimateButton';
-import ImageDropZone from 'components/ImageDropZone';
 import { useParams } from 'react-router';
 import { getById } from 'api/combo';
 import { HttpStatusCode } from 'axios';
 import { useIntl } from 'react-intl';
+import { useNavigate } from 'react-router';
 
 export default function ComboDetail() {
     const { id } = useParams<{ id: string }>();
     const intl = useIntl();
     const [combo, setCombo] = useState<any>(null);
+    const navigate = useNavigate();
     const [alert, setAlert] = useState({
         open: false,
         message: '',
@@ -57,7 +55,7 @@ export default function ComboDetail() {
                         Thông tin combo
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         {combo?.image && (
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
@@ -100,7 +98,7 @@ export default function ComboDetail() {
                 <Grid size={12} sx={{ p: 0, m: 0 }}>
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
-                            <Button variant="contained" sx={{ my: 3, ml: 1 }}>
+                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/combo/edit/${id}`)}>
                                 Cập nhật
                             </Button>
                         </AnimateButton>

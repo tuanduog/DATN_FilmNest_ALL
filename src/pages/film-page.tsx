@@ -86,7 +86,7 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
-import formatDate from 'utils/formatDate';
+import formatDate from 'utils/formatDateTime';
 import { resetPassword } from 'api/user';
 
 const fuzzyFilter: FilterFn<Teacher> = (row, columnId, value, addMeta) => {
