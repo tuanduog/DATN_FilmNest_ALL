@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface TheatersService {
+public interface TheaterService {
 
     List<String> getLocations();
 
@@ -18,6 +18,8 @@ public interface TheatersService {
     List<Theater> getAllTheater();
 
     Page<TheaterResponse> getList(Pageable pageable, String keyword, Status status);
+
+    TheaterResponse getById(Integer id);
 
     void addTheater(TheaterRequest request);
 

@@ -4,7 +4,7 @@ import com.booking.booking_ticket.dto.request.TheaterRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.entity.Theater;
-import com.booking.booking_ticket.service.Impl.TheatersServiceImpl;
+import com.booking.booking_ticket.service.Impl.TheaterServiceImpl;
 import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("api/theater")
 public class TheaterController {
 
-    private final TheatersServiceImpl theatersService;
+    private final TheaterServiceImpl theatersService;
 
     @GetMapping("/getLocations")
     public ResponseData<?> getGenres()
@@ -41,8 +41,6 @@ public class TheaterController {
             log.error("there is an error of introspect: {}",e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
-
-
     }
 
     @GetMapping("/getTheaterByLocation")
@@ -60,8 +58,6 @@ public class TheaterController {
             log.error("there is an error of introspect: {}",e.getMessage());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
-
-
     }
 
     @GetMapping("/getTheaters")
@@ -82,14 +78,25 @@ public class TheaterController {
     }
 
     @GetMapping("/v1")
-    public ResponseData<?> getList(@PageableDefault() Pageable pageable, @RequestParam String keyword, @RequestParam Status status){
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable, @RequestParam(required = false) String keyword, @RequestParam(required = false) Status status){
         return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", theatersService.getList(pageable, keyword, status));
+    }
+
+    @GetMapping("/v1/{id}")
+    public ResponseData<?> getById(@PathVariable Integer id){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get theater successful", theatersService.getById(id));
     }
 
     @PostMapping("/v1")
     public ResponseData<?> addTheater(@RequestBody TheaterRequest request){
         theatersService.addTheater(request);
         return new ResponseData<>(HttpStatus.OK.value(), "Add theater successful");
+    }
+
+    @PutMapping("/v1/{id}")
+    public ResponseData<?> updateTheater(@PathVariable Integer id, @RequestBody TheaterRequest request){
+        theatersService.editTheater(id, request);
+        return new ResponseData<>(HttpStatus.OK.value(), "Update theater successful");
     }
 
     @DeleteMapping("/v1/{id}")

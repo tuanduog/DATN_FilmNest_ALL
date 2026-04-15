@@ -4,7 +4,7 @@ import com.booking.booking_ticket.dto.request.TheaterRequest;
 import com.booking.booking_ticket.dto.response.TheaterResponse;
 import com.booking.booking_ticket.entity.Theater;
 import com.booking.booking_ticket.repository.TheaterRepository;
-import com.booking.booking_ticket.service.TheatersService;
+import com.booking.booking_ticket.service.TheaterService;
 import com.booking.booking_ticket.utils.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class TheatersServiceImpl implements TheatersService {
+public class TheaterServiceImpl implements TheaterService {
 
     @Autowired
     public TheaterRepository theaterRepository;
@@ -46,6 +46,29 @@ public class TheatersServiceImpl implements TheatersService {
     }
 
     @Override
+    public TheaterResponse getById(Integer id){
+        Theater theater = theaterRepository.getOne(id);
+
+        TheaterResponse response = new TheaterResponse();
+        response.setId(theater.getId());
+        response.setAddress(theater.getAddress());
+        response.setName(theater.getName());
+        response.setHotline(theater.getHotline());
+        response.setOpenTime(theater.getOpenTime());
+        response.setCloseTime(theater.getCloseTime());
+        response.setStatus(theater.getStatus());
+        response.setCommuneName(theater.getCommuneName());
+        response.setProvinceName(theater.getProvinceName());
+        response.setDescription(theater.getDescription());
+        response.setLatitude(theater.getLatitude());
+        response.setLongitude(theater.getLongitude());
+        response.setProvinceCode(theater.getProvinceCode());
+        response.setCommuneCode(theater.getCommuneCode());
+
+        return response;
+    }
+
+    @Override
     public void addTheater(TheaterRequest request) {
         Theater theater = new Theater();
 
@@ -65,6 +88,7 @@ public class TheatersServiceImpl implements TheatersService {
 
         theater.setOpenTime(request.getOpenTime());
         theater.setCloseTime(request.getCloseTime());
+        theater.setStatus(Status.ACTIVE);
 
         theaterRepository.save(theater);
     }

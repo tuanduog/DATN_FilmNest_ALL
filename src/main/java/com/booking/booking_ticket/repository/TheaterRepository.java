@@ -28,5 +28,4 @@ public interface TheaterRepository extends JpaRepository<Theater,Integer> {
         AND (:status IS NULL OR t.status = :status)
     """)
     Page<TheaterResponse> findAllForKeyword(Pageable pageable, String keyword, Status status);
-
 }

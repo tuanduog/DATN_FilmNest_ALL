@@ -18,13 +18,13 @@ public class Theater extends BaseEntity {
     String name;
 
     @Column(name = "province_code")
-    Integer provinceCode;
+    String provinceCode;
 
     @Column(name = "province_name")
     String provinceName;
 
     @Column(name = "commune_code")
-    Integer communeCode;
+    String communeCode;
 
     @Column(name = "commune_name")
     String communeName;

@@ -21,11 +21,11 @@ public class TheaterResponse {
 
     String address;
 
-    Integer provinceCode;
+    String provinceCode;
 
     String provinceName;
 
-    Integer communeCode;
+    String communeCode;
 
     String communeName;
 
