@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
         util.validateUser(request.getUsername(), request.getEmail(), request.getPhone());
         Users user = new Users();
         user.setUsername(request.getUsername());
+        user.setFullname(request.getFullname());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode("123456"));
         user.setPhone(request.getPhone());
@@ -108,6 +109,7 @@ public class UserServiceImpl implements UserService {
         util.validateExistPhone(user.getPhone(), request.getPhone());
 
         user.setUsername(request.getUsername());
+        user.setFullname(request.getFullname());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setDob(request.getDob());

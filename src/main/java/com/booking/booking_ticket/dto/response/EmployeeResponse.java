@@ -27,6 +27,8 @@ public class EmployeeResponse {
 
     String email;
 
+    String fullname;
+
     String phone;
 
     Role role;
@@ -39,12 +41,13 @@ public class EmployeeResponse {
 
     String nationality;
 
-    public EmployeeResponse(Integer id, String code, Double salary, LocalDate hireAt, String email, String phone, Role role, Status status) {
+    public EmployeeResponse(Integer id, String code, Double salary, LocalDate hireAt, String email, String fullname, String phone, Role role, Status status) {
         this.id = id;
         this.code = code;
         this.salary = salary;
         this.hireAt = hireAt;
         this.email = email;
+        this.fullname = fullname;
         this.phone = phone;
         this.role = role;
         this.status = status;

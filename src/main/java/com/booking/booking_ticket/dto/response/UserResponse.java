@@ -23,6 +23,8 @@ public class UserResponse {
 
     String email;
 
+    String fullname;
+
     String phone;
 
     Gender gender;

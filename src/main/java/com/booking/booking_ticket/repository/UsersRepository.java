@@ -19,7 +19,7 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
     Optional<Users> findByPhone(String phone);
 
     @Query("""
-        SELECT new com.booking.booking_ticket.dto.response.UserResponse(u.id, u.username, u.email, u.phone, u.gender, u.dob, u.nationality, u.role, u.status)
+        SELECT new com.booking.booking_ticket.dto.response.UserResponse(u.id, u.username, u.email, u.fullname, u.phone, u.gender, u.dob, u.nationality, u.role, u.status)
         FROM Users u
         WHERE (LOWER(u.username) LIKE :keyword OR LOWER(u.email) LIKE :keyword)
         AND (:status IS NULL OR u.status = :status)

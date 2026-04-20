@@ -1,7 +1,9 @@
 package com.booking.booking_ticket.entity;
 
+import com.booking.booking_ticket.utils.MembershipType;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Table(name = "membership")
@@ -9,18 +11,21 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Membership extends BaseEntity{
 
-    private String name;
+    String image;
 
-    private String type;
+    String name;
 
-    private Double price;
+    MembershipType type;
 
-    private Integer discount;
+    Double price;
 
-    @Column(name = "duration", nullable = false, columnDefinition = "TEXT")
-    private Integer duration;
+    Integer discount;
 
-    private String description;
+    Integer duration;
+
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
+    String description;
 }

@@ -19,6 +19,8 @@ public class UserRequest implements Serializable {
 
     String email;
 
+    String fullname;
+
     String phone;
 
     Gender gender;
