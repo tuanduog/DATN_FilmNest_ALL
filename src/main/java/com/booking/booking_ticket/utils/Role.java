@@ -1,18 +1,31 @@
 package com.booking.booking_ticket.utils;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.Arrays;
 
 public enum Role {
 
-    @JsonProperty("administrator")
-    ADMINISTRATOR,
+    ADMINISTRATOR("administrator"), MANAGER("manager"), STAFF("staff"), USER("user");
 
-    @JsonProperty("manager")
-    MANAGER,
+    private final String value;
 
-    @JsonProperty("staff")
-    STAFF,
+    Role(String value) {
+        this.value = value;
+    }
 
-    @JsonProperty("user")
-    USER
+    @JsonValue
+    public String getValue() {
+        return value;
+    }
+
+    @JsonCreator
+    public static Role fromValue(String value) {
+        return Arrays.stream(Role.values())
+                .filter(s -> s.value.equalsIgnoreCase(value))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Invalid status " + value));
+    }
 }

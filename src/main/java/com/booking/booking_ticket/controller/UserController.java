@@ -2,23 +2,20 @@ package com.booking.booking_ticket.controller;
 
 import java.util.List;
 
+import com.booking.booking_ticket.dto.request.UserRequest;
+import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.service.UserService;
+import com.booking.booking_ticket.utils.Status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.booking.booking_ticket.entity.Users;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
@@ -55,5 +52,33 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to getusers : " + e.getMessage());
         }
+    }
+
+    @GetMapping("/v1")
+    public ResponseData<?> getList(Pageable pageable, String keyword, Status status) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successfully", userService.getList(pageable, keyword, status));
+    }
+
+    @GetMapping("/v1/{id}")
+    public ResponseData<?> getById(@PathVariable Integer id) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get user successfully", userService.getById(id));
+    }
+
+    @PostMapping("/v1")
+    public ResponseData<?> addUser(@RequestBody UserRequest user) {
+        userService.addUser(user);
+        return new ResponseData<>(HttpStatus.OK.value(), "Add user successfully");
+    }
+
+    @PutMapping("/v1/{id}")
+    public ResponseData<?> updateUser(@PathVariable Integer id, @RequestBody UserRequest user) {
+        userService.updateUser(id, user);
+        return new ResponseData<>(HttpStatus.OK.value(), "Update user successfully");
+    }
+
+    @DeleteMapping("/v1/{id}")
+    public ResponseData<?> deleteUser(@PathVariable Integer id) {
+        userService.deleteUser(id);
+        return new ResponseData<>(HttpStatus.OK.value(), "Delete user successfully");
     }
 }

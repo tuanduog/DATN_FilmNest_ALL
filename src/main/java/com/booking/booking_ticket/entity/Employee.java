@@ -26,6 +26,10 @@ public class Employee extends BaseEntity{
     LocalDate hireAt;
 
     @ManyToOne
+    @JoinColumn(name = "manager_id")
+    Employee manager;
+
+    @ManyToOne
     @JoinColumn(name = "theater_id")
     Theater theater;
 }

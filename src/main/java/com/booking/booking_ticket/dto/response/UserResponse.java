@@ -1,19 +1,23 @@
-package com.booking.booking_ticket.dto;
+package com.booking.booking_ticket.dto.response;
 
+import com.booking.booking_ticket.utils.Gender;
 import com.booking.booking_ticket.utils.Role;
+import com.booking.booking_ticket.utils.Status;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-@Data
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDTO {
+public class UserResponse {
 
-    Integer userId;
+    Integer id;
 
     String username;
 
@@ -21,7 +25,13 @@ public class UserDTO {
 
     String phone;
 
-    String membership;
+    Gender gender;
+
+    LocalDate dob;
+
+    String nationality;
 
     Role role;
+
+    Status status;
 }

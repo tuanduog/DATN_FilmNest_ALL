@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/combo")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ComboController {
 
     private final ComboService comboService;
