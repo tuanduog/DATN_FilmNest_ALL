@@ -61,7 +61,7 @@ import {
 // project-imports
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
-import { deleteById, getList } from 'api/teacher';
+import { deleteById, getList } from 'api/employee';
 
 import EmptyTable from 'components/third-party/react-table/EmptyTable';
 import HeaderSort from 'components/third-party/react-table/HeaderSort';
@@ -70,7 +70,7 @@ import RowEditable from 'components/third-party/react-table/RowEditable';
 // assets
 import { Add, ArrowDown2, ArrowRight2, Command, Edit2, Eye, Lock, TableDocument, Trash } from 'iconsax-reactjs';
 import { DEFAULT_PAGE_SIZE, PageRequest } from 'types/paging';
-import type { Teacher } from 'types/teacher';
+import type { Employee } from 'types/employee';
 import {
     Alert,
     Button,
@@ -88,7 +88,7 @@ import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
 import formatDate from 'utils/formatDateTime';
 
-const fuzzyFilter: FilterFn<Teacher> = (row, columnId, value, addMeta) => {
+const fuzzyFilter: FilterFn<Employee> = (row, columnId, value, addMeta) => {
     // rank the item
     const itemRank = rankItem(row.getValue(columnId), value);
 
@@ -107,7 +107,7 @@ function EditAction({
     setReload,
     setAlert
 }: {
-    row: Row<Teacher>;
+    row: Row<Employee>;
     reload: boolean;
     setReload: (e: boolean) => void;
     setAlert: React.Dispatch<
@@ -121,22 +121,17 @@ function EditAction({
     const navigate = useNavigate();
     const intl = useIntl();
     const { user, logout } = useAuth();
-    const [hasDetailPermission, setHasDetailPermission] = useState(false);
-    const [hasEditPermission, setHasEditPermission] = useState(false);
-    const [hasDeletePermission, setHasDeletePermission] = useState(false);
-    const [hasResetPasswordPermission, setHasResetPasswordPermission] = useState(false);
-    const [open, setOpen] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
 
     const handleDelete = async () => {
-        const response = await deleteById(row.original.id);
+        const response = await deleteById(Number(row.original.id));
 
-        if (response.statusCode == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: 'Xóa giáo viên/trợ giảng thành công', severity: 'success' });
+        if (response.status == HttpStatusCode.Ok) {
+            setAlert({ open: true, message: 'Xóa nhân viên thành công', severity: 'success' });
             setReload(!reload);
-        } else if (response.statusCode == HttpStatusCode.Unauthorized) {
+        } else if (response.status == HttpStatusCode.Unauthorized) {
             logout();
-        } else if (response.statusCode == HttpStatusCode.UnprocessableEntity) {
+        } else if (response.status == HttpStatusCode.UnprocessableEntity) {
             setAlert({ open: true, message: response.data, severity: 'error' });
         } else {
             setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
@@ -145,56 +140,25 @@ function EditAction({
         setOpenDelete(false);
     };
 
-    const handleResetPassword = async () => {
-        const response = await resetPassword(row.original.username);
-
-        if (response.statusCode == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: 'Đặt lại mật khẩu thành công', severity: 'success' });
-            setReload(!reload);
-        } else if (response.statusCode == HttpStatusCode.Unauthorized) {
-            logout();
-        } else if (response.statusCode == HttpStatusCode.UnprocessableEntity) {
-            setAlert({ open: true, message: response.data, severity: 'error' });
-        } else {
-            setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
-        }
-
-        setOpen(false);
-    };
-
     return (
         <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-            {hasDetailPermission && (
-                <Tooltip title={intl.formatMessage({ id: 'detail' })}>
-                    <IconButton color="primary" onClick={() => navigate(`/teacher/detail/${row.id}`)} disabled={row.original.status == 0}>
-                        <Eye variant="Outline" />
-                    </IconButton>
-                </Tooltip>
-            )}
+            <Tooltip title={intl.formatMessage({ id: 'detail-employee' })}>
+                <IconButton color="primary" onClick={() => navigate(`/admin/employee/detail/${row.id}`)} disabled={row.original.status == 'inactive'}>
+                    <Eye variant="Outline" />
+                </IconButton>
+            </Tooltip>
 
-            {hasEditPermission && (
-                <Tooltip title={intl.formatMessage({ id: 'edit' })}>
-                    <IconButton color="primary" onClick={() => navigate(`/teacher/edit/${row.id}`)} disabled={row.original.status == 0}>
-                        <Edit2 variant="Outline" />
-                    </IconButton>
-                </Tooltip>
-            )}
+            <Tooltip title={intl.formatMessage({ id: 'edit-employee' })}>
+                <IconButton color="primary" onClick={() => navigate(`/admin/employee/edit/${row.id}`)} disabled={row.original.status == 'inactive'}>
+                    <Edit2 variant="Outline" />
+                </IconButton>
+            </Tooltip>
 
-            {hasDeletePermission && (
-                <Tooltip title={intl.formatMessage({ id: 'delete' })}>
-                    <IconButton color="primary" onClick={() => setOpenDelete(true)} disabled={row.original.status == 0}>
-                        <Trash variant="Outline" />
-                    </IconButton>
-                </Tooltip>
-            )}
-
-            {hasResetPasswordPermission && (
-                <Tooltip title={intl.formatMessage({ id: 'reset-password' })}>
-                    <IconButton color="primary" onClick={() => setOpen(true)} disabled={row.original.status == 0}>
-                        <Lock variant="Outline" />
-                    </IconButton>
-                </Tooltip>
-            )}
+            <Tooltip title={intl.formatMessage({ id: 'delete-employee' })}>
+                <IconButton color="error" onClick={() => setOpenDelete(true)} disabled={row.original.status == 'inactive'}>
+                    <Trash variant="Outline" />
+                </IconButton>
+            </Tooltip>
 
             <Dialog
                 open={openDelete}
@@ -202,11 +166,11 @@ function EditAction({
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa giáo viên/trợ giảng này không?</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa nhân viên này không?</DialogTitle>
 
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa giáo viên/trở giảng, tất cả thông tin đi kèm cũng sẽ bị xóa.
+                        Khi xóa nhân viên này, tất cả thông tin đi kèm cũng sẽ bị xóa.
                     </DialogContentText>
                 </DialogContent>
 
@@ -216,26 +180,6 @@ function EditAction({
                     </Button>
 
                     <Button variant="contained" color="error" onClick={() => handleDelete()} autoFocus>
-                        Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-                <DialogTitle id="alert-dialog-title">Bạn có muốn đặt lại mật khẩu không?</DialogTitle>
-
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Hành động sẽ gây ra thay đổi dữ liệu, bạn có chắc chắn muốn đặt lại mật khẩu không?
-                    </DialogContentText>
-                </DialogContent>
-
-                <DialogActions>
-                    <Button variant="contained" color="primary" onClick={() => setOpen(false)}>
-                        Huỷ
-                    </Button>
-
-                    <Button variant="contained" color="error" onClick={() => handleResetPassword()} autoFocus>
                         Xác nhận
                     </Button>
                 </DialogActions>
@@ -351,11 +295,11 @@ function DraggableRow({ row }: { row: Row<any> }) {
 
 // ==============================|| REACT TABLE - MAIN ||============================== //
 
-export default function Teacher() {
+export default function EmployeePage() {
     const { logout, user } = useAuth();
     const intl = useIntl();
     const [reload, setReload] = useState(false);
-    const columns = useMemo<ColumnDef<Teacher>[]>(
+    const columns = useMemo<ColumnDef<Employee>[]>(
         () => [
             {
                 id: 'id',
@@ -368,25 +312,17 @@ export default function Teacher() {
                 meta: { className: 'cell-center' }
             },
             {
-                id: 'fullName',
-                header: 'Tên giáo viên',
-                accessorKey: 'fullName',
+                id: 'code',
+                header: intl.formatMessage({ id: 'code' }),
+                accessorKey: 'code',
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' }
             },
             {
-                id: 'roleName',
-                header: intl.formatMessage({ id: 'roleName' }),
-                accessorKey: 'roleName',
-                dataType: 'text',
-                enableGrouping: false,
-                meta: { width: '35%' }
-            },
-            {
-                id: 'phone',
-                header: intl.formatMessage({ id: 'phone' }),
-                accessorKey: 'phone',
+                id: 'fullname',
+                header: intl.formatMessage({ id: 'fullname' }),
+                accessorKey: 'fullname',
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' }
@@ -400,22 +336,47 @@ export default function Teacher() {
                 meta: { width: '35%' }
             },
             {
-                id: 'birthday',
-                header: intl.formatMessage({ id: 'birthday' }),
-                accessorKey: 'birthday',
+                id: 'phone',
+                header: intl.formatMessage({ id: 'phone' }),
+                accessorKey: 'phone',
+                dataType: 'text',
+                enableGrouping: false,
+                meta: { width: '35%' }
+            },
+            {
+                id: 'gender',
+                header: intl.formatMessage({ id: 'gender' }),
+                accessorKey: 'gender',
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' },
-                cell: ({ cell }) => formatDate(cell.getValue<string>())
+                cell: ({ row }) => {
+                    const gender = row.original.gender;
+                    return gender === 'MALE' ? 'Nam' : gender === 'FEMALE' ? 'Nữ' : 'Khác';
+                }
             },
             {
                 id: 'hireAt',
-                header: 'Ngày bắt đầu làm việc',
+                header: intl.formatMessage({ id: 'hire-at' }),
                 accessorKey: 'hireAt',
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' },
-                cell: ({ cell }) => formatDate(cell.getValue<string>())
+                cell: ({ row }) => {
+                    return formatDate(row.original.hireAt);
+                }
+            },
+            {
+                id: 'role',
+                header: intl.formatMessage({ id: 'role' }),
+                accessorKey: 'role',
+                dataType: 'text',
+                enableGrouping: false,
+                meta: { width: '35%' },
+                cell: ({ row }) => {
+                    const role = row.original.role;
+                    return role === 'MANAGER' ? 'Quản lý rạp' : role === 'STAFF' ? 'Nhân viên' : role;
+                }
             },
             {
                 id: 'status',
@@ -427,9 +388,9 @@ export default function Teacher() {
                     return (
                         <Chip
                             label={
-                                status === 1 ? intl.formatMessage({ id: 'active' }) : status === 0 ? intl.formatMessage({ id: 'inactive' }) : 'UNKNOWN'
+                                status === 'ACTIVE' ? intl.formatMessage({ id: 'active' }) : status === 'INACTIVE' ? intl.formatMessage({ id: 'inactive' }) : 'UNKNOWN'
                             }
-                            color={status === 1 ? 'success' : 'error'}
+                            color={status === 'ACTIVE' ? 'success' : 'error'}
                         />
                     );
                 },
@@ -448,7 +409,7 @@ export default function Teacher() {
         [intl, reload]
     );
     let options: number[] = [10, 25, 50, 100];
-    const [data, setData] = useState<Teacher[]>([]);
+    const [data, setData] = useState<Employee[]>([]);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [pageNumber, setPageNumber] = useState(0);
@@ -457,10 +418,8 @@ export default function Teacher() {
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: '',
-        roleId: ''
+        status: ''
     });
-    const [hasAddPermission, setHasAddPermission] = useState(false);
     const [alert, setAlert] = useState({
         open: false,
         message: '',
@@ -488,22 +447,22 @@ export default function Teacher() {
     };
 
     useEffect(() => {
-        const fetchTeachers = async () => {
+        const fetchEmployees = async () => {
             const response = await getList(pageRequest);
 
-            if (response.statusCode === HttpStatusCode.Ok) {
+            if (response.status === HttpStatusCode.Ok) {
                 setData(response.data.content);
                 setTotalPages(response.data.totalPages);
                 setTotalElements(response.data.totalElements);
                 setPageNumber(response.data.pageable.pageNumber);
-            } else if (response.statusCode === HttpStatusCode.Unauthorized) {
+            } else if (response.status === HttpStatusCode.Unauthorized) {
                 logout();
             } else {
                 setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
             }
         };
 
-        fetchTeachers();
+        fetchEmployees();
     }, [pageRequest, intl, logout, reload]);
 
     useEffect(() => {
@@ -518,7 +477,7 @@ export default function Teacher() {
         columns,
         manualPagination: true,
         defaultColumn: { cell: RowEditable },
-        getRowId: (row: Teacher) => (row.id ?? '').toString(),
+        getRowId: (row: Employee) => (row.id ?? '').toString(),
         state: { rowSelection, columnFilters, sorting, grouping, columnOrder, columnVisibility },
         enableRowSelection: true,
         onRowSelectionChange: setRowSelection,
@@ -547,13 +506,13 @@ export default function Teacher() {
             setSelectedRow,
             revertData: (rowIndex: number, revert: unknown) => {
                 if (revert) {
-                    setData((old: Teacher[]) => old.map((row, index) => (index === rowIndex ? originalData[rowIndex] : row)));
+                    setData((old: Employee[]) => old.map((row, index) => (index === rowIndex ? originalData[rowIndex] : row)));
                 } else {
                     setOriginalData((old) => old.map((row, index) => (index === rowIndex ? data[rowIndex] : row)));
                 }
             },
             updateData: (rowIndex, columnId, value) => {
-                setData((old: Teacher[]) =>
+                setData((old: Employee[]) =>
                     old.map((row, index) => {
                         if (index === rowIndex) {
                             return { ...old[rowIndex]!, [columnId]: value };
@@ -611,25 +570,21 @@ export default function Teacher() {
                 })}
             >
                 <Typography variant="h3" gutterBottom>
-                    <FormattedMessage id="teacher-list" />
+                    <FormattedMessage id="employee-list" />
                 </Typography>
 
-                {hasAddPermission && (
-                    <Button
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: '#FF5C00',
-                            '&:hover': { backgroundColor: '#FF5C00' }
-                        }}
-                        variant="contained"
-                        onClick={() => navigate('/teacher/add')}
-                        startIcon={<Add />}
-                    >
-                        <FormattedMessage id="add-teacher" />
-                    </Button>
-                )}
+                <Button
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                    variant="contained"
+                    onClick={() => navigate('/admin/employee/add')}
+                    startIcon={<Add />}
+                >
+                    <FormattedMessage id="add-employee" />
+                </Button>
             </Stack>
 
             <MainCard content={false}>
@@ -673,7 +628,7 @@ export default function Teacher() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm tên, email, SĐT'}
+                            placeholder={'Tìm kiếm theo mã nhân viên, email'}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {
@@ -688,24 +643,6 @@ export default function Teacher() {
                         />
 
                         <Select
-                            value={pageRequest.roleId}
-                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, roleId: event.target.value })}
-                            displayEmpty
-                            input={<OutlinedInput />}
-                            slotProps={{ input: { 'aria-label': 'Status Filter' } }}
-                        >
-                            <MenuItem value="">
-                                <FormattedMessage id="role" />
-                            </MenuItem>
-                            <MenuItem value="10">
-                                <FormattedMessage id="teacher" />
-                            </MenuItem>
-                            <MenuItem value="11">
-                                <FormattedMessage id="assistant" />
-                            </MenuItem>
-                        </Select>
-
-                        <Select
                             value={pageRequest.status}
                             onChange={(event) => setPageRequest({ ...pageRequest, page: 0, status: event.target.value })}
                             displayEmpty
@@ -715,10 +652,10 @@ export default function Teacher() {
                             <MenuItem value="">
                                 <FormattedMessage id="status" />
                             </MenuItem>
-                            <MenuItem value="1">
+                            <MenuItem value="ACTIVE">
                                 <FormattedMessage id="active" />
                             </MenuItem>
-                            <MenuItem value="0">
+                            <MenuItem value="INACTIVE">
                                 <FormattedMessage id="inactive" />
                             </MenuItem>
                         </Select>

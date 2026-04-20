@@ -53,6 +53,20 @@ const admin: NavItemType = {
       type: 'item',
       url: '/admin/theater',
       icon: icons.contactus
+    },
+    {
+      id: 'user',
+      title: 'user',
+      type: 'item',
+      url: '/admin/user',
+      icon: icons.contactus
+    },
+    {
+      id: 'employee',
+      title: 'employee',
+      type: 'item',
+      url: '/admin/employee',
+      icon: icons.contactus
     }
   ]
 };

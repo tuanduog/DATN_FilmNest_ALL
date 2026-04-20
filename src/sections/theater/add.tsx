@@ -37,9 +37,9 @@ export default function AddTheater() {
     const initialValues: Theater = {
         name: '',
         address: '',
-        provinceCode: 0,
+        provinceCode: '',
         provinceName: '',
-        communeCode: 0,
+        communeCode: '',
         communeName: '',
         description: '',
         hotline: '',

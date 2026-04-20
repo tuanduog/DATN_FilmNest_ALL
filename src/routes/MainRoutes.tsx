@@ -17,6 +17,12 @@ import TheaterPage from 'pages/theater-page';
 import AddTheater from 'sections/theater/add';
 import TheaterDetail from 'sections/theater/detail';
 import EditTheater from 'sections/theater/edit';
+import UserPage from 'pages/user-page';
+import UserDetail from 'sections/user/detail';
+import AddUser from 'sections/user/add';
+import EditUser from 'sections/user/edit';
+import EmployeePage from 'pages/employee-page';
+import AddEmployee from 'sections/employee/add';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
@@ -82,7 +88,39 @@ const MainRoutes = {
         {
           path: 'admin/theater/detail/:id',
           element: <TheaterDetail />
-        }
+        },
+        {
+          path: 'admin/user',
+          element: <UserPage />
+        },
+        {
+          path: 'admin/user/add',
+          element: <AddUser />
+        },
+        {
+          path: 'admin/user/edit/:id',
+          element: <EditUser />
+        },
+        {
+          path: 'admin/user/detail/:id',
+          element: <UserDetail />
+        },
+        {
+          path: 'admin/employee',
+          element: <EmployeePage />
+        },
+        {
+          path: 'admin/employee/add',
+          element: <AddEmployee />
+        },
+        // {
+        //   path: 'admin/employee/edit/:id',
+        //   element: <EditEmployee />
+        // },
+        // {
+        //   path: 'admin/employee/detail/:id',
+        //   element: <EmployeeDetail />
+        // }
       ]
     },
     {

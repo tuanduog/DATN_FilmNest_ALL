@@ -178,7 +178,9 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                                         onBlur={formik.handleBlur}
                                         displayEmpty
                                     >
-                                        <MenuItem value={0} disabled>Chọn tỉnh/thành phố</MenuItem>
+                                        <MenuItem value="" disabled sx={{ display: 'none' }}>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn tỉnh/thành phố</Box>
+                                        </MenuItem>
                                         {provinces.map((p) => (
                                             <MenuItem key={p.code} value={p.code}>{p.name}</MenuItem>
                                         ))}
@@ -203,7 +205,9 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                                         displayEmpty
                                         disabled={!formik.values.provinceCode}
                                     >
-                                        <MenuItem value={0} disabled>Chọn xã/phường</MenuItem>
+                                        <MenuItem value="" disabled sx={{ display: 'none' }}>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn xã/phường</Box>
+                                        </MenuItem>
                                         {communes.map((c) => (
                                             <MenuItem key={c.code} value={c.code}>{c.name}</MenuItem>
                                         ))}
