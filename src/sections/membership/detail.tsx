@@ -59,7 +59,6 @@ export default function MembershipDetail() {
                         {membership?.image && (
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
-                                    <InputLabel sx={{ mb: 1 }}>Hình ảnh gói thành viên</InputLabel>
                                     <img
                                         src={membership.image}
                                         alt="combo"
@@ -122,7 +121,7 @@ export default function MembershipDetail() {
                 <Grid size={12} sx={{ p: 0, m: 0 }}>
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
-                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/combo/edit/${id}`)}>
+                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/membership/edit/${id}`)}>
                                 Cập nhật
                             </Button>
                         </AnimateButton>

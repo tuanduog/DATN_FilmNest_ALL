@@ -67,6 +67,13 @@ const admin: NavItemType = {
       type: 'item',
       url: '/admin/employee',
       icon: icons.contactus
+    },
+    {
+      id: 'membership',
+      title: 'membership',
+      type: 'item',
+      url: '/admin/membership',
+      icon: icons.contactus
     }
   ]
 };

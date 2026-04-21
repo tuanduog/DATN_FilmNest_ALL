@@ -248,6 +248,8 @@ export default function MembershipForm({ handleNext, setMembership, membership }
                                     name="description"
                                     placeholder="Nhập mô tả"
                                     size="small"
+                                    rows={4}
+                                    multiline
                                     fullWidth
                                     value={formik.values.description}
                                     onChange={formik.handleChange}

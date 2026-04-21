@@ -70,8 +70,12 @@ export default function EditMembership() {
                 const response = await getById(Number(id));
 
                 if (response.status === HttpStatusCode.Ok) {
-                    setMembership(response.data);
-                    setPreview(response.data.image || '');
+                    const data = response.data;
+                    if (data.type) {
+                        data.type = data.type.toUpperCase();
+                    }
+                    setMembership(data);
+                    setPreview(data.image || '');
                 } else if (response.status === HttpStatusCode.BadRequest) {
                     setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
                 } else {

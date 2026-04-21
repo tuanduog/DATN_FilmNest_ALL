@@ -82,7 +82,14 @@ export default function EditUser() {
                 const response = await getById(Number(id));
 
                 if (response.status === HttpStatusCode.Ok) {
-                    setUser(response.data);
+                    const data = response.data;
+                    if (data.role) {
+                        data.role = data.role.toUpperCase();
+                    }
+                    if (data.gender) {
+                        data.gender = data.gender.toUpperCase();
+                    }
+                    setUser(data);
                 } else if (response.status === HttpStatusCode.BadRequest) {
                     setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
                 } else {

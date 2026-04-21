@@ -86,6 +86,7 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
+import formatPrice from 'utils/formatPrice';
 
 const fuzzyFilter: FilterFn<Membership> = (row, columnId, value, addMeta) => {
     // rank the item
@@ -316,23 +317,49 @@ export default function MembershipPage() {
                 accessorKey: 'name',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '25%' }
+            },
+            {
+                id: 'type',
+                header: intl.formatMessage({ id: 'membership-type' }),
+                accessorKey: 'type',
+                dataType: 'text',
+                enableGrouping: false,
+                meta: { width: '20%' }
             },
             {
                 id: 'discount',
                 header: intl.formatMessage({ id: 'discount' }),
                 accessorKey: 'discount',
-                dataType: 'number',
+                dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '20%' },
+                cell: ({ row }) => {
+                    const { discount } = row.original;
+
+                    return (
+                        <Typography>
+                            {discount}%
+                        </Typography>
+                    );
+                }
             },
             {
                 id: 'duration',
                 header: intl.formatMessage({ id: 'duration' }),
                 accessorKey: 'duration',
-                dataType: 'number',
+                dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '20%' },
+                cell: ({ row }) => {
+                    const { duration } = row.original;
+
+                    return (
+                        <Typography>
+                            {duration} tháng
+                        </Typography>
+                    );
+                }
             },
             {
                 id: 'price',
@@ -340,7 +367,11 @@ export default function MembershipPage() {
                 accessorKey: 'price',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '20%' },
+                cell: ({ row }) => {
+                    const { price } = row.original;
+                    return formatPrice(price);
+                }
             },
             {
                 id: 'status',
