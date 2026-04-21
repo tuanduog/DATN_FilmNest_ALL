@@ -68,7 +68,7 @@ import HeaderSort from 'components/third-party/react-table/HeaderSort';
 import RowEditable from 'components/third-party/react-table/RowEditable';
 
 // assets
-import { Add, ArrowDown2, ArrowRight2, Command, Edit2, Eye, Lock, TableDocument, Trash } from 'iconsax-reactjs';
+import { Add, ArrowDown2, ArrowRight2, Command, Edit2, Eye, TableDocument, Trash } from 'iconsax-reactjs';
 import { DEFAULT_PAGE_SIZE, PageRequest } from 'types/paging';
 import type { Membership } from 'types/membership';
 import {
@@ -534,7 +534,7 @@ export default function MembershipPage() {
                 })}
             >
                 <Typography variant="h3" gutterBottom>
-                    <FormattedMessage id="combo-list" />
+                    <FormattedMessage id="membership-list" />
                 </Typography>
 
                 <Button
@@ -544,10 +544,10 @@ export default function MembershipPage() {
                         justifyContent: 'center',
                     }}
                     variant="contained"
-                    onClick={() => navigate('/admin/combo/add')}
+                    onClick={() => navigate('/admin/membership/add')}
                     startIcon={<Add />}
                 >
-                    <FormattedMessage id="add-combo" />
+                    <FormattedMessage id="add-membership" />
                 </Button>
             </Stack>
 
@@ -592,7 +592,7 @@ export default function MembershipPage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm theo tên combo'}
+                            placeholder={'Tìm kiếm theo tên gói thành viên'}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {

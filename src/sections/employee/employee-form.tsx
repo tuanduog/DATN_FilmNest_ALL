@@ -458,7 +458,7 @@ export default function EmployeeForm({ handleNext, setEmployee, employee }: Empl
 
             <TheaterDialog
                 open={openTheaterDialog}
-                id={formik.values.theaterId}
+                id={formik.values.theaterId!}
                 onClose={() => setOpenTheaterDialog(false)}
                 onConfirm={(theater: Theater) => {
                     formik.setFieldValue('theaterName', theater.name);

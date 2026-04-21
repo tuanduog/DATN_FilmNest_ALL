@@ -17,10 +17,10 @@ export interface Employee {
     nationality: string;
     role: string;
 
-    userId: number;
-    theaterId: number;
+    userId?: number | null;
+    theaterId?: number | null;
     theaterName?: string;
-    managerId: number | null;
+    managerId?: number | null;
     managerName?: string;
     status?: string;
 }

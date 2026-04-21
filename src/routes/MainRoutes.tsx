@@ -23,6 +23,12 @@ import AddUser from 'sections/user/add';
 import EditUser from 'sections/user/edit';
 import EmployeePage from 'pages/employee-page';
 import AddEmployee from 'sections/employee/add';
+import MembershipPage from 'pages/membership-page';
+import AddMembership from 'sections/membership/add';
+import EditMembership from 'sections/membership/edit';
+import MembershipDetail from 'sections/membership/detail';
+import EditEmployee from 'sections/employee/edit';
+import EmployeeDetail from 'sections/employee/detail';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
@@ -113,14 +119,30 @@ const MainRoutes = {
           path: 'admin/employee/add',
           element: <AddEmployee />
         },
-        // {
-        //   path: 'admin/employee/edit/:id',
-        //   element: <EditEmployee />
-        // },
-        // {
-        //   path: 'admin/employee/detail/:id',
-        //   element: <EmployeeDetail />
-        // }
+        {
+          path: 'admin/employee/edit/:id',
+          element: <EditEmployee />
+        },
+        {
+          path: 'admin/employee/detail/:id',
+          element: <EmployeeDetail />
+        },
+        {
+          path: 'admin/membership',
+          element: <MembershipPage />
+        },
+        {
+          path: 'admin/membership/add',
+          element: <AddMembership />
+        },
+        {
+          path: 'admin/membership/edit/:id',
+          element: <EditMembership />
+        },
+        {
+          path: 'admin/membership/detail/:id',
+          element: <MembershipDetail />
+        }
       ]
     },
     {

@@ -36,11 +36,11 @@ export default function AddCombo() {
 
     // Extend Combo to hold file for upload locally
     const initialValues: Combo = {
-        id: '',
+        id: 0,
         name: '',
         price: 0,
         description: '',
-        status: 'active',
+        status: '',
         image: null
     };
 
