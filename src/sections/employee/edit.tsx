@@ -43,7 +43,13 @@ const validationSchema = Yup.object({
     nationality: Yup.string().required('Quốc tịch là bắt buộc'),
     role: Yup.string().required('Vai trò là bắt buộc'),
     salary: Yup.number().typeError('Lương phải là một số').nullable(),
-    hireAt: Yup.string().required('Ngày bắt đầu làm việc là bắt buộc')
+    hireAt: Yup.string().required('Ngày bắt đầu làm việc là bắt buộc'),
+    theaterId: Yup.number().required('Rạp chiếu phụ trách là bắt buộc').min(1, 'Rạp chiếu phụ trách là bắt buộc'),
+    managerId: Yup.number().nullable().when('role', {
+        is: 'STAFF',
+        then: (schema) => schema.required('Người quản lý trực tiếp là bắt buộc').min(1, 'Người quản lý trực tiếp là bắt buộc'),
+        otherwise: (schema) => schema.nullable()
+    })
 });
 
 export default function EditEmployee() {
@@ -76,6 +82,7 @@ export default function EditEmployee() {
     }, []);
 
     const initialValues = {
+        id: 0,
         username: '',
         email: '',
         fullname: '',
@@ -100,7 +107,12 @@ export default function EditEmployee() {
                 const response = await getById(Number(id));
 
                 if (response.status === HttpStatusCode.Ok) {
-                    setEmployee(response.data);
+                    const data = response.data;
+                    data.gender = data.gender?.toUpperCase() || '';
+                    data.role = data.role?.toUpperCase() || '';
+                    if (data.dob) data.dob = data.dob.split('T')[0];
+                    if (data.hireAt) data.hireAt = data.hireAt.split('T')[0];
+                    setEmployee(data);
                 } else if (response.status === HttpStatusCode.BadRequest) {
                     setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
                 } else {
@@ -140,6 +152,11 @@ export default function EditEmployee() {
         <Box>
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <form onSubmit={formik.handleSubmit} noValidate>
+                    {formik.submitCount > 0 && Object.keys(formik.errors).length > 0 && (
+                        <Alert severity="error" sx={{ mb: 3 }}>
+                            Vui lòng kiểm tra lại các lỗi: {Object.keys(formik.errors).join(', ')}
+                        </Alert>
+                    )}
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
                             Thông tin nhân viên
@@ -455,6 +472,11 @@ export default function EditEmployee() {
                                     )}
                                     <ArrowDropDownIcon sx={{ color: 'rgba(0, 0, 0, 0.54)' }} />
                                 </Box>
+                                {formik.touched.theaterId && formik.errors.theaterId && (
+                                    <FormHelperText error id="standard-weight-helper-text-theaterId">
+                                        {formik.errors.theaterId as string}
+                                    </FormHelperText>
+                                )}
                             </Grid>
 
                             {formik.values.role == "STAFF" && (
@@ -491,6 +513,11 @@ export default function EditEmployee() {
                                         )}
                                         <ArrowDropDownIcon sx={{ color: 'rgba(0, 0, 0, 0.54)' }} />
                                     </Box>
+                                    {formik.touched.managerId && formik.errors.managerId && (
+                                        <FormHelperText error id="standard-weight-helper-text-managerId">
+                                            {formik.errors.managerId as string}
+                                        </FormHelperText>
+                                    )}
                                 </Grid>
                             )}
                         </Grid>

@@ -60,7 +60,7 @@ export default function AddConfirmForm({ handleBack, theater }: ConfirmProps) {
                         Xác nhận thông tin rạp chiếu
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
                                 <InputLabel sx={{ fontWeight: 'bold' }}>Tên rạp chiếu</InputLabel>

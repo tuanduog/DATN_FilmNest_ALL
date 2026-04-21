@@ -88,7 +88,7 @@ export default function AddConfirmForm({ handleBack, user }: ConfirmProps) {
                         Xác nhận thông tin người dùng
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
                                 <InputLabel sx={{ fontWeight: 'bold' }}>Tên người dùng</InputLabel>

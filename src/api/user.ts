@@ -47,4 +47,13 @@ const deleteById = async (id: number) => {
     }
 }
 
-export { getList, create, getById, update, deleteById };
+const checkExistUser = async (username: string) => {
+    try {
+        const response = await axiosServices.get('/api/user/v1/check-exist', { params: { username } });
+        return response.data;
+    } catch (error: Error | any) {
+        return error;
+    }
+}
+
+export { getList, create, getById, update, deleteById, checkExistUser };

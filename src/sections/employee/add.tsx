@@ -47,8 +47,8 @@ export default function AddEmployee() {
         fullname: '',
         role: '',
 
-        userId: 0,
-        theaterId: 0,
+        userId: null,
+        theaterId: null,
         managerId: null,
     };
 

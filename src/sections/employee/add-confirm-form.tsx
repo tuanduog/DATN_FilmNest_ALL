@@ -48,14 +48,9 @@ export default function AddConfirmForm({ handleBack, employee }: ConfirmProps) {
     }, []);
 
     const handleSubmit = async () => {
-        const payload = {
-            salary: employee.salary,
-            hireAt: employee.hireAt,
-
-        };
 
         try {
-            const response = await create(payload as any);
+            const response = await create(employee as any);
 
             if (response.status === HttpStatusCode.Ok) {
                 navigate('/admin/employee', {
@@ -83,7 +78,7 @@ export default function AddConfirmForm({ handleBack, employee }: ConfirmProps) {
                         Xác nhận thông tin nhân viên
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
                                 <InputLabel sx={{ fontWeight: 'bold' }}>Tên tài khoản</InputLabel>
@@ -170,7 +165,7 @@ export default function AddConfirmForm({ handleBack, employee }: ConfirmProps) {
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
                                 <InputLabel sx={{ fontWeight: 'bold' }}>Vai trò</InputLabel>
-                                <Typography>{employee.role === 'USER' ? 'Người dùng' : employee.role === 'MANAGER' ? 'Quản lý rạp' : 'Nhân viên'}</Typography>
+                                <Typography>{employee.role === 'USER' ? 'Người dùng' : employee.role === 'MANAGER' ? 'Quản lý' : 'Nhân viên'}</Typography>
                             </Stack>
                         </Grid>
                     </Grid>

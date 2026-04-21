@@ -25,6 +25,7 @@ import TheaterDialog from './theater-dialog';
 import { Theater } from 'types/theater';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ManagerDialog from './manager-dialog';
+import { checkExistUser } from 'api/user';
 
 interface EmployeeFormProps {
     handleNext: () => void;
@@ -45,7 +46,13 @@ const validationSchema = Yup.object({
     nationality: Yup.string().required('Quốc tịch là bắt buộc'),
     role: Yup.string().required('Vai trò là bắt buộc'),
     salary: Yup.number().typeError('Lương phải là một số').nullable(),
-    hireAt: Yup.string().required('Ngày bắt đầu làm việc là bắt buộc')
+    hireAt: Yup.string().required('Ngày bắt đầu làm việc là bắt buộc'),
+    theaterId: Yup.number().required('Rạp chiếu phụ trách là bắt buộc').min(1, 'Rạp chiếu phụ trách là bắt buộc'),
+    managerId: Yup.number().nullable().when('role', {
+        is: 'STAFF',
+        then: (schema) => schema.required('Người quản lý trực tiếp là bắt buộc').min(1, 'Người quản lý trực tiếp là bắt buộc'),
+        otherwise: (schema) => schema.nullable()
+    })
 });
 
 export default function EmployeeForm({ handleNext, setEmployee, employee }: EmployeeFormProps) {
@@ -79,10 +86,38 @@ export default function EmployeeForm({ handleNext, setEmployee, employee }: Empl
         initialValues: employee,
         validationSchema: validationSchema,
         onSubmit: async (values) => {
+            checkExistUser(values.username);
             setEmployee(values);
             handleNext();
         }
     });
+
+    useEffect(() => {
+        const checkExistUsername = async () => {
+            const res = await checkExistUser(formik.values.username);
+            const status = res.data.status;
+            if (status == 1 || status == 2) {
+                setAlert({
+                    open: true,
+                    message: res.data.message,
+                    severity: 'error'
+                });
+            }
+            if (status == 3) {
+                const data = res.data.data;
+                formik.setFieldValue('id', data.id);
+                formik.setFieldValue('username', data.username);
+                formik.setFieldValue('email', data.email);
+                formik.setFieldValue('fullname', data.fullname);
+                formik.setFieldValue('phone', data.phone);
+                formik.setFieldValue('gender', data.gender);
+                formik.setFieldValue('dob', data.dob);
+                formik.setFieldValue('nationality', data.nationality);
+                formik.setFieldValue('role', data.role);
+            }
+        }
+        checkExistUsername();
+    }, [formik.values.username]);
 
     return (
         <Box>
@@ -403,6 +438,11 @@ export default function EmployeeForm({ handleNext, setEmployee, employee }: Empl
                                     )}
                                     <ArrowDropDownIcon sx={{ color: 'rgba(0, 0, 0, 0.54)' }} />
                                 </Box>
+                                {formik.touched.theaterId && formik.errors.theaterId && (
+                                    <FormHelperText error id="standard-weight-helper-text-theaterId">
+                                        {formik.errors.theaterId as string}
+                                    </FormHelperText>
+                                )}
                             </Grid>
 
                             {formik.values.role == "STAFF" && (
@@ -439,6 +479,11 @@ export default function EmployeeForm({ handleNext, setEmployee, employee }: Empl
                                         )}
                                         <ArrowDropDownIcon sx={{ color: 'rgba(0, 0, 0, 0.54)' }} />
                                     </Box>
+                                    {formik.touched.managerId && formik.errors.managerId && (
+                                        <FormHelperText error id="standard-weight-helper-text-managerId">
+                                            {formik.errors.managerId as string}
+                                        </FormHelperText>
+                                    )}
                                 </Grid>
                             )}
                         </Grid>

@@ -97,7 +97,7 @@ export default function AddConfirmForm({ handleBack, combo }: ConfirmProps) {
                         Xác nhận thông tin combo ưu đãi
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         {combo.image && (
                             <Grid size={12} sx={{ mb: 2 }}>
                                 <Box sx={{ width: '100%' }}>

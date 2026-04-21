@@ -100,7 +100,7 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
                         Xác nhận thông tin gói thành viên
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         {membership.image && (
                             <Grid size={12} sx={{ mb: 2 }}>
                                 <Box sx={{ width: '100%' }}>

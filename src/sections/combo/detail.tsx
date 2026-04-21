@@ -98,7 +98,7 @@ export default function ComboDetail() {
                 <Grid size={12} sx={{ p: 0, m: 0 }}>
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
-                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/combo/edit/${id}`)}>
+                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/combo/edit/${id}`)}>
                                 Cập nhật
                             </Button>
                         </AnimateButton>

@@ -74,14 +74,6 @@ export default function EmployeeDetail() {
 
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="username" sx={{ mb: 1 }}>
-                                Tên tài khoản
-                            </InputLabel>
-
-                            <Typography>{employee?.username}</Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="code" sx={{ mb: 1 }}>
                                 Mã nhân viên
                             </InputLabel>
@@ -195,7 +187,7 @@ export default function EmployeeDetail() {
                 <Grid size={12} sx={{ p: 0, m: 0 }}>
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
-                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/employee/edit/${id}`)}>
+                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/employee/edit/${id}`)}>
                                 Cập nhật
                             </Button>
                         </AnimateButton>

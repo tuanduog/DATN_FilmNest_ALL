@@ -57,7 +57,7 @@ export default function TheaterDetail() {
 
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="name" sx={{ mb: 1 }}>
                                 Tên rạp chiếu
                             </InputLabel>
 
@@ -65,7 +65,7 @@ export default function TheaterDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="provinceName" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="provinceName" sx={{ mb: 1 }}>
                                 Tỉnh/Thành phố
                             </InputLabel>
 
@@ -73,7 +73,7 @@ export default function TheaterDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="communeName" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="communeName" sx={{ mb: 1 }}>
                                 Xã/Phường
                             </InputLabel>
 
@@ -81,7 +81,7 @@ export default function TheaterDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="address" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="address" sx={{ mb: 1 }}>
                                 Địa chỉ
                             </InputLabel>
 
@@ -89,7 +89,7 @@ export default function TheaterDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="hotline" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="hotline" sx={{ mb: 1 }}>
                                 Hotline
                             </InputLabel>
 
@@ -97,7 +97,7 @@ export default function TheaterDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="openTime" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="openTime" sx={{ mb: 1 }}>
                                 Giờ mở cửa
                             </InputLabel>
 
@@ -105,7 +105,7 @@ export default function TheaterDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="closeTime" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="closeTime" sx={{ mb: 1 }}>
                                 Giờ đóng cửa
                             </InputLabel>
 
@@ -113,7 +113,7 @@ export default function TheaterDetail() {
                         </Grid>
 
                         <Grid size={12}>
-                            <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="description" sx={{ mb: 1 }}>
                                 Mô tả
                             </InputLabel>
 
@@ -125,7 +125,7 @@ export default function TheaterDetail() {
                 <Grid size={12} sx={{ p: 0, m: 0 }}>
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
-                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/theater/edit/${id}`)}>
+                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/theater/edit/${id}`)}>
                                 Cập nhật
                             </Button>
                         </AnimateButton>

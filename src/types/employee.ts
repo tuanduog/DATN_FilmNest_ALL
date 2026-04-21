@@ -1,6 +1,3 @@
-import { User } from "./user";
-import { Theater } from "./theater";
-
 export interface Employee {
     id?: number;
     code: string;

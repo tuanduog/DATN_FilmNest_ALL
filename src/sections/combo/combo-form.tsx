@@ -28,8 +28,7 @@ interface ComboFormProps {
 const validationSchema = Yup.object({
     name: Yup.string().required('Tên combo là bắt buộc'),
     price: Yup.number().required('Giá tiền là bắt buộc').min(1, 'Giá tiền phải lớn hơn 0'),
-    description: Yup.string().required('Mô tả là bắt buộc'),
-    status: Yup.string().required('Trạng thái là bắt buộc')
+    description: Yup.string().required('Mô tả là bắt buộc')
 });
 
 export default function ComboForm({ handleNext, setCombo, combo }: ComboFormProps) {

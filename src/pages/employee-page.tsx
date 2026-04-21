@@ -352,7 +352,7 @@ export default function EmployeePage() {
                 meta: { width: '35%' },
                 cell: ({ row }) => {
                     const gender = row.original.gender;
-                    return gender === 'MALE' ? 'Nam' : gender === 'FEMALE' ? 'Nữ' : 'Khác';
+                    return gender === 'male' ? 'Nam' : gender === 'female' ? 'Nữ' : 'Khác';
                 }
             },
             {
