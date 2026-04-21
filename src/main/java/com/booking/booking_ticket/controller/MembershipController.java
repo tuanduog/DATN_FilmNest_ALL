@@ -68,7 +68,7 @@ public class MembershipController {
     }
 
     @PutMapping("/v1/{id}")
-    public ResponseData<?> updateMembership(@PathVariable Integer id, MembershipRequest request){
+    public ResponseData<?> updateMembership(@PathVariable Integer id, @RequestBody MembershipRequest request){
         membershipService.updateMembership(id, request);
         return new ResponseData<>(HttpStatus.OK.value(), "Update Membership Successful");
     }

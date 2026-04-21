@@ -1,10 +1,14 @@
 package com.booking.booking_ticket.service.Impl;
 
 import com.booking.booking_ticket.dto.request.UserRequest;
+import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.UserResponse;
+import com.booking.booking_ticket.entity.Employee;
 import com.booking.booking_ticket.entity.Users;
+import com.booking.booking_ticket.repository.EmployeeRepository;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.service.UserService;
+import com.booking.booking_ticket.utils.Role;
 import com.booking.booking_ticket.utils.Status;
 import com.booking.booking_ticket.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     @Autowired
     private Util util;
@@ -86,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addUser(UserRequest request){
-        util.validateUser(request.getUsername(), request.getEmail(), request.getPhone());
+        util.validateUser(request.getUsername(), request.getEmail(), request.getPhone(), null);
         Users user = new Users();
         user.setUsername(request.getUsername());
         user.setFullname(request.getFullname());
@@ -104,9 +111,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(Integer id, UserRequest request){
         Users user = usersRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Username not exists!"));
-        util.validateExistUsername(user.getUsername(), request.getUsername());
-        util.validateExistEmail(user.getEmail(), request.getEmail());
-        util.validateExistPhone(user.getPhone(), request.getPhone());
+        util.validateExistUsername(user.getUsername(), request.getUsername(), id);
+        util.validateExistEmail(user.getEmail(), request.getEmail(), id);
+        util.validateExistPhone(user.getPhone(), request.getPhone(), id);
 
         user.setUsername(request.getUsername());
         user.setFullname(request.getFullname());
@@ -124,5 +131,33 @@ public class UserServiceImpl implements UserService {
         Users user = usersRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("Username not exists"));
         user.setStatus(Status.INACTIVE);
         usersRepository.save(user);
+    }
+
+    @Override
+    public ResponseData<?> checkExistUser(String username){
+        Optional<Users> user = usersRepository.findByUsername(username);
+
+        if(user.isPresent()){
+            Optional<Employee> employee = employeeRepository.findByUser_Id(user.get().getId());
+            if(employee.isPresent()){
+                return new ResponseData<>(1, "Đã tồn tại nhân viên với số tài khoản này rồi");
+            }
+            if(user.get().getRole().equals(Role.USER) || user.get().getRole().equals(Role.ADMINISTRATOR)){
+                return new ResponseData<>(2, "Đã tồn tại người dùng với số tài khoản này rồi");
+            } else {
+                UserResponse response = new UserResponse();
+                response.setId(user.get().getId());
+                response.setUsername(user.get().getUsername());
+                response.setFullname(user.get().getFullname());
+                response.setEmail(user.get().getEmail());
+                response.setPhone(user.get().getPhone());
+                response.setDob(user.get().getDob());
+                response.setGender(user.get().getGender());
+                response.setNationality(user.get().getNationality());
+                response.setRole(user.get().getRole());
+                return new ResponseData<>(3, "Thông tin người dùng", response);
+            }
+        }
+        return new ResponseData<>(4, "Chưa có người dùng");
     }
 }

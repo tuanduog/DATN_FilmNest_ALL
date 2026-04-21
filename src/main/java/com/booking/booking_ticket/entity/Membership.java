@@ -18,6 +18,7 @@ public class Membership extends BaseEntity{
 
     String name;
 
+    @Enumerated(EnumType.STRING)
     MembershipType type;
 
     Double price;

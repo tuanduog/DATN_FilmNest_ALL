@@ -59,7 +59,7 @@ public class UserController {
         return new ResponseData<>(HttpStatus.OK.value(), "Get list successfully", userService.getList(pageable, keyword, status));
     }
 
-    @GetMapping("/v1/{id}")
+    @GetMapping("/v1/{id:\\d+}")
     public ResponseData<?> getById(@PathVariable Integer id) {
         return new ResponseData<>(HttpStatus.OK.value(), "Get user successfully", userService.getById(id));
     }
@@ -80,5 +80,10 @@ public class UserController {
     public ResponseData<?> deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Delete user successfully");
+    }
+
+    @GetMapping("/v1/check-exist")
+    public ResponseData<?> checkUserExist(@RequestParam String username) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Check user successfully", userService.checkExistUser(username));
     }
 }

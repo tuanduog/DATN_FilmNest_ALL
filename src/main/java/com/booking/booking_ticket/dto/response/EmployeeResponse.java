@@ -19,6 +19,8 @@ public class EmployeeResponse {
 
     Integer id;
 
+    String username;
+
     String code;
 
     Double salary;
@@ -41,7 +43,15 @@ public class EmployeeResponse {
 
     String nationality;
 
-    public EmployeeResponse(Integer id, String code, Double salary, LocalDate hireAt, String email, String fullname, String phone, Role role, Status status) {
+    String managerName;
+
+    String theaterName;
+
+    Integer theaterId;
+
+    Integer managerId;
+
+    public EmployeeResponse(Integer id, String code, Double salary, LocalDate hireAt, String email, String fullname, String phone, Gender gender, Role role, Status status) {
         this.id = id;
         this.code = code;
         this.salary = salary;
@@ -49,6 +59,7 @@ public class EmployeeResponse {
         this.email = email;
         this.fullname = fullname;
         this.phone = phone;
+        this.gender = gender;
         this.role = role;
         this.status = status;
     }

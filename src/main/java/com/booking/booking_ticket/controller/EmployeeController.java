@@ -43,7 +43,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/v1/{id}")
-    public ResponseData<?> updateEmployee(@PathVariable Integer id, EmployeeRequest request){
+    public ResponseData<?> updateEmployee(@PathVariable Integer id, @RequestBody EmployeeRequest request){
         employeeService.updateEmployee(id, request);
         return new ResponseData<>(HttpStatus.OK.value(), "Update Employee Successful");
     }

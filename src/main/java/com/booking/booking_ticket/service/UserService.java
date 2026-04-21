@@ -1,6 +1,7 @@
 package com.booking.booking_ticket.service;
 
 import com.booking.booking_ticket.dto.request.UserRequest;
+import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.UserResponse;
 import com.booking.booking_ticket.entity.Users;
 import com.booking.booking_ticket.utils.Status;
@@ -26,4 +27,6 @@ public interface UserService {
     public void updateUser(Integer id, UserRequest request);
 
     public void deleteUser(Integer id);
+
+    public ResponseData<?> checkExistUser(String username);
 }

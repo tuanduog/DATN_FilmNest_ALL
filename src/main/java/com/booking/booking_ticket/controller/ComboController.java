@@ -41,7 +41,7 @@ public class ComboController {
     }
 
     @PutMapping("/v1/{id}")
-    public ResponseData<?> updateCombo(@PathVariable Integer id, ComboRequest request){
+    public ResponseData<?> updateCombo(@PathVariable Integer id, @RequestBody ComboRequest request){
         comboService.updateCombo(id, request);
         return new ResponseData<>(HttpStatus.OK.value(), "Update Combo Successful");
     }

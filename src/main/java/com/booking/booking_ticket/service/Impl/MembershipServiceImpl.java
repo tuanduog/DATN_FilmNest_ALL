@@ -92,6 +92,7 @@ public class MembershipServiceImpl implements MembershipService {
         MembershipResponse response = new MembershipResponse();
         if (membership != null){
             response.setId(membership.getId());
+            response.setImage(membership.getImage());
             response.setName(membership.getName());
             response.setType(membership.getType());
             response.setPrice(membership.getPrice());
