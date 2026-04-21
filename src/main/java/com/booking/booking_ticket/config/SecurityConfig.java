@@ -35,7 +35,7 @@ public class SecurityConfig {
     public static final String[] PUBLIC_ENDPOINTS = { "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**",
             "/swagger-ui.html", "/webjars/**", "/auth/token", "/auth/login", "/auth/introspect", "/auth/register",
             "/auth/logout", "/api/combo/**", "/product/get-product", "/discount/get-discount", "/api/user/**",
-            "/movie/**", "/wsocket/**", "/topic/**", "/app/**", "/sockjs/**", "/api/theater/**",
+            "/movie/**", "/wsocket/**", "/topic/**", "/app/**", "/sockjs/**", "/api/theater/**", "/api/membership/**",
             "/movie/get-movie/**",
             "/auth/get-showtime/**", "/api/files/upload/image", "/booking/**", "/reviews/get-Top5Movies",
             "/comments/getAll-Comments/**" };

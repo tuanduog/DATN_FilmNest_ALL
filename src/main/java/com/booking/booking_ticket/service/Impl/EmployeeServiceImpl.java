@@ -9,7 +9,6 @@ import com.booking.booking_ticket.repository.EmployeeRepository;
 import com.booking.booking_ticket.repository.TheaterRepository;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.service.EmployeeService;
-import com.booking.booking_ticket.utils.Role;
 import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -58,6 +57,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeResponse getById(Integer id) {
         return null;
+    }
+
+    @Override
+    public void updateEmployee(Integer id, EmployeeRequest request) {
+
     }
 
     @Override

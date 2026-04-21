@@ -37,16 +37,16 @@ public class EmployeeController {
         return new ResponseData<>(HttpStatus.OK.value(), "Add Employee Successful");
     }
 
-//    @GetMapping("/v1/{id}")
-//    public ResponseData<?> getById(@PathVariable Integer id){
-//        return new ResponseData<>(HttpStatus.OK.value(), "Get Combo Successful", comboService.getById(id));
-//    }
+    @GetMapping("/v1/{id}")
+    public ResponseData<?> getById(@PathVariable Integer id){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get Employee Successful", employeeService.getById(id));
+    }
 
-//    @PutMapping("/v1/{id}")
-//    public ResponseData<?> updateCombo(@PathVariable Integer id, ComboRequest request){
-//        comboService.updateCombo(id, request);
-//        return new ResponseData<>(HttpStatus.OK.value(), "Update Combo Successful");
-//    }
+    @PutMapping("/v1/{id}")
+    public ResponseData<?> updateEmployee(@PathVariable Integer id, EmployeeRequest request){
+        employeeService.updateEmployee(id, request);
+        return new ResponseData<>(HttpStatus.OK.value(), "Update Employee Successful");
+    }
 
     @DeleteMapping("/v1/{id}")
     public ResponseData<?> deleteEmployee(@PathVariable Integer id){

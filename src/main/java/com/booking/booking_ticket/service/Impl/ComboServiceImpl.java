@@ -68,6 +68,10 @@ public class ComboServiceImpl implements ComboService {
     public void updateCombo(Integer id, ComboRequest request){
         Combo combo = comboRepository.getOne(id);
 
+        if (request.getImage() != null){
+            combo.setImage(request.getImage());
+        }
+
         if (request.getName() != null){
             combo.setName(request.getName());
         }

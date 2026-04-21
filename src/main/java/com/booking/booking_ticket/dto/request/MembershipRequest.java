@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.dto.request;
 
+import com.booking.booking_ticket.utils.MembershipType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,9 +15,17 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MembershipRequest {
 
-    String type;
+    String image;
 
-    LocalDateTime startDate;
+    String name;
 
-    LocalDateTime expiredDate;
+    MembershipType type;
+
+    Double price;
+
+    Integer discount;
+
+    Integer duration;
+
+    String description;
 }
