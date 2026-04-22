@@ -29,6 +29,7 @@ import EditMembership from 'sections/membership/edit';
 import MembershipDetail from 'sections/membership/detail';
 import EditEmployee from 'sections/employee/edit';
 import EmployeeDetail from 'sections/employee/detail';
+import RoomSeatConfig from 'sections/room/seat';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
@@ -142,6 +143,10 @@ const MainRoutes = {
         {
           path: 'admin/membership/detail/:id',
           element: <MembershipDetail />
+        },
+        {
+          path: 'admin/room/seat-config',
+          element: <RoomSeatConfig />
         }
       ]
     },
