@@ -277,29 +277,6 @@ const ManagerDialog: React.FC<ManagerDialogProps> = ({ open, id, onClose, onConf
                 meta: { width: '35%' }
             },
             {
-                id: 'gender',
-                header: intl.formatMessage({ id: 'gender' }),
-                accessorKey: 'gender',
-                dataType: 'text',
-                enableGrouping: false,
-                meta: { width: '35%' },
-                cell: ({ row }) => {
-                    const gender = row.original.gender;
-                    return gender === 'MALE' ? 'Nam' : gender === 'FEMALE' ? 'Nữ' : 'Khác';
-                }
-            },
-            {
-                id: 'hireAt',
-                header: intl.formatMessage({ id: 'hire-at' }),
-                accessorKey: 'hireAt',
-                dataType: 'text',
-                enableGrouping: false,
-                meta: { width: '35%' },
-                cell: ({ row }) => {
-                    return formatDate(row.original.hireAt);
-                }
-            },
-            {
                 id: 'role',
                 header: intl.formatMessage({ id: 'role' }),
                 accessorKey: 'role',
@@ -308,8 +285,16 @@ const ManagerDialog: React.FC<ManagerDialogProps> = ({ open, id, onClose, onConf
                 meta: { width: '35%' },
                 cell: ({ row }) => {
                     const role = row.original.role;
-                    return role === 'MANAGER' ? 'Quản lý rạp' : role === 'STAFF' ? 'Nhân viên' : role;
+                    return role === 'manager' ? 'Quản lý' : role === 'staff' ? 'Nhân viên' : role;
                 }
+            },
+            {
+                id: 'theaterName',
+                header: intl.formatMessage({ id: 'theater-responsiblility' }),
+                accessorKey: 'theaterName',
+                dataType: 'text',
+                enableGrouping: false,
+                meta: { width: '35%' }
             },
             {
                 id: 'status',
@@ -345,7 +330,8 @@ const ManagerDialog: React.FC<ManagerDialogProps> = ({ open, id, onClose, onConf
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: ''
+        status: '',
+        role: 'MANAGER'
     });
     const [alert, setAlert] = useState({
         open: false,
@@ -482,7 +468,7 @@ const ManagerDialog: React.FC<ManagerDialogProps> = ({ open, id, onClose, onConf
     const columnSensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
     const rowSensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
 
-    useEffect(() => setColumnVisibility({ id: false, role: false, contact: false, country: false, progress: false }), []);
+    useEffect(() => setColumnVisibility({ id: false, contact: false, country: false, progress: false }), []);
 
     return (
         <Dialog

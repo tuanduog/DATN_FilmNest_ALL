@@ -317,7 +317,7 @@ export default function EmployeePage() {
                 accessorKey: 'code',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '20%' }
             },
             {
                 id: 'fullname',
@@ -333,7 +333,7 @@ export default function EmployeePage() {
                 accessorKey: 'email',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '25%' }
             },
             {
                 id: 'phone',
@@ -342,18 +342,6 @@ export default function EmployeePage() {
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' }
-            },
-            {
-                id: 'gender',
-                header: intl.formatMessage({ id: 'gender' }),
-                accessorKey: 'gender',
-                dataType: 'text',
-                enableGrouping: false,
-                meta: { width: '35%' },
-                cell: ({ row }) => {
-                    const gender = row.original.gender;
-                    return gender === 'male' ? 'Nam' : gender === 'female' ? 'Nữ' : 'Khác';
-                }
             },
             {
                 id: 'hireAt',
@@ -375,8 +363,16 @@ export default function EmployeePage() {
                 meta: { width: '35%' },
                 cell: ({ row }) => {
                     const role = row.original.role;
-                    return role === 'MANAGER' ? 'Quản lý rạp' : role === 'STAFF' ? 'Nhân viên' : role;
+                    return role === 'manager' ? 'Quản lý' : role === 'staff' ? 'Nhân viên' : role;
                 }
+            },
+            {
+                id: 'theaterName',
+                header: intl.formatMessage({ id: 'theater-responsiblility' }),
+                accessorKey: 'theaterName',
+                dataType: 'text',
+                enableGrouping: false,
+                meta: { width: '35%' }
             },
             {
                 id: 'status',
@@ -552,7 +548,7 @@ export default function EmployeePage() {
     const columnSensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
     const rowSensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
 
-    useEffect(() => setColumnVisibility({ id: false, role: false, contact: false, country: false, progress: false }), []);
+    useEffect(() => setColumnVisibility({ id: false, contact: false, country: false, progress: false }), []);
 
     return (
         <Stack
