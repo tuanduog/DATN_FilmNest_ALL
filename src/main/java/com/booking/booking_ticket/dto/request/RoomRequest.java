@@ -1,7 +1,6 @@
 package com.booking.booking_ticket.dto.request;
 
-import com.booking.booking_ticket.utils.SeatStatus;
-import com.booking.booking_ticket.utils.SeatType;
+import com.booking.booking_ticket.utils.RoomType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,17 +11,19 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SeatRequest {
+public class RoomRequest {
 
-    String label;
+    String name;
 
-    Integer row;
+    Integer capacity;
 
-    Integer col;
+    Integer totalRow;
 
-    Double price;
+    Integer totalColumn;
 
-    SeatType type;
+    RoomType type;
 
-    SeatStatus seatStatus;
+    Integer theaterId;
+
+    SeatRequest[] seats;
 }

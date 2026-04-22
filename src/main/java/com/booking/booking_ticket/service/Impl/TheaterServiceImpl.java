@@ -94,7 +94,7 @@ public class TheaterServiceImpl implements TheaterService {
     }
 
     @Override
-    public void editTheater(int id, TheaterRequest request) {
+    public void updateTheater(int id, TheaterRequest request) {
         Theater theater = theaterRepository.getOne(id);
 
         if (theater.getName() != null) {

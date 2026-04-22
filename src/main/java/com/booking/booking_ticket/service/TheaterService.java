@@ -23,7 +23,7 @@ public interface TheaterService {
 
     void addTheater(TheaterRequest request);
 
-    void editTheater(int id, TheaterRequest request);
+    void updateTheater(int id, TheaterRequest request);
 
     void deleteTheater(int id);
 }

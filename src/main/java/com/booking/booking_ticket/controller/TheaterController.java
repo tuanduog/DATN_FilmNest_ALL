@@ -95,7 +95,7 @@ public class TheaterController {
 
     @PutMapping("/v1/{id}")
     public ResponseData<?> updateTheater(@PathVariable Integer id, @RequestBody TheaterRequest request){
-        theatersService.editTheater(id, request);
+        theatersService.updateTheater(id, request);
         return new ResponseData<>(HttpStatus.OK.value(), "Update theater successful");
     }
 

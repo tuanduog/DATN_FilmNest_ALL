@@ -2,6 +2,7 @@ package com.booking.booking_ticket.entity;
 
 import com.booking.booking_ticket.utils.SeatStatus;
 import com.booking.booking_ticket.utils.SeatType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,4 +33,8 @@ public class Seat extends BaseEntity {
     @Column(name = "seat_status")
     @Enumerated(EnumType.STRING)
     SeatStatus seatStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room room;
 }

@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public enum RoomType {
 
-    TWOD("2d"), THREED("3d"), IMAX("imax");
+    STANDARD("standard"), THREE_D("three_d"), IMAX("imax");
 
     private final String value;
 
