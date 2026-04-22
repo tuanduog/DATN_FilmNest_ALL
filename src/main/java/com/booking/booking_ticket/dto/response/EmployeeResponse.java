@@ -51,7 +51,7 @@ public class EmployeeResponse {
 
     Integer managerId;
 
-    public EmployeeResponse(Integer id, String code, Double salary, LocalDate hireAt, String email, String fullname, String phone, Gender gender, Role role, Status status) {
+    public EmployeeResponse(Integer id, String code, Double salary, LocalDate hireAt, String email, String fullname, String phone, Gender gender, Role role, String theaterName, Status status) {
         this.id = id;
         this.code = code;
         this.salary = salary;
@@ -61,6 +61,7 @@ public class EmployeeResponse {
         this.phone = phone;
         this.gender = gender;
         this.role = role;
+        this.theaterName = theaterName;
         this.status = status;
     }
 }

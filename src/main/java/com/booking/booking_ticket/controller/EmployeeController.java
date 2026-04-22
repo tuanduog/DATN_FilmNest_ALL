@@ -6,6 +6,7 @@ import com.booking.booking_ticket.dto.response.ComboResponse;
 import com.booking.booking_ticket.dto.response.EmployeeResponse;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.service.EmployeeService;
+import com.booking.booking_ticket.utils.Role;
 import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +27,11 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping("/v1")
-    public ResponseData<?> getList(@PageableDefault() Pageable pageable, @RequestParam(required = false) String keyword, @RequestParam(required = false) Status status){
-        Page<EmployeeResponse> data = employeeService.getList(pageable, keyword, status);
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable,
+                                   @RequestParam(required = false) String keyword,
+                                   @RequestParam(required = false) Status status,
+                                   @RequestParam(required = false) Role role){
+        Page<EmployeeResponse> data = employeeService.getList(pageable, keyword, status, role);
         return new ResponseData<>(HttpStatus.OK.value(), "Get List Successful", data);
     }
 

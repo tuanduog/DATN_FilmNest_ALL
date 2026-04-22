@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -15,28 +16,28 @@ import java.util.Optional;
 public interface UsersRepository extends JpaRepository<Users, Integer> {
 
     @Query("""
-        SELECT e
-        FROM Employee e
-        WHERE (:id IS NULL OR e.id <> :id)
-            AND (:username IS NULL OR e.user.username = :username)
+        SELECT u
+        FROM Users u
+        WHERE u.username = :username
+            AND (:id IS NULL OR u.id <> :id)
     """)
     Optional<Users> validateUsername(String username, Integer id);
 
     Optional<Users> findByUsername(String username);
 
     @Query("""
-        SELECT e
-        FROM Employee e
-        WHERE (:id IS NULL OR e.id <> :id)
-            AND (:username IS NULL OR e.user.email = :email)
+        SELECT u
+        FROM Users u
+        WHERE u.email = :email
+            AND (:id IS NULL OR u.id <> :id)
     """)
     Optional<Users> findByEmail(String email, Integer id);
 
     @Query("""
-        SELECT e
-        FROM Employee e
-        WHERE (:id IS NULL OR e.id <> :id)
-            AND (:username IS NULL OR e.user.phone = :phone)
+        SELECT u
+        FROM Users u
+        WHERE u.phone = :phone
+            AND (:id IS NULL OR u.id <> :id)
     """)
     Optional<Users> findByPhone(String phone, Integer id);
 

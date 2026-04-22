@@ -9,6 +9,7 @@ import com.booking.booking_ticket.repository.EmployeeRepository;
 import com.booking.booking_ticket.repository.TheaterRepository;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.service.EmployeeService;
+import com.booking.booking_ticket.utils.Role;
 import com.booking.booking_ticket.utils.Status;
 import com.booking.booking_ticket.utils.Util;
 import lombok.RequiredArgsConstructor;
@@ -35,14 +36,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Page<EmployeeResponse> getList(Pageable pageable, String keyword, Status status) {
+    public Page<EmployeeResponse> getList(Pageable pageable, String keyword, Status status, Role role) {
         if (keyword != null) {
             keyword = "%"  + keyword + "%";
         } else {
             keyword = "%";
         }
 
-        return employeeRepository.findAllByKeyword(pageable, keyword, status);
+        return employeeRepository.findAllByKeyword(pageable, keyword, status, role);
     }
 
     @Override
@@ -181,19 +182,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void updateEmployee(Integer id, EmployeeRequest request) {
         Optional<Employee> employee = employeeRepository.findById(id);
 
-        Optional<Users> user = usersRepository.findById(request.getUserId());
-        if(user.isPresent()){
-            util.validateUser(request.getUsername(), request.getEmail(), request.getPhone(), user.get().getId());
-            user.get().setUsername(request.getUsername());
-            user.get().setEmail(request.getEmail());
-            user.get().setPhone(request.getPhone());
-            user.get().setDob(request.getDob());
-            user.get().setGender(request.getGender());
-            user.get().setNationality(request.getNationality());
-            user.get().setRole(request.getRole());
-            usersRepository.save(user.get());
-        }
         if(employee.isPresent()){
+            Optional<Users> user = usersRepository.findById(employee.get().getUser().getId());
+            if(user.isPresent()){
+                util.validateUser(request.getUsername(), request.getEmail(), request.getPhone(), user.get().getId());
+                user.get().setUsername(request.getUsername());
+                user.get().setEmail(request.getEmail());
+                user.get().setPhone(request.getPhone());
+                user.get().setDob(request.getDob());
+                user.get().setGender(request.getGender());
+                user.get().setNationality(request.getNationality());
+                user.get().setRole(request.getRole());
+                usersRepository.save(user.get());
+            }
+
             util.validateEmployeeCode(request.getCode(), employee.get().getId());
             if(request.getCode() != null){
                 employee.get().setCode(request.getCode());
