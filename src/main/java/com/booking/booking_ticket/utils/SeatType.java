@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public enum SeatType {
 
-    VIP("vip"), SWEETBOX("couple"), STANDARD("standard");
+    VIP("vip"), SWEETBOX("sweetbox"), STANDARD("standard");
 
     private final String value;
 
