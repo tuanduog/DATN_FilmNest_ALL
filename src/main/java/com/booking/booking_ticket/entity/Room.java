@@ -19,6 +19,12 @@ public class Room extends BaseEntity {
 
     private Integer capacity;
 
+    @Column(name = "total_row")
+    private Integer totalRow;
+
+    @Column(name = "total_column")
+    private Integer totalColumn;
+
     @Column(name = "type", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomType type;

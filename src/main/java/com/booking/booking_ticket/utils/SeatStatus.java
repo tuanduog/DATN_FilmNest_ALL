@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Arrays;
 
-public enum RoomType {
+public enum SeatStatus {
 
-    TWOD("2d"), THREED("3d"), IMAX("imax");
+    ACTIVE("active"), DISABLED("disabled"), DELETED("deleted");
 
     private final String value;
 
-    RoomType(String value) {
+    SeatStatus(String value) {
         this.value = value;
     }
 
@@ -21,8 +21,8 @@ public enum RoomType {
     }
 
     @JsonCreator
-    public static RoomType fromValue(String value) {
-        return Arrays.stream(RoomType.values())
+    public static SeatStatus fromValue(String value) {
+        return Arrays.stream(SeatStatus.values())
                 .filter(s -> s.value.equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid status " + value));
