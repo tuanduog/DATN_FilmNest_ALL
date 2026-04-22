@@ -70,5 +70,19 @@
     "membership-discount-amount": "Số tiền giảm giá thẻ thành viên",
     "membership-discount-type": "Loại giảm giá thẻ thành viên",
     "membership-type": "Loại thẻ thành viên",
-    "theater-responsiblility": "Rạp phụ trách"
+    "theater-responsiblility": "Rạp phụ trách",
+    "capacity": "Số lượng chỗ ngồi",
+    "type": "Loại",
+    "room-type": "Loại phòng",
+    "room-capacity": "Số lượng chỗ ngồi",
+    "room-total-seats": "Tổng số chỗ ngồi",
+    "room-theater-name": "Tên rạp",
+    "room-description": "Mô tả phòng",
+    "room-status": "Trạng thái phòng",
+    "room-price": "Giá phòng",
+    "room-discount": "Giảm giá phòng",
+    "room-duration": "Thời hạn phòng",
+    "room-discount-percent": "Phần trăm giảm giá phòng",
+    "room-discount-amount": "Số tiền giảm giá phòng",
+    "room-discount-type": "Loại giảm giá phòng"
 }

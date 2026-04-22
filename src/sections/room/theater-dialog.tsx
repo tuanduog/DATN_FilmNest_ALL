@@ -637,7 +637,7 @@ const TheaterDialog: React.FC<TheaterDialogProps> = ({ open, id, onClose, onConf
           size="large"
           onClick={handleConfirm}
         >
-          Thêm vào lớp
+          Xác nhận
         </Button>
       </Box>
     </Dialog>

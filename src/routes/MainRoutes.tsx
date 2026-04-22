@@ -29,7 +29,10 @@ import EditMembership from 'sections/membership/edit';
 import MembershipDetail from 'sections/membership/detail';
 import EditEmployee from 'sections/employee/edit';
 import EmployeeDetail from 'sections/employee/detail';
-import RoomSeatConfig from 'sections/room/seat';
+import RoomPage from 'pages/room-page';
+import AddRoom from 'sections/room/add';
+import EditRoom from 'sections/room/edit';
+
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/error/404')));
@@ -145,9 +148,22 @@ const MainRoutes = {
           element: <MembershipDetail />
         },
         {
-          path: 'admin/room/seat-config',
-          element: <RoomSeatConfig />
-        }
+          path: 'admin/room',
+          element: <RoomPage />
+        },
+        {
+          path: 'admin/room/add',
+          element: <AddRoom />
+        },
+        {
+          path: 'admin/room/edit/:id',
+          element: <EditRoom />
+        },
+
+        // {
+        //   path: 'admin/room/detail/:id',
+        //   element: <RoomDetail />
+        // }
       ]
     },
     {
