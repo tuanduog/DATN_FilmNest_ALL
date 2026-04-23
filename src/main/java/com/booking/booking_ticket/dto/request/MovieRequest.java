@@ -18,9 +18,9 @@ public class MovieRequest implements Serializable {
 
     String trailerUrl;
 
-    String movieName;
+    String name;
 
-    String movieDescription;
+    String description;
 
     String director;
 

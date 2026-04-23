@@ -6,6 +6,7 @@ import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponse;
 import com.booking.booking_ticket.entity.Movie;
 import com.booking.booking_ticket.repository.MovieRepository;
 import com.booking.booking_ticket.service.MovieService;
+import com.booking.booking_ticket.utils.ShowingStatus;
 import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,41 +55,68 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MovieResponse getById(Integer id){
-        return null;
+        Movie movie = movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Movie does not exists"));
+
+        MovieResponse response = new MovieResponse();
+        response.setId(movie.getId());
+        response.setImage(movie.getImage());
+        response.setName(movie.getName());
+        response.setGenre(movie.getGenre());
+        response.setDirector(movie.getDirector());
+        response.setDuration(movie.getDuration());
+        response.setActor(movie.getActor());
+        response.setDescription(movie.getDescription());
+        response.setReleaseDate(movie.getReleaseDate());
+        response.setEndDate(movie.getEndDate());
+        response.setShowingStatus(movie.getShowingStatus());
+        response.setTrailerUrl(movie.getTrailerUrl());
+        response.setStatus(movie.getStatus());
+
+        return response;
     }
 
     @Override
-    public void addMovie(MovieRequest movieRequest) {
+    public void addMovie(MovieRequest request) {
+        Optional<Movie> m = movieRepository.validateByName(request.getName(), null);
+        if (m.isPresent()) {
+            throw new RuntimeException("This movie already exists");
+        }
         Movie movie = new Movie();
-        movie.setActor(movieRequest.getActor());
-        movie.setDescription(movieRequest.getMovieDescription());
-        movie.setGenre(movieRequest.getGenre());
-        movie.setImage(movieRequest.getImage());
-        movie.setName(movieRequest.getMovieName());
-        movie.setEndDate(movieRequest.getEndDate());
-        movie.setDuration(movieRequest.getDuration());
-        movie.setDirector(movieRequest.getDirector());
-        movie.setReleaseDate(movieRequest.getReleaseDate());
-        movie.setShowingStatus(movieRequest.getShowingStatus());
+        movie.setActor(request.getActor());
+        movie.setDescription(request.getDescription());
+        movie.setGenre(request.getGenre());
+        movie.setImage(request.getImage());
+        movie.setName(request.getName());
+        movie.setEndDate(request.getEndDate());
+        movie.setDuration(request.getDuration());
+        movie.setDirector(request.getDirector());
+        movie.setReleaseDate(request.getReleaseDate());
+        movie.setShowingStatus(request.getShowingStatus());
+        movie.setStatus(Status.ACTIVE);
+        movie.setShowingStatus(ShowingStatus.COMING_SOON);
 
         movieRepository.save(movie);
     }
 
     @Override
-    public void updateMovie(Integer id, MovieRequest movieRequest) {
+    public void updateMovie(Integer id, MovieRequest request) {
         Movie m = movieRepository.findById(id).get();
 
-        m.setDescription(movieRequest.getMovieDescription());
-        m.setGenre(movieRequest.getGenre());
-        m.setImage(movieRequest.getImage());
-        m.setName(movieRequest.getMovieName());
-        m.setEndDate(movieRequest.getEndDate());
-        m.setDuration(movieRequest.getDuration());
-        m.setDirector(movieRequest.getDirector());
-        m.setReleaseDate(movieRequest.getReleaseDate());
-        m.setShowingStatus(movieRequest.getShowingStatus());
-        m.setTrailerUrl(movieRequest.getTrailerUrl());
-        m.setActor(movieRequest.getActor());
+        Optional<Movie> movie = movieRepository.validateByName(request.getName(), id);
+        if(movie.isPresent()){
+            throw new RuntimeException("This movie already exists");
+        }
+        m.setName(request.getName());
+        m.setGenre(request.getGenre());
+        m.setImage(request.getImage());
+        m.setEndDate(request.getEndDate());
+        m.setDuration(request.getDuration());
+        m.setDirector(request.getDirector());
+        m.setReleaseDate(request.getReleaseDate());
+        m.setDescription(request.getDescription());
+        m.setShowingStatus(request.getShowingStatus());
+        m.setTrailerUrl(request.getTrailerUrl());
+        m.setActor(request.getActor());
         movieRepository.save(m);
     }
 
@@ -97,6 +125,7 @@ public class MovieServiceImpl implements MovieService {
         Optional<Movie> movie = movieRepository.findById(id);
         if (movie.isPresent()) {
             movie.get().setStatus(Status.INACTIVE);
+            movieRepository.save(movie.get());
         }
     }
 

@@ -3,7 +3,6 @@ package com.booking.booking_ticket.controller;
 import java.util.List;
 
 import com.booking.booking_ticket.dto.request.MovieRequest;
-import com.booking.booking_ticket.dto.request.RoomRequest;
 import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponse;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;

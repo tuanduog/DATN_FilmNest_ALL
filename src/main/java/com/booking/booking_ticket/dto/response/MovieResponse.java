@@ -1,6 +1,7 @@
 package com.booking.booking_ticket.dto.response;
 
 import com.booking.booking_ticket.utils.ShowingStatus;
+import com.booking.booking_ticket.utils.Status;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MovieResponse {
+public class        MovieResponse {
+
+    Integer id;
 
     String image;
 
@@ -38,14 +41,17 @@ public class MovieResponse {
 
     LocalDate endDate;
 
-    public MovieResponse(String image, String name, String director, String genre, Integer duration, LocalDate releaseDate, ShowingStatus showingStatus, LocalDate endDate) {
-        this.image = image;
+    Status status;
+
+    public MovieResponse(Integer id, String name, String director, String genre, Integer duration, LocalDate releaseDate, ShowingStatus showingStatus, Status status, LocalDate endDate) {
+        this.id = id;
         this.name = name;
         this.director = director;
         this.genre = genre;
         this.duration = duration;
         this.releaseDate = releaseDate;
         this.showingStatus = showingStatus;
+        this.status = status;
         this.endDate = endDate;
     }
 }
