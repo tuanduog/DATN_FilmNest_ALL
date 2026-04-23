@@ -109,7 +109,6 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                     STANDARD: standard?.price || 50000,
                     VIP: vip?.price || 80000,
                     SWEETBOX: sweetbox?.price || 120000,
-                    DELETED: 0
                 });
             } else {
                 generateSeats(room.totalRow, room.totalColumn);
