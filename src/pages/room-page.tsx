@@ -142,19 +142,19 @@ function EditAction({
     return (
         <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
             <Tooltip title={intl.formatMessage({ id: 'detail-room' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/room/detail/${row.id}`)} disabled={row.original.status == 'inactive'}>
+                <IconButton color="primary" onClick={() => navigate(`/admin/room/detail/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
                     <Eye variant="Outline" />
                 </IconButton>
             </Tooltip>
 
             <Tooltip title={intl.formatMessage({ id: 'edit-room' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/room/edit/${row.id}`)} disabled={row.original.status == 'inactive'}>
+                <IconButton color="primary" onClick={() => navigate(`/admin/room/edit/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
                     <Edit2 variant="Outline" />
                 </IconButton>
             </Tooltip>
 
             <Tooltip title={intl.formatMessage({ id: 'delete-room' })}>
-                <IconButton color="error" onClick={() => setOpenDelete(true)} disabled={row.original.status == 'inactive'}>
+                <IconButton color="error" onClick={() => setOpenDelete(true)} disabled={row.original.status === 'INACTIVE'}>
                     <Trash variant="Outline" />
                 </IconButton>
             </Tooltip>
@@ -312,7 +312,7 @@ export default function RoomPage() {
             },
             {
                 id: 'name',
-                header: intl.formatMessage({ id: 'theater-name' }),
+                header: intl.formatMessage({ id: 'room-name' }),
                 accessorKey: 'name',
                 dataType: 'text',
                 enableGrouping: false,
@@ -330,13 +330,13 @@ export default function RoomPage() {
                 id: 'capacity',
                 header: intl.formatMessage({ id: 'capacity' }),
                 accessorKey: 'capacity',
-                dataType: 'number',
+                dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' }
             },
             {
                 id: 'theaterName',
-                header: intl.formatMessage({ id: 'theater-name' }),
+                header: intl.formatMessage({ id: 'room-theater-name' }),
                 accessorKey: 'theaterName',
                 dataType: 'text',
                 enableGrouping: false,

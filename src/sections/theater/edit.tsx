@@ -117,7 +117,6 @@ export default function EditTheater() {
 
                 if (response.status === HttpStatusCode.Ok) {
                     setTheater(response.data);
-                    console.log(response.data);
                     if (response.data?.provinceCode) {
                         await fetchCommunes(response.data.provinceCode);
                     }

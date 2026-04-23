@@ -32,6 +32,7 @@ import EmployeeDetail from 'sections/employee/detail';
 import RoomPage from 'pages/room-page';
 import AddRoom from 'sections/room/add';
 import EditRoom from 'sections/room/edit';
+import RoomDetail from 'sections/room/detail';
 
 
 // pages routing
@@ -160,10 +161,10 @@ const MainRoutes = {
           element: <EditRoom />
         },
 
-        // {
-        //   path: 'admin/room/detail/:id',
-        //   element: <RoomDetail />
-        // }
+        {
+          path: 'admin/room/detail/:id',
+          element: <RoomDetail />
+        }
       ]
     },
     {

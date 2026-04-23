@@ -46,12 +46,17 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
 
     const formik = useFormik<Room>({
         initialValues: room,
+        enableReinitialize: true,
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             setRoom(values);
             handleNext();
         }
     });
+
+    if (Object.keys(formik.errors).length > 0 && formik.submitCount > 0) {
+        console.log('Validation Errors:', formik.errors);
+    }
 
     return (
         <Box>
@@ -167,13 +172,18 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
             />
 
             <Snackbar
-                open={alert.open}
+                open={alert.open || (Object.keys(formik.errors).length > 0 && formik.submitCount > 0)}
                 autoHideDuration={3000}
                 onClose={() => setAlert({ ...alert, open: false })}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
-                <Alert onClose={() => setAlert({ ...alert, open: false })} severity={alert.severity} variant="filled" sx={{ width: '100%' }}>
-                    {alert.message}
+                <Alert
+                    onClose={() => setAlert({ ...alert, open: false })}
+                    severity={Object.keys(formik.errors).length > 0 ? "error" : alert.severity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {Object.keys(formik.errors).length > 0 ? "Vui lòng kiểm tra lại các trường thông tin!" : alert.message}
                 </Alert>
             </Snackbar>
         </Box>

@@ -10,6 +10,7 @@ import RoomSeatConfig from './seat';
 import RoomConfirmForm from './add-confirm-form';
 import { Room } from 'types/room';
 import { getById } from 'api/room';
+import { HttpStatusCode } from 'axios';
 
 const steps = ['Thông tin phòng chiếu', 'Thiết lập ghế', 'Xác nhận'];
 
@@ -64,8 +65,12 @@ export default function EditRoom() {
             if (!id) return;
             try {
                 const response = await getById(Number(id));
-                if (response && !response.error) {
-                    setRoom(response);
+                if (response.status === HttpStatusCode.Ok) {
+                    const data = response.data;
+                    if (data.type) {
+                        data.type = data.type.toUpperCase();
+                    }
+                    setRoom(data);
                 }
             } catch (error) {
                 console.error('Error fetching room:', error);

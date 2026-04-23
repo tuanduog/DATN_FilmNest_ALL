@@ -92,7 +92,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                             id: `${s.row}-${s.col}`,
                             row: s.row,
                             col: s.col,
-                            type: (s.seatStatus === 'DELETED' ? 'DELETED' : s.type) as SeatDisplayType,
+                            type: ((s.seatStatus || '').toUpperCase() === 'DELETED' ? 'DELETED' : (s.type || 'STANDARD').toUpperCase()) as SeatDisplayType,
                             label: s.label,
                             price: s.price
                         }));
@@ -101,14 +101,15 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                 setSeats(rows);
 
                 // Also restore base prices from first found seats of each type
-                const standard = flat.find((s) => s.type === 'STANDARD' && s.seatStatus === 'ACTIVE');
-                const vip = flat.find((s) => s.type === 'VIP' && s.seatStatus === 'ACTIVE');
-                const sweetbox = flat.find((s) => s.type === 'SWEETBOX' && s.seatStatus === 'ACTIVE');
+                const standard = flat.find((s) => (s.type || '').toUpperCase() === 'STANDARD' && (s.seatStatus || '').toUpperCase() === 'ACTIVE');
+                const vip = flat.find((s) => (s.type || '').toUpperCase() === 'VIP' && (s.seatStatus || '').toUpperCase() === 'ACTIVE');
+                const sweetbox = flat.find((s) => (s.type || '').toUpperCase() === 'SWEETBOX' && (s.seatStatus || '').toUpperCase() === 'ACTIVE');
 
                 setPrices({
                     STANDARD: standard?.price || 50000,
                     VIP: vip?.price || 80000,
-                    SWEETBOX: sweetbox?.price || 120000
+                    SWEETBOX: sweetbox?.price || 120000,
+                    DELETED: 0
                 });
             } else {
                 generateSeats(room.totalRow, room.totalColumn);
@@ -190,6 +191,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
             case 'VIP': return '#fff3e0';
             case 'SWEETBOX': return '#fce4ec';
             case 'DELETED': return 'transparent';
+            default: return '#e3f2fd';
         }
     };
 
@@ -199,6 +201,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
             case 'VIP': return '1px solid #ff9800';
             case 'SWEETBOX': return '1px solid #e91e63';
             case 'DELETED': return '1px dashed #bdbdbd';
+            default: return '1px solid #2196f3';
         }
     };
 
@@ -208,6 +211,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
             case 'VIP': return '#e65100';
             case 'SWEETBOX': return '#880e4f';
             case 'DELETED': return 'transparent';
+            default: return '#0d47a1';
         }
     };
 

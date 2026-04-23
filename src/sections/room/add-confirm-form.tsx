@@ -26,6 +26,7 @@ import { Room } from 'types/room';
 import { create, update } from 'api/room';
 import { Seat, SeatType } from 'types/seat';
 import { useNavigate } from 'react-router';
+import { HttpStatusCode } from 'axios';
 
 interface RoomConfirmFormProps {
     handleBack: () => void;
@@ -40,29 +41,35 @@ const ROOM_TYPE_LABEL: Record<string, string> = {
 };
 
 const getSeatColor = (seat: Seat) => {
-    if (seat.seatStatus === 'DELETED') return 'transparent';
-    switch (seat.type) {
+    if ((seat.seatStatus || '').toUpperCase() === 'DELETED') return 'transparent';
+    const type = (seat.type || '').toUpperCase();
+    switch (type) {
         case 'STANDARD': return '#e3f2fd';
         case 'VIP': return '#fff3e0';
         case 'SWEETBOX': return '#fce4ec';
+        default: return '#e3f2fd';
     }
 };
 
 const getSeatBorder = (seat: Seat) => {
-    if (seat.seatStatus === 'DELETED') return '1px dashed #bdbdbd';
-    switch (seat.type) {
+    if ((seat.seatStatus || '').toUpperCase() === 'DELETED') return '1px dashed #bdbdbd';
+    const type = (seat.type || '').toUpperCase();
+    switch (type) {
         case 'STANDARD': return '1px solid #2196f3';
         case 'VIP': return '1px solid #ff9800';
         case 'SWEETBOX': return '1px solid #e91e63';
+        default: return '1px solid #2196f3';
     }
 };
 
 const getSeatTextColor = (seat: Seat) => {
-    if (seat.seatStatus === 'DELETED') return 'transparent';
-    switch (seat.type) {
+    if ((seat.seatStatus || '').toUpperCase() === 'DELETED') return 'transparent';
+    const type = (seat.type || '').toUpperCase();
+    switch (type) {
         case 'STANDARD': return '#0d47a1';
         case 'VIP': return '#e65100';
         case 'SWEETBOX': return '#880e4f';
+        default: return '#0d47a1';
     }
 };
 
@@ -97,10 +104,14 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
         : [];
 
     const countByType = (type: SeatType) =>
-        (room.seats as Seat[] | undefined)?.filter((s) => s.type === type && s.seatStatus === 'ACTIVE').length ?? 0;
+        (room.seats as Seat[] | undefined)?.filter(
+            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE'
+        ).length ?? 0;
 
     const getPriceByType = (type: SeatType) =>
-        (room.seats as Seat[] | undefined)?.find((s) => s.type === type && s.seatStatus === 'ACTIVE')?.price ?? 0;
+        (room.seats as Seat[] | undefined)?.find(
+            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE'
+        )?.price ?? 0;
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -126,13 +137,13 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
 
             const response = isEdit ? await update(room.id!, payload) : await create(payload as any);
 
-            if (response && !response?.response?.data?.error) {
+            if (response.status === HttpStatusCode.Ok) {
                 setAlert({ open: true, message: isEdit ? 'Cập nhật phòng chiếu thành công!' : 'Tạo phòng chiếu thành công!', severity: 'success' });
                 setTimeout(() => {
                     navigate('/admin/room');
                 }, 1500);
             } else {
-                const errMsg = response?.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+                const errMsg = response?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
                 setAlert({ open: true, message: errMsg, severity: 'error' });
             }
         } catch {
@@ -167,7 +178,9 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                                 <CategoryIcon color="primary" />
                                 <Box>
                                     <Typography variant="caption" color="textSecondary">Loại phòng</Typography>
-                                    <Typography variant="body1" fontWeight={600}>{ROOM_TYPE_LABEL[room.type] || room.type}</Typography>
+                                    <Typography variant="body1" fontWeight={600}>
+                                        {ROOM_TYPE_LABEL[(room.type || '').toUpperCase()] || room.type}
+                                    </Typography>
                                 </Box>
                             </Stack>
 
@@ -256,17 +269,17 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                                             <Box
                                                 key={`${seat.row}-${seat.col}`}
                                                 sx={{
-                                                    width: (seat.type === 'SWEETBOX' && seat.seatStatus === 'ACTIVE') ? 60 : 30,
-                                                    height: 30,
+                                                    width: ((seat.type || '').toUpperCase() === 'SWEETBOX' && (seat.seatStatus || '').toUpperCase() === 'ACTIVE') ? 60 : 38,
+                                                    height: 38,
                                                     bgcolor: getSeatColor(seat),
                                                     border: getSeatBorder(seat),
-                                                    borderRadius: 0.5,
+                                                    borderRadius: 1,
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                 }}
                                             >
-                                                {seat.seatStatus !== 'DELETED' && (
+                                                {(seat.seatStatus || '').toUpperCase() !== 'DELETED' && (
                                                     <Typography variant="caption" sx={{ fontSize: '0.6rem', fontWeight: 600, color: getSeatTextColor(seat) }}>
                                                         {seat.label}
                                                     </Typography>
