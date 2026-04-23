@@ -265,6 +265,25 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="trailerUrl" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Link trailer
+                                </InputLabel>
+
+                                <TextField
+                                    id="trailerUrl"
+                                    name="trailerUrl"
+                                    placeholder="Nhập link trailer"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.trailerUrl}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.trailerUrl && Boolean(formik.errors.trailerUrl)}
+                                    helperText={formik.touched.trailerUrl && formik.errors.trailerUrl}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 12 }}>
                                 <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
                                     Mô tả
                                 </InputLabel>

@@ -131,5 +131,18 @@
   "movie-discount-amount": "Movie Discount Amount",
   "movie-discount-type": "Movie Discount Type",
   "now-showing": "Now Showing",
-  "stop": "Stop"
+  "stop": "Stop",
+  "director": "Director",
+  "actor": "Actor",
+  "genre": "Genre",
+  "release-date": "Release Date",
+  "end-date": "End Date",
+  "duration": "Duration",
+  "trailer-url": "Trailer URL",
+  "showing-status": "Showing Status",
+  "release": "Release",
+  "stop-showing": "Stop Showing",
+  "please-select-one-director": "Please select one director",
+  "please-select-one-actor": "Please select one actor",
+  "please-select-one-genre": "Please select one genre"
 }

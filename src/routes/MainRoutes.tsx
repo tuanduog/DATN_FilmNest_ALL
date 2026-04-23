@@ -33,6 +33,10 @@ import RoomPage from 'pages/room-page';
 import AddRoom from 'sections/room/add';
 import EditRoom from 'sections/room/edit';
 import RoomDetail from 'sections/room/detail';
+import MoviePage from 'pages/movie-page';
+import AddMovie from 'sections/movie/add';
+import MovieDetail from 'sections/movie/detail';
+import EditMovie from 'sections/movie/edit';
 
 
 // pages routing
@@ -160,10 +164,25 @@ const MainRoutes = {
           path: 'admin/room/edit/:id',
           element: <EditRoom />
         },
-
         {
           path: 'admin/room/detail/:id',
           element: <RoomDetail />
+        },
+        {
+          path: 'admin/movie',
+          element: <MoviePage />
+        },
+        {
+          path: 'admin/movie/add',
+          element: <AddMovie />
+        },
+        {
+          path: 'admin/movie/edit/:id',
+          element: <EditMovie />
+        },
+        {
+          path: 'admin/movie/detail/:id',
+          element: <MovieDetail />
         }
       ]
     },

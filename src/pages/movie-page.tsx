@@ -341,11 +341,14 @@ export default function MoviePage() {
                 accessorKey: 'duration',
                 dataType: 'text',
                 enableGrouping: false,
+                cell: (cell) => {
+                    return cell.getValue() + ' phút';
+                },
                 meta: { width: '35%' }
             },
             {
                 id: 'releaseDate',
-                header: intl.formatMessage({ id: 'releaseDate' }),
+                header: intl.formatMessage({ id: 'release-date' }),
                 accessorKey: 'releaseDate',
                 dataType: 'date',
                 cell: (cell) => {
@@ -414,7 +417,8 @@ export default function MoviePage() {
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: ''
+        status: '',
+        showingStatus: ''
     });
     const [alert, setAlert] = useState({
         open: false,
@@ -447,6 +451,10 @@ export default function MoviePage() {
             const response = await getList(pageRequest);
 
             if (response.status === HttpStatusCode.Ok) {
+                response.data.content.forEach((item: Movie) => {
+                    item.showingStatus = item.showingStatus?.toUpperCase();
+                })
+                console.log(response.data.content);
                 setData(response.data.content);
                 setTotalPages(response.data.totalPages);
                 setTotalElements(response.data.totalElements);
@@ -653,6 +661,27 @@ export default function MoviePage() {
                             </MenuItem>
                             <MenuItem value="INACTIVE">
                                 <FormattedMessage id="inactive" />
+                            </MenuItem>
+                        </Select>
+
+                        <Select
+                            value={pageRequest.showingStatus}
+                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, showingStatus: event.target.value })}
+                            displayEmpty
+                            input={<OutlinedInput />}
+                            slotProps={{ input: { 'aria-label': 'Showing Status Filter' } }}
+                        >
+                            <MenuItem value="">
+                                <FormattedMessage id="showing-status" />
+                            </MenuItem>
+                            <MenuItem value="COMING_SOON">
+                                <FormattedMessage id="coming-soon" />
+                            </MenuItem>
+                            <MenuItem value="NOW_SHOWING">
+                                <FormattedMessage id="now-showing" />
+                            </MenuItem>
+                            <MenuItem value="STOP">
+                                <FormattedMessage id="stop" />
                             </MenuItem>
                         </Select>
                     </Stack>

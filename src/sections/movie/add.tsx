@@ -45,7 +45,7 @@ export default function AddMovie() {
         releaseDate: '',
         director: '',
         actor: '',
-        showingStatus: ''
+        showingStatus: 'COMING_SOON'
     };
 
     const [movie, setMovie] = useState<Movie>(initialValues);

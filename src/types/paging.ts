@@ -17,6 +17,7 @@ export interface PageRequest {
     type?: string | undefined;
     status?: string | undefined;
     role?: string | undefined;
+    showingStatus?: string | undefined;
 }
 
 export const DEFAULT_PAGE_SIZE = 10;

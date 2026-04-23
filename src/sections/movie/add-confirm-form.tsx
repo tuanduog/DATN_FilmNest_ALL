@@ -96,10 +96,10 @@ export default function AddConfirmForm({ handleBack, movie }: ConfirmProps) {
                         Xác nhận thông tin phim
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         {movie.image && (
                             <Grid size={12}>
-                                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mb: 2 }}>
+                                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'left', mb: 2 }}>
                                     <Box>
                                         <img
                                             alt="movie-poster"

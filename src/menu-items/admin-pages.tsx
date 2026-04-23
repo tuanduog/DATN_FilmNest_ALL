@@ -81,6 +81,13 @@ const admin: NavItemType = {
       type: 'item',
       url: '/admin/room',
       icon: icons.contactus
+    },
+    {
+      id: 'movie',
+      title: 'movie',
+      type: 'item',
+      url: '/admin/movie',
+      icon: icons.contactus
     }
   ]
 };
