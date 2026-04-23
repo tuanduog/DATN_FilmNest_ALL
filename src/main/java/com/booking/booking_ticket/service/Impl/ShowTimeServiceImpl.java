@@ -4,7 +4,7 @@ import com.booking.booking_ticket.dto.RoomDTO;
 import com.booking.booking_ticket.dto.ShowTimeDTO;
 import com.booking.booking_ticket.dto.TheaterDTO;
 import com.booking.booking_ticket.dto.request.ShowTimeRequest;
-import com.booking.booking_ticket.dto.response.ShowtimeResponse;
+import com.booking.booking_ticket.dto.response.ShowTimeResponse;
 import com.booking.booking_ticket.entity.Room;
 import com.booking.booking_ticket.entity.ShowTime;
 import com.booking.booking_ticket.entity.Theater;
@@ -13,7 +13,10 @@ import com.booking.booking_ticket.repository.RoomRepository;
 import com.booking.booking_ticket.repository.ShowTimeRepository;
 import com.booking.booking_ticket.service.ShowTimeService;
 import com.booking.booking_ticket.utils.ShowingStatus;
+import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,40 +59,43 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public List<ShowtimeResponse> getShowTime() {
+    public List<ShowTimeResponse> getShowTime() {
         return showTimeRepository.findAllShowtimes();
     }
 
     @Override
-    public int addShowtime(ShowTimeRequest showTimeRequest) {
-        ShowTime showTime = new ShowTime();
-        showTime.setStartTime(showTimeRequest.getStartTime());
-        showTime.setMovie(movieRepository.findById(showTimeRequest.getMovieId()).get());
-        showTime.setRoom(roomRepository.findById(showTimeRequest.getRoomId()).get());
+    public Page<ShowTimeResponse> getList(Pageable pageable, String keyword, Status status){
+        if (keyword != null){
+            keyword = "%" + keyword.trim().toLowerCase() + "%";
+        } else {
+            keyword = "%";
+        }
 
-        showTimeRepository.save(showTime);
-
-        return showTime.getId();
+        return showTimeRepository.findAllByKeyword(pageable, keyword, status);
     }
 
     @Override
-    public int editShowtime(int id, ShowTimeRequest showTimeRequest) {
-        ShowTime show_time = showTimeRepository.findById(id).get();
-        show_time.setStartTime(showTimeRequest.getStartTime());
-        show_time.setRoom(roomRepository.findById(showTimeRequest.getRoomId()).get());
-        show_time.setMovie(movieRepository.findById(showTimeRequest.getMovieId()).get());
-        showTimeRepository.save(show_time);
-        return show_time.getId();
+    public void addShowTime(ShowTimeRequest request){
+
     }
 
     @Override
-    public int deleteMovie(int id) {
-        showTimeRepository.deleteById(id);
-        return id;
+    public void updateShowTime(Integer id, ShowTimeRequest request){
+
     }
 
     @Override
-    public List<ShowtimeResponse> getShowtimeByRoomId(int id){
+    public ShowTimeResponse getById(Integer id){
+        return null;
+    }
+
+    @Override
+    public void deleteShowTime(Integer id) {
+
+    }
+
+    @Override
+    public List<ShowTimeResponse> getShowtimeByRoomId(int id){
         String showingStatus = ShowingStatus.NOW_SHOWING.getValue();
         return showTimeRepository.findShow_timeByRooms(id, showingStatus);
     }

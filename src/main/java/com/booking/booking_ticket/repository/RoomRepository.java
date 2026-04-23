@@ -26,7 +26,17 @@ public interface RoomRepository extends JpaRepository<Room,Integer> {
         WHERE (LOWER(r.name) LIKE :keyword)
         AND (:status IS NULL OR r.status = :status)
     """)
-    Page<RoomResponse> findAllForKeyword(Pageable pageable, String keyword, Status status);
+    Page<RoomResponse> findAllByKeyword(Pageable pageable, String keyword, Status status);
+
+    @Query("""
+        SELECT new com.booking.booking_ticket.dto.response.RoomResponse(r.id, r.name, r.capacity, r.totalRow, r.totalColumn, r.type, r.theater.name, r.status)
+        FROM Room r
+            JOIN Theater t ON t.id = r.theater.id
+        WHERE t.id = :theaterId
+        AND (LOWER(r.name) LIKE :keyword)
+        AND (:status IS NULL OR r.status = :status)
+    """)
+    Page<RoomResponse> findAllByTheaterId(Integer theaterId, Pageable pageable, String keyword, Status status);
 
     @Query("""
         SELECT r

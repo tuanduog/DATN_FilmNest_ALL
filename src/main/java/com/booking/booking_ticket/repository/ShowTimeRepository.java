@@ -1,6 +1,9 @@
 package com.booking.booking_ticket.repository;
 
-import com.booking.booking_ticket.dto.response.ShowtimeResponse;
+import com.booking.booking_ticket.dto.response.ShowTimeResponse;
+import com.booking.booking_ticket.utils.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -15,20 +18,31 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer>{
     @EntityGraph(attributePaths = {"room"})
     List<ShowTime> findByMovie_Id(Integer movieId);
 
-    @Query("SELECT new com.booking.booking_ticket.dto.response.ShowtimeResponse(s.id, s.startTime, m.name, m.id, t.name,t.id,r.name,r.id) " +
+    @Query("SELECT new com.booking.booking_ticket.dto.response.ShowTimeResponse(s.id, s.showDate, s.startTime) " +
             "FROM ShowTime s " +
             "JOIN s.room r " +
             "JOIN r.theater t " +
             "JOIN s.movie m")
-    List<ShowtimeResponse> findAllShowtimes();
+    List<ShowTimeResponse> findAllShowtimes();
 
     @Query("SELECT s f from ShowTime  s where s.room.id = :roomId")
     List<ShowTime> findShowtimeByRoomId(Integer roomId);
 
-    @Query("SELECT new com.booking.booking_ticket.dto.response.ShowtimeResponse(s.id, s.startTime, m.name, m.id, t.name,t.id,r.name,r.id) " +
+    @Query("SELECT new com.booking.booking_ticket.dto.response.ShowTimeResponse(s.id, s.showDate, s.startTime) " +
             "FROM ShowTime s " +
             "JOIN s.room r " +
             "JOIN r.theater t " +
             "JOIN s.movie m where m.showingStatus = :showingStatus and s.room.id = :roomId")
-    List<ShowtimeResponse> findShow_timeByRooms(Integer roomId, String showingStatus);
+    List<ShowTimeResponse> findShow_timeByRooms(Integer roomId, String showingStatus);
+
+    @Query("""
+        SELECT new com.booking.booking_ticket.dto.response.ShowTimeResponse(s.id, s.showDate, s.startTime, m.name, t.name, r.name, s.status)
+        FROM ShowTime s
+            JOIN Movie m ON m.id = s.movie.id
+            JOIN Room r ON r.id = s.room.id
+            JOIN Theater t ON t.id = r.theater.id
+        WHERE (LOWER(t.name) LIKE :keyword OR LOWER(m.name) LIKE :keyword)
+        AND (:status IS NULL OR t.status = :status)
+    """)
+    Page<ShowTimeResponse> findAllByKeyword(Pageable pageable, String keyword, Status status);
 }

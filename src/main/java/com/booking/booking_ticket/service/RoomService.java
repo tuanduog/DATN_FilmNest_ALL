@@ -15,6 +15,8 @@ public interface RoomService {
 
     public Page<RoomResponse> getList(Pageable pageable, String keyword, Status status);
 
+    public Page<RoomResponse> getListByTheaterId(Integer theaterId, Pageable pageable, String keyword, Status status);
+
     public void addRoom(RoomRequest request);
 
     public void updateRoom(Integer id, RoomRequest request);

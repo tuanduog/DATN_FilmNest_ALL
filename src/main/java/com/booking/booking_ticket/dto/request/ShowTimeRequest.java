@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Builder
@@ -14,7 +15,11 @@ import java.time.LocalTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShowTimeRequest implements Serializable {
 
+    LocalDate showDate;
+
     LocalTime startTime;
+
+    Double surcharge;
 
     Integer movieId;
 

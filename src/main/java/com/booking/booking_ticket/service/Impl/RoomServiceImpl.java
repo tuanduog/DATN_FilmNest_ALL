@@ -48,7 +48,18 @@ public class RoomServiceImpl implements RoomService {
             keyword = "%";
         }
 
-        return roomRepository.findAllForKeyword(pageable, keyword, status);
+        return roomRepository.findAllByKeyword(pageable, keyword, status);
+    }
+
+    @Override
+    public Page<RoomResponse> getListByTheaterId(Integer theaterId, Pageable pageable, String keyword, Status status) {
+        if (keyword != null){
+            keyword = "%" + keyword.trim().toLowerCase() + "%";
+        } else {
+            keyword = "%";
+        }
+
+        return roomRepository.findAllByTheaterId(theaterId, pageable, keyword, status);
     }
 
     @Override

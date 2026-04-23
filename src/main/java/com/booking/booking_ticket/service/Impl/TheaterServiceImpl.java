@@ -42,7 +42,7 @@ public class TheaterServiceImpl implements TheaterService {
             keyword = "%";
         }
 
-        return theaterRepository.findAllForKeyword(pageable, keyword, status);
+        return theaterRepository.findAllByKeyword(pageable, keyword, status);
     }
 
     @Override

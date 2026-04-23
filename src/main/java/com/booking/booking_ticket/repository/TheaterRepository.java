@@ -27,5 +27,5 @@ public interface TheaterRepository extends JpaRepository<Theater,Integer> {
         WHERE (LOWER(t.name) LIKE :keyword)
         AND (:status IS NULL OR t.status = :status)
     """)
-    Page<TheaterResponse> findAllForKeyword(Pageable pageable, String keyword, Status status);
+    Page<TheaterResponse> findAllByKeyword(Pageable pageable, String keyword, Status status);
 }

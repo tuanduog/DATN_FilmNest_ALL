@@ -73,4 +73,12 @@ public class RoomController {
         roomService.deleteRoom(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Delete room successful");
     }
+
+    @GetMapping("/v1/theater/{id}")
+    public ResponseData<?> getListByTheaterId(@PathVariable Integer id,
+                                              @PageableDefault() Pageable pageable,
+                                              @RequestParam(required = false) String keyword,
+                                              @RequestParam(required = false) Status status){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", roomService.getListByTheaterId(id, pageable, keyword, status));
+    }
 }

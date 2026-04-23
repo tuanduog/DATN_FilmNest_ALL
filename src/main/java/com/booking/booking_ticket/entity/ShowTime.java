@@ -24,7 +24,7 @@ public class ShowTime extends BaseEntity {
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
-    private Double price;
+    private Double surcharge;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
