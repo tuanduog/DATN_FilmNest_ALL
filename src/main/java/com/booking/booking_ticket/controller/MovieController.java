@@ -8,6 +8,7 @@ import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.service.Impl.MovieServiceImpl;
 import com.booking.booking_ticket.service.MovieService;
+import com.booking.booking_ticket.utils.ShowingStatus;
 import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,9 +98,9 @@ public class MovieController {
     @GetMapping("/v1")
     public ResponseData<?> getList(@PageableDefault() Pageable pageable,
                                    @RequestParam(required = false) String keyword,
-                                   @RequestParam(required = false) String genre,
+                                   @RequestParam(required = false)ShowingStatus showingStatus,
                                    @RequestParam(required = false) Status status){
-        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", movieService.getList(pageable, keyword, genre, status));
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", movieService.getList(pageable, keyword, showingStatus, status));
     }
 
     @GetMapping("/v1/{id}")

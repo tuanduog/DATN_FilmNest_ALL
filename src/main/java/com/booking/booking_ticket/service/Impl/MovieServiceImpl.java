@@ -37,20 +37,14 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Page<MovieResponse> getList(Pageable pageable, String keyword, String genre, Status status){
+    public Page<MovieResponse> getList(Pageable pageable, String keyword, ShowingStatus showingStatus, Status status){
         if (keyword != null) {
             keyword = "%" + keyword.trim().toLowerCase() + "%";
         } else {
             keyword = "%";
         }
 
-        if (genre != null) {
-            genre = "%" + genre.trim().toLowerCase() + "%";
-        } else {
-            genre = "%";
-        }
-
-        return movieRepository.findAllByKeyword(pageable, keyword, genre, status);
+        return movieRepository.findAllByKeyword(pageable, keyword, showingStatus, status);
     }
 
     @Override
@@ -90,6 +84,7 @@ public class MovieServiceImpl implements MovieService {
         movie.setEndDate(request.getEndDate());
         movie.setDuration(request.getDuration());
         movie.setDirector(request.getDirector());
+        movie.setTrailerUrl(request.getTrailerUrl());
         movie.setReleaseDate(request.getReleaseDate());
         movie.setShowingStatus(request.getShowingStatus());
         movie.setStatus(Status.ACTIVE);
@@ -106,17 +101,49 @@ public class MovieServiceImpl implements MovieService {
         if(movie.isPresent()){
             throw new RuntimeException("This movie already exists");
         }
-        m.setName(request.getName());
-        m.setGenre(request.getGenre());
-        m.setImage(request.getImage());
-        m.setEndDate(request.getEndDate());
-        m.setDuration(request.getDuration());
-        m.setDirector(request.getDirector());
-        m.setReleaseDate(request.getReleaseDate());
-        m.setDescription(request.getDescription());
-        m.setShowingStatus(request.getShowingStatus());
-        m.setTrailerUrl(request.getTrailerUrl());
-        m.setActor(request.getActor());
+        if (request.getName() != null) {
+            m.setName(request.getName());
+        }
+
+        if (request.getGenre() != null) {
+            m.setGenre(request.getGenre());
+        }
+
+        if (request.getImage() != null) {
+            m.setImage(request.getImage());
+        }
+
+        if (request.getEndDate() != null) {
+            m.setEndDate(request.getEndDate());
+        }
+
+        if (request.getDuration() != null) {
+            m.setDuration(request.getDuration());
+        }
+
+        if (request.getDirector() != null) {
+            m.setDirector(request.getDirector());
+        }
+
+        if (request.getReleaseDate() != null) {
+            m.setReleaseDate(request.getReleaseDate());
+        }
+
+        if (request.getDescription() != null) {
+            m.setDescription(request.getDescription());
+        }
+
+        if (request.getShowingStatus() != null) {
+            m.setShowingStatus(request.getShowingStatus());
+        }
+
+        if (request.getTrailerUrl() != null) {
+            m.setTrailerUrl(request.getTrailerUrl());
+        }
+
+        if (request.getActor() != null) {
+            m.setActor(request.getActor());
+        }
         movieRepository.save(m);
     }
 

@@ -2,6 +2,7 @@ package com.booking.booking_ticket.repository;
 
 import com.booking.booking_ticket.dto.response.MovieResponse;
 import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponse;
+import com.booking.booking_ticket.utils.ShowingStatus;
 import com.booking.booking_ticket.utils.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,8 +43,8 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>{
         SELECT new com.booking.booking_ticket.dto.response.MovieResponse(m.id, m.name, m.director, m.genre, m.duration, m.releaseDate, m.showingStatus, m.status, m.endDate)
         FROM Movie m
         WHERE (LOWER(m.name) LIKE :keyword OR LOWER(m.director) LIKE :keyword)
-        AND (:status IS NULL OR m.showingStatus = :status)
-        AND (LOWER(m.genre) LIKE :genre)
+        AND (:status IS NULL OR m.status = :status)
+        AND (:showingStatus IS NULL OR m.showingStatus = :showingStatus)
     """)
-    Page<MovieResponse> findAllByKeyword(Pageable pageable, String keyword, String genre, Status status);
+    Page<MovieResponse> findAllByKeyword(Pageable pageable, String keyword, ShowingStatus showingStatus, Status status);
 }
