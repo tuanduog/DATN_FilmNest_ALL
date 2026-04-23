@@ -61,7 +61,7 @@ import {
 // project-imports
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
-import { deleteById, getList } from 'api/combo';
+import { deleteById, getList } from 'api/movie';
 
 import EmptyTable from 'components/third-party/react-table/EmptyTable';
 import HeaderSort from 'components/third-party/react-table/HeaderSort';
@@ -70,7 +70,7 @@ import RowEditable from 'components/third-party/react-table/RowEditable';
 // assets
 import { Add, ArrowDown2, ArrowRight2, Command, Edit2, Eye, Lock, TableDocument, Trash } from 'iconsax-reactjs';
 import { DEFAULT_PAGE_SIZE, PageRequest } from 'types/paging';
-import type { Combo } from 'types/combo';
+import type { Movie } from 'types/movie';
 import {
     Alert,
     Button,
@@ -86,8 +86,9 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
+import formatDate from 'utils/formatDateTime';
 
-const fuzzyFilter: FilterFn<Combo> = (row, columnId, value, addMeta) => {
+const fuzzyFilter: FilterFn<Movie> = (row, columnId, value, addMeta) => {
     // rank the item
     const itemRank = rankItem(row.getValue(columnId), value);
 
@@ -106,7 +107,7 @@ function EditAction({
     setReload,
     setAlert
 }: {
-    row: Row<Combo>;
+    row: Row<Movie>;
     reload: boolean;
     setReload: (e: boolean) => void;
     setAlert: React.Dispatch<
@@ -141,19 +142,19 @@ function EditAction({
 
     return (
         <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-            <Tooltip title={intl.formatMessage({ id: 'detail-combo' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/combo/detail/${row.id}`)} disabled={row.original.status == 'inactive'}>
+            <Tooltip title={intl.formatMessage({ id: 'detail-movie' })}>
+                <IconButton color="primary" onClick={() => navigate(`/admin/movie/detail/${row.id}`)} disabled={row.original.status == 'inactive'}>
                     <Eye variant="Outline" />
                 </IconButton>
             </Tooltip>
 
-            <Tooltip title={intl.formatMessage({ id: 'edit-combo' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/combo/edit/${row.id}`)} disabled={row.original.status == 'inactive'}>
+            <Tooltip title={intl.formatMessage({ id: 'edit-movie' })}>
+                <IconButton color="primary" onClick={() => navigate(`/admin/movie/edit/${row.id}`)} disabled={row.original.status == 'inactive'}>
                     <Edit2 variant="Outline" />
                 </IconButton>
             </Tooltip>
 
-            <Tooltip title={intl.formatMessage({ id: 'delete-combo' })}>
+            <Tooltip title={intl.formatMessage({ id: 'delete-movie' })}>
                 <IconButton color="error" onClick={() => setOpenDelete(true)} disabled={row.original.status == 'inactive'}>
                     <Trash variant="Outline" />
                 </IconButton>
@@ -165,11 +166,11 @@ function EditAction({
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa combo ưu đãi này không?</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa phim này không?</DialogTitle>
 
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa combo ưu đãi này, tất cả thông tin đi kèm cũng sẽ bị xóa.
+                        Khi xóa phim này, tất cả thông tin đi kèm cũng sẽ bị xóa.
                     </DialogContentText>
                 </DialogContent>
 
@@ -294,11 +295,11 @@ function DraggableRow({ row }: { row: Row<any> }) {
 
 // ==============================|| REACT TABLE - MAIN ||============================== //
 
-export default function ComboPage() {
+export default function MoviePage() {
     const { logout, user } = useAuth();
     const intl = useIntl();
     const [reload, setReload] = useState(false);
-    const columns = useMemo<ColumnDef<Combo>[]>(
+    const columns = useMemo<ColumnDef<Movie>[]>(
         () => [
             {
                 id: 'id',
@@ -312,27 +313,66 @@ export default function ComboPage() {
             },
             {
                 id: 'name',
-                header: intl.formatMessage({ id: 'combo-name' }),
+                header: intl.formatMessage({ id: 'movie-name' }),
                 accessorKey: 'name',
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' }
             },
             {
-                id: 'description',
-                header: intl.formatMessage({ id: 'description' }),
-                accessorKey: 'description',
+                id: 'director',
+                header: intl.formatMessage({ id: 'director' }),
+                accessorKey: 'director',
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' }
             },
             {
-                id: 'price',
-                header: intl.formatMessage({ id: 'price' }),
-                accessorKey: 'price',
+                id: 'genre',
+                header: intl.formatMessage({ id: 'genre' }),
+                accessorKey: 'genre',
                 dataType: 'text',
                 enableGrouping: false,
                 meta: { width: '35%' }
+            },
+            {
+                id: 'duration',
+                header: intl.formatMessage({ id: 'duration' }),
+                accessorKey: 'duration',
+                dataType: 'text',
+                enableGrouping: false,
+                meta: { width: '35%' }
+            },
+            {
+                id: 'releaseDate',
+                header: intl.formatMessage({ id: 'releaseDate' }),
+                accessorKey: 'releaseDate',
+                dataType: 'date',
+                cell: (cell) => {
+                    return formatDate(cell.getValue() as string);
+                },
+                enableGrouping: false,
+                meta: { width: '35%' }
+            },
+            {
+                id: 'showingStatus',
+                header: intl.formatMessage({ id: 'showing-status' }),
+                accessorKey: 'showingStatus',
+                cell: (cell) => {
+                    const { showingStatus } = cell.row.original;
+
+                    return (
+                        <Chip
+                            label={
+                                showingStatus === 'COMING_SOON' ? intl.formatMessage({ id: 'coming-soon' }) : showingStatus === 'NOW_SHOWING' ? intl.formatMessage({ id: 'now-showing' }) : intl.formatMessage({ id: 'stop' })
+                            }
+                            color={showingStatus === 'COMING_SOON' ? 'warning' : showingStatus === 'NOW_SHOWING' ? 'success' : 'error'}
+                        />
+                    );
+                },
+                dataType: 'select',
+                enableGrouping: false,
+                meta: { width: '20%' }
             },
             {
                 id: 'status',
@@ -365,7 +405,7 @@ export default function ComboPage() {
         [intl, reload]
     );
     let options: number[] = [10, 25, 50, 100];
-    const [data, setData] = useState<Combo[]>([]);
+    const [data, setData] = useState<Movie[]>([]);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [pageNumber, setPageNumber] = useState(0);
@@ -403,7 +443,7 @@ export default function ComboPage() {
     };
 
     useEffect(() => {
-        const fetchCombos = async () => {
+        const fetchMovies = async () => {
             const response = await getList(pageRequest);
 
             if (response.status === HttpStatusCode.Ok) {
@@ -418,7 +458,7 @@ export default function ComboPage() {
             }
         };
 
-        fetchCombos();
+        fetchMovies();
     }, [pageRequest, intl, logout, reload]);
 
     useEffect(() => {
@@ -433,7 +473,7 @@ export default function ComboPage() {
         columns,
         manualPagination: true,
         defaultColumn: { cell: RowEditable },
-        getRowId: (row: Combo) => (row.id ?? '').toString(),
+        getRowId: (row: Movie) => (row.id ?? '').toString(),
         state: { rowSelection, columnFilters, sorting, grouping, columnOrder, columnVisibility },
         enableRowSelection: true,
         onRowSelectionChange: setRowSelection,
@@ -462,13 +502,13 @@ export default function ComboPage() {
             setSelectedRow,
             revertData: (rowIndex: number, revert: unknown) => {
                 if (revert) {
-                    setData((old: Combo[]) => old.map((row, index) => (index === rowIndex ? originalData[rowIndex] : row)));
+                    setData((old: Movie[]) => old.map((row, index) => (index === rowIndex ? originalData[rowIndex] : row)));
                 } else {
                     setOriginalData((old) => old.map((row, index) => (index === rowIndex ? data[rowIndex] : row)));
                 }
             },
             updateData: (rowIndex, columnId, value) => {
-                setData((old: Combo[]) =>
+                setData((old: Movie[]) =>
                     old.map((row, index) => {
                         if (index === rowIndex) {
                             return { ...old[rowIndex]!, [columnId]: value };
@@ -526,7 +566,7 @@ export default function ComboPage() {
                 })}
             >
                 <Typography variant="h3" gutterBottom>
-                    <FormattedMessage id="combo-list" />
+                    <FormattedMessage id="movie-list" />
                 </Typography>
 
                 <Button
@@ -536,10 +576,10 @@ export default function ComboPage() {
                         justifyContent: 'center',
                     }}
                     variant="contained"
-                    onClick={() => navigate('/admin/combo/add')}
+                    onClick={() => navigate('/admin/movie/add')}
                     startIcon={<Add />}
                 >
-                    <FormattedMessage id="add-combo" />
+                    <FormattedMessage id="add-movie" />
                 </Button>
             </Stack>
 
@@ -584,7 +624,7 @@ export default function ComboPage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm theo tên combo'}
+                            placeholder={'Tìm kiếm theo tên phim'}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {

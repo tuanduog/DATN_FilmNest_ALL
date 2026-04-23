@@ -90,5 +90,21 @@
     "edit-room": "Sửa phòng chiếu",
     "delete-room": "Xóa phòng chiếu",
     "detail-room": "Chi tiết phòng chiếu",
-    "room-name": "Tên phòng chiếu"
+    "room-name": "Tên phòng chiếu",
+    "movie": "Phim",
+    "movie-list": "Danh sách phim",
+    "movie-name": "Tên phim",
+    "add-movie": "Thêm phim",
+    "edit-movie": "Sửa phim",
+    "delete-movie": "Xóa phim",
+    "movie-price": "Giá phim",
+    "movie-description": "Mô tả phim",
+    "movie-status": "Trạng thái phim",
+    "movie-discount": "Giảm giá phim",
+    "movie-duration": "Thời hạn phim",
+    "movie-discount-percent": "Phần trăm giảm giá phim",
+    "movie-discount-amount": "Số tiền giảm giá phim",
+    "movie-discount-type": "Loại giảm giá phim",
+    "now-showing": "Đang chiếu",
+    "stop": "Dừng chiếu"
 }

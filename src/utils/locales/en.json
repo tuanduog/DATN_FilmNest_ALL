@@ -115,5 +115,21 @@
   "room-discount-amount": "Room Discount Amount",
   "room-discount-type": "Room Discount Type",
   "capacity": "Capacity",
-  "type": "Type"
+  "type": "Type",
+  "movie": "Movie",
+  "movie-list": "Movie List",
+  "movie-name": "Movie Name",
+  "add-movie": "Add Movie",
+  "edit-movie": "Edit Movie",
+  "delete-movie": "Delete Movie",
+  "movie-price": "Movie Price",
+  "movie-description": "Movie Description",
+  "movie-status": "Movie Status",
+  "movie-discount": "Movie Discount",
+  "movie-duration": "Movie Duration",
+  "movie-discount-percent": "Movie Discount Percent",
+  "movie-discount-amount": "Movie Discount Amount",
+  "movie-discount-type": "Movie Discount Type",
+  "now-showing": "Now Showing",
+  "stop": "Stop"
 }
