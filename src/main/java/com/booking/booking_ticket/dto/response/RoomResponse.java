@@ -28,5 +28,20 @@ public class RoomResponse {
 
     String theaterName;
 
+    Integer theaterId;
+
     Status status;
+
+    SeatResponse[] seats;
+
+    public RoomResponse(Integer id, String name, Integer capacity, Integer totalRow, Integer totalColumn, RoomType type, String theaterName, Status status) {
+        this.id = id;
+        this.name = name;
+        this.capacity = capacity;
+        this.totalRow = totalRow;
+        this.totalColumn = totalColumn;
+        this.type = type;
+        this.theaterName = theaterName;
+        this.status = status;
+    }
 }

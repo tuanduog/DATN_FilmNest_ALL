@@ -28,5 +28,11 @@ public interface RoomRepository extends JpaRepository<Room,Integer> {
     """)
     Page<RoomResponse> findAllForKeyword(Pageable pageable, String keyword, Status status);
 
-    Optional<Room> findByName(String name);
+    @Query("""
+        SELECT r
+        FROM Room r
+        WHERE r.name = :name
+            AND (:id IS NULL OR r.id <> :id)
+    """)
+    Optional<Room> validateByName(String name, Integer id);
 }

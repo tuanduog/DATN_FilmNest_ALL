@@ -3,6 +3,7 @@ package com.booking.booking_ticket.service.Impl;
 import com.booking.booking_ticket.dto.request.RoomRequest;
 import com.booking.booking_ticket.dto.request.SeatRequest;
 import com.booking.booking_ticket.dto.response.RoomResponse;
+import com.booking.booking_ticket.dto.response.SeatResponse;
 import com.booking.booking_ticket.entity.Room;
 import com.booking.booking_ticket.entity.Seat;
 import com.booking.booking_ticket.entity.Theater;
@@ -53,7 +54,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public void addRoom(RoomRequest request){
-        Optional<Room> room = roomRepository.findByName(request.getName());
+        Optional<Room> room = roomRepository.validateByName(request.getName(), null);
         if (room.isPresent()){
             throw new RuntimeException("This room already exists");
         }
@@ -87,12 +88,91 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void updateRoom(Integer id, RoomRequest request){
+        Room room = roomRepository.findById(id).orElseThrow(()-> new RuntimeException("Room does not exist"));
+        Optional<Room> validateName = roomRepository.validateByName(request.getName(), id);
+        if (validateName.isPresent()){
+            throw new RuntimeException("This room already exists");
+        }
+        if (request.getName() != null){
+            room.setName(request.getName());
+        }
 
+        if (request.getType() != null){
+            room.setType(request.getType());
+        }
+
+        if (request.getCapacity() != null){
+            room.setCapacity(request.getCapacity());
+        }
+
+        if (request.getTotalColumn() != null){
+            room.setTotalColumn(request.getTotalColumn());
+        }
+
+        if (request.getTotalRow() != null){
+            room.setTotalRow(request.getTotalRow());
+        }
+
+        if (request.getTheaterId() != null){
+            Optional<Theater> theater = theaterRepository.findById(request.getTheaterId());
+            if (theater.isPresent()){
+                room.setTheater(theater.get());
+            }
+        }
+
+        roomRepository.save(room);
+
+        if (request.getSeats() != null){
+            seatRepository.deleteAllByRoom_Id(room.getId());
+            List<Seat> seats = new ArrayList<>();
+            List<SeatRequest> seatRequests = Arrays.asList(request.getSeats());
+            for (SeatRequest s : seatRequests) {
+                Seat seat = new Seat();
+                seat.setRoom(room);
+                seat.setCode(s.getLabel());
+                seat.setType(s.getType());
+                seat.setSeatStatus(s.getSeatStatus());
+                seat.setPrice(s.getPrice());
+                seat.setRowIndex(s.getRow());
+                seat.setColumnIndex(s.getCol());
+                seats.add(seat);
+            }
+            seatRepository.saveAll(seats);
+        }
     }
 
     @Override
     public RoomResponse getById(Integer id){
-        return null;
+        Optional<Room> room = roomRepository.findById(id);
+        RoomResponse r = new RoomResponse();
+        if (room.isPresent()){
+            r.setId(room.get().getId());
+            r.setName(room.get().getName());
+            r.setType(room.get().getType());
+            r.setCapacity(room.get().getCapacity());
+            r.setTotalColumn(room.get().getTotalColumn());
+            r.setTotalRow(room.get().getTotalRow());
+            r.setTheaterName(room.get().getTheater().getName());
+            r.setTheaterId(room.get().getTheater().getId());
+            r.setStatus(room.get().getStatus());
+
+            List<SeatResponse> seatList = new ArrayList<>();
+            List<Seat> seats = seatRepository.findByRoom_Id(room.get().getId());
+            for (Seat seat : seats){
+                SeatResponse s = new SeatResponse();
+                s.setId(seat.getId());
+                s.setLabel(seat.getCode());
+                s.setType(seat.getType());
+                s.setPrice(seat.getPrice());
+                s.setRow(seat.getRowIndex());
+                s.setCol(seat.getColumnIndex());
+                s.setSeatStatus(seat.getSeatStatus());
+                seatList.add(s);
+            }
+            SeatResponse[] seatArray = seatList.toArray(new SeatResponse[seatList.size()]);
+            r.setSeats(seatArray);
+        }
+        return r;
     }
 
     @Override
