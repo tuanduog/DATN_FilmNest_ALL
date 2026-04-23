@@ -4,6 +4,7 @@ import com.booking.booking_ticket.dto.request.MovieRequest;
 import com.booking.booking_ticket.dto.response.MovieResponse;
 import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponse;
 import com.booking.booking_ticket.entity.Movie;
+import com.booking.booking_ticket.utils.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,13 +16,15 @@ public interface MovieService {
 
     List<Movie> getAllMovies();
 
-    Page<MovieResponse> getList(Pageable  pageable, String keyword, String genre, Integer status);
+    Page<MovieResponse> getList(Pageable pageable, String keyword, String genre, Status status);
 
-    public int addMovie(MovieRequest movieRequest);
+    public void addMovie(MovieRequest request);
 
-    public int editMovie(int id, MovieRequest movieRequest);
+    public MovieResponse getById(Integer id);
 
-    public int deleteMovie(int id);
+    public void updateMovie(Integer id, MovieRequest request);
+
+    public void deleteMovie(Integer id);
 
     public List<MoviesWithRevenuesResponse> getTopMovies();
 

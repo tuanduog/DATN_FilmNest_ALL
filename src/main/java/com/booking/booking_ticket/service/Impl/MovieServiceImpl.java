@@ -6,6 +6,7 @@ import com.booking.booking_ticket.dto.response.MoviesWithRevenuesResponse;
 import com.booking.booking_ticket.entity.Movie;
 import com.booking.booking_ticket.repository.MovieRepository;
 import com.booking.booking_ticket.service.MovieService;
+import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Page<MovieResponse> getList(Pageable pageable, String keyword, String genre, Integer status){
+    public Page<MovieResponse> getList(Pageable pageable, String keyword, String genre, Status status){
         if (keyword != null) {
             keyword = "%" + keyword.trim().toLowerCase() + "%";
         } else {
@@ -51,7 +53,12 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public int addMovie(MovieRequest movieRequest) {
+    public MovieResponse getById(Integer id){
+        return null;
+    }
+
+    @Override
+    public void addMovie(MovieRequest movieRequest) {
         Movie movie = new Movie();
         movie.setActor(movieRequest.getActor());
         movie.setDescription(movieRequest.getMovieDescription());
@@ -65,11 +72,10 @@ public class MovieServiceImpl implements MovieService {
         movie.setShowingStatus(movieRequest.getShowingStatus());
 
         movieRepository.save(movie);
-        return movie.getId();
     }
 
     @Override
-    public int editMovie(int id, MovieRequest movieRequest) {
+    public void updateMovie(Integer id, MovieRequest movieRequest) {
         Movie m = movieRepository.findById(id).get();
 
         m.setDescription(movieRequest.getMovieDescription());
@@ -84,13 +90,14 @@ public class MovieServiceImpl implements MovieService {
         m.setTrailerUrl(movieRequest.getTrailerUrl());
         m.setActor(movieRequest.getActor());
         movieRepository.save(m);
-        return m.getId();
     }
 
     @Override
-    public int deleteMovie(int id) {
-        movieRepository.deleteById(id);
-        return id;
+    public void deleteMovie(Integer id) {
+        Optional<Movie> movie = movieRepository.findById(id);
+        if (movie.isPresent()) {
+            movie.get().setStatus(Status.INACTIVE);
+        }
     }
 
     @Override

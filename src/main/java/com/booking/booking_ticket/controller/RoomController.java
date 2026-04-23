@@ -1,7 +1,6 @@
 package com.booking.booking_ticket.controller;
 
 import com.booking.booking_ticket.dto.request.RoomRequest;
-import com.booking.booking_ticket.dto.request.TheaterRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.entity.Room;
