@@ -11,6 +11,15 @@ const getList = async (pageRequest: PageRequest) => {
     }
 }
 
+const getListByTheaterId = async (theaterId: number, pageRequest: PageRequest) => {
+    try {
+        const response = await axiosServices.get(`/api/room/v1/theater/${theaterId}`, { params: pageRequest });
+        return response.data;
+    } catch (error: Error | any) {
+        return error;
+    }
+}
+
 const create = async (room: Room) => {
     try {
         const response = await axiosServices.post('/api/room/v1', room);
@@ -47,4 +56,4 @@ const deleteById = async (id: number) => {
     }
 }
 
-export { getList, create, getById, update, deleteById };
+export { getList, getListByTheaterId, create, getById, update, deleteById };

@@ -144,5 +144,8 @@
   "stop-showing": "Stop Showing",
   "please-select-one-director": "Please select one director",
   "please-select-one-actor": "Please select one actor",
-  "please-select-one-genre": "Please select one genre"
+  "please-select-one-genre": "Please select one genre",
+  "showtime": "Showtime",
+  "showtime-list": "Showtime List",
+  "add-showtime": "Add Showtime"
 }

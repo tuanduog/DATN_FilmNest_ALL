@@ -38,7 +38,7 @@ const validationSchema = Yup.object({
 });
 
 export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProps) {
-    const [image, setImage] = useState<File | null>(movie.image!);
+    const [image, setImage] = useState<File | string | null>(movie.image!);
     const [preview, setPreview] = useState<string | null>('');
 
     const [alert, setAlert] = useState({

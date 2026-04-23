@@ -37,6 +37,8 @@ import MoviePage from 'pages/movie-page';
 import AddMovie from 'sections/movie/add';
 import MovieDetail from 'sections/movie/detail';
 import EditMovie from 'sections/movie/edit';
+import ShowtimePage from 'pages/showtime-page';
+import AddShowtime from 'sections/showtime/add';
 
 
 // pages routing
@@ -183,6 +185,14 @@ const MainRoutes = {
         {
           path: 'admin/movie/detail/:id',
           element: <MovieDetail />
+        },
+        {
+          path: 'admin/showtime',
+          element: <ShowtimePage />
+        },
+        {
+          path: 'admin/showtime/add',
+          element: <AddShowtime />
         }
       ]
     },

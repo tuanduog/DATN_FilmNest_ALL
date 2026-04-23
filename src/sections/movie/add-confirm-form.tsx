@@ -103,7 +103,7 @@ export default function AddConfirmForm({ handleBack, movie }: ConfirmProps) {
                                     <Box>
                                         <img
                                             alt="movie-poster"
-                                            src={URL.createObjectURL(movie.image!)}
+                                            src={typeof movie.image === 'string' ? movie.image : URL.createObjectURL(movie.image as File)}
                                             style={{ width: '200px', height: 'auto', display: 'block', borderRadius: '8px', objectFit: 'cover', boxShadow: '0px 4px 10px rgba(0,0,0,0.1)' }}
                                         />
                                     </Box>

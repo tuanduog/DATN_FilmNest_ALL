@@ -11,6 +11,6 @@ export interface Movie {
     trailerUrl?: string;
     showingStatus?: string;
     status?: string;
-    image?: File | null;
+    image?: File | string | null;
     imageUrl?: string;
 }

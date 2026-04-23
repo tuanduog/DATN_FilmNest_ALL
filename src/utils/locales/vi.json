@@ -118,5 +118,18 @@
     "stop-showing": "Dừng chiếu",
     "please-select-one-director": "Vui lòng chọn một đạo diễn",
     "please-select-one-actor": "Vui lòng chọn một diễn viên",
-    "please-select-one-genre": "Vui lòng chọn một thể loại"
+    "please-select-one-genre": "Vui lòng chọn một thể loại",
+    "showtime": "Suất chiếu",
+    "showtime-list": "Danh sách suất chiếu",
+    "showtime-name": "Tên suất chiếu",
+    "add-showtime": "Thêm suất chiếu",
+    "edit-showtime": "Sửa suất chiếu",
+    "delete-showtime": "Xóa suất chiếu",
+    "showtime-price": "Giá suất chiếu",
+    "showtime-description": "Mô tả suất chiếu",
+    "showtime-status": "Trạng thái suất chiếu",
+    "showtime-discount": "Giảm giá suất chiếu",
+    "showtime-discount-percent": "Phần trăm giảm giá suất chiếu",
+    "showtime-discount-amount": "Số tiền giảm giá suất chiếu",
+    "showtime-discount-type": "Loại giảm giá suất chiếu"
 }
