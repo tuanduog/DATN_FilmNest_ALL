@@ -43,8 +43,9 @@ public class        MovieResponse {
 
     Status status;
 
-    public MovieResponse(Integer id, String name, String director, String genre, Integer duration, LocalDate releaseDate, ShowingStatus showingStatus, Status status, LocalDate endDate) {
+    public MovieResponse(Integer id, String image, String name, String director, String genre, Integer duration, LocalDate releaseDate, ShowingStatus showingStatus, Status status, LocalDate endDate) {
         this.id = id;
+        this.image = image;
         this.name = name;
         this.director = director;
         this.genre = genre;

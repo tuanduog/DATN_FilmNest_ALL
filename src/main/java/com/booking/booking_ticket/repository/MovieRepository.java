@@ -40,7 +40,7 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>{
     List<MoviesWithRevenuesResponse> topMovies();
 
     @Query("""
-        SELECT new com.booking.booking_ticket.dto.response.MovieResponse(m.id, m.name, m.director, m.genre, m.duration, m.releaseDate, m.showingStatus, m.status, m.endDate)
+        SELECT new com.booking.booking_ticket.dto.response.MovieResponse(m.id, m.image, m.name, m.director, m.genre, m.duration, m.releaseDate, m.showingStatus, m.status, m.endDate)
         FROM Movie m
         WHERE (LOWER(m.name) LIKE :keyword OR LOWER(m.director) LIKE :keyword)
         AND (:status IS NULL OR m.status = :status)

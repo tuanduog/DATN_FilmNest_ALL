@@ -11,7 +11,10 @@ import org.springframework.stereotype.Repository;
 import com.booking.booking_ticket.entity.ShowTime;
 import org.springframework.data.jpa.repository.EntityGraph;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer>{
@@ -45,4 +48,12 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer>{
         AND (:status IS NULL OR t.status = :status)
     """)
     Page<ShowTimeResponse> findAllByKeyword(Pageable pageable, String keyword, Status status);
+
+    @Query("""
+        SELECT s
+        FROM ShowTime s
+        WHERE s.showDate = :showDate AND s.startTime = :startTime AND s.movie.id = :movieId AND s.room.id = :roomId
+            AND (:id IS NULL OR s.id <> :id)
+    """)
+    Optional<ShowTime> validateShowTime(LocalDate showDate, LocalTime startTime, int movieId, int roomId, Integer id);
 }

@@ -20,6 +20,8 @@ public class ShowTimeResponse {
 
     LocalTime startTime;
 
+    Double surcharge;
+
     String movieName;
 
     Integer movieId;
