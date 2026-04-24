@@ -18,7 +18,7 @@ public interface AuthService {
 
     IntrospectiveResponse introspect(HttpServletRequest request) throws JOSEException, ParseException;
 
-    void registerCustomer(RegisterRequest registerRequest);
+    void register(RegisterRequest registerRequest);
 
     boolean logout(HttpServletRequest request);
 }

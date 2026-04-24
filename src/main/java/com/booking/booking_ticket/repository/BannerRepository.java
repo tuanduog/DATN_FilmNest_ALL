@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface BannerRepository extends JpaRepository<Banner, Integer> {
 
     @Query("""
-        SELECT new com.booking.booking_ticket.dto.response.BannerResponse(b.id, b.name, b.createdAt, b.updatedAt, b.status)
+        SELECT new com.booking.booking_ticket.dto.response.BannerResponse(b.id, b.image, b.name, b.createdAt, b.updatedAt, b.status)
         FROM Banner b
         WHERE (LOWER(b.name) LIKE :keyword)
         AND (:status IS NULL OR b.status = :status)

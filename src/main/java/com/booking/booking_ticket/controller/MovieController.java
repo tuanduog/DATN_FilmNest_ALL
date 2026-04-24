@@ -50,22 +50,6 @@ public class MovieController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
-    @GetMapping("/getAll")
-    public ResponseData<?> getMovies()
-    {
-        try {
-            List<Movie> result = moviesService.getAllMovies();
-            System.out.println(result.size());
-            if(!result.isEmpty())
-                return new ResponseData<>(HttpStatus.OK.value(),"Có movies",result);
-            else
-                return new ResponseError(HttpStatus.BAD_REQUEST.value(), "movies null");
-        }
-        catch (Exception e)
-        {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
-    }
 
     @GetMapping("/getTopMovies")
     public ResponseData<?> getTopMovies()
@@ -83,10 +67,9 @@ public class MovieController {
         }
     }
 
-    @GetMapping(value = "/getAll-movies", produces = "application/json")
-    public ResponseEntity<?> getAllMovies() {
-        List<Movie> mv = movieService.getAllMovies();
-        return ResponseEntity.ok(mv);
+    @GetMapping("/v1/all")
+    public ResponseData<?> getAll() {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get all successful", movieService.getAll());
     }
 
     @GetMapping("/get-movie/{id}")

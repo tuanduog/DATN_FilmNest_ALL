@@ -20,16 +20,6 @@ public class TheaterServiceImpl implements TheaterService {
     public TheaterRepository theaterRepository;
 
     @Override
-    public List<String> getLocations() {
-        return theaterRepository.getLocations();
-    }
-
-    @Override
-    public List<Theater> getTheatersByLocation(String location) {
-        return theaterRepository.getTheatersByTheaterLocation(location);
-    }
-
-    @Override
     public List<Theater> getAllTheater() {
         return theaterRepository.findAll();
     }

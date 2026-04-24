@@ -33,9 +33,10 @@ public class AuthController {
     private final AuthServiceImpl authServiceImpl;
 
     @PostMapping("/login")
-    public ResponseData<AuthResponse> login(@RequestBody AuthRequest authRequest, HttpServletResponse response) {
+    public ResponseData<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
         try {
-            var result = authService.isAuthenticated(authRequest);
+            AuthResponse result = authService.isAuthenticated(request);
+
             if (result.getIsAuthenticated() == true) {
                 ResponseCookie cookie = ResponseCookie.from("jwt", result.getToken())
                         .httpOnly(true)
@@ -46,7 +47,7 @@ public class AuthController {
                 response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
                 return new ResponseData<>(HttpStatus.OK.value(), "User authenticated", result);
-            } else return new ResponseError(HttpStatus.BAD_REQUEST.value(), "wrong username or password");
+            } else return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Wrong username or password");
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
@@ -75,9 +76,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseData<Long> login(@RequestBody RegisterRequest registerRequest) {
+    public ResponseData<Long> register(@RequestBody RegisterRequest registerRequest) {
         try {
-            authService.registerCustomer(registerRequest);
+            authService.register(registerRequest);
             return new ResponseData<>(HttpStatus.OK.value(), "Register successful!");
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());

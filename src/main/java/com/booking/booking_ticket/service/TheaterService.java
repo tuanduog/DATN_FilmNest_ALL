@@ -11,10 +11,6 @@ import java.util.List;
 
 public interface TheaterService {
 
-    List<String> getLocations();
-
-    List<Theater> getTheatersByLocation(String location);
-
     List<Theater> getAllTheater();
 
     Page<TheaterResponse> getList(Pageable pageable, String keyword, Status status);

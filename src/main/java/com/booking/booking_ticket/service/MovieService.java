@@ -15,7 +15,7 @@ public interface MovieService {
 
     List<String> getGenres();
 
-    List<Movie> getAllMovies();
+    List<Movie> getAll();
 
     Page<MovieResponse> getList(Pageable pageable, String keyword, ShowingStatus showingStatus, Status status);
 

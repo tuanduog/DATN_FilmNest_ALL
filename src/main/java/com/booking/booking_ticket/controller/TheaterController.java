@@ -25,43 +25,8 @@ public class TheaterController {
 
     private final TheaterServiceImpl theatersService;
 
-    @GetMapping("/getLocations")
-    public ResponseData<?> getGenres()
-    {
-        try{
-            List<String> result = theatersService.getLocations();
-            System.out.println(result.size());
-            if(!result.isEmpty())
-                return new ResponseData<>(HttpStatus.OK.value(),"Có location",result);
-            else
-                return new ResponseError(HttpStatus.BAD_REQUEST.value(), "location null");
-        }
-        catch (Exception e)
-        {
-            log.error("there is an error of introspect: {}",e.getMessage());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
-    }
-
-    @GetMapping("/getTheaterByLocation")
-    public ResponseData<?> getGenres(@RequestParam String Location)
-    {
-        try {
-            List<Theater> result = theatersService.getTheatersByLocation(Location);
-            if(!result.isEmpty())
-                return new ResponseData<>(HttpStatus.OK.value(),"Có theater",result);
-            else
-                return new ResponseError(HttpStatus.BAD_REQUEST.value(), "theater null");
-        }
-        catch (Exception e)
-        {
-            log.error("there is an error of introspect: {}",e.getMessage());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
-    }
-
-    @GetMapping("/getTheaters")
-    public ResponseData<?> getTheaters()
+    @GetMapping("/v1/all")
+    public ResponseData<?> getAllTheater()
     {
         try {
             List<Theater> result = theatersService.getAllTheater();

@@ -32,8 +32,9 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
+    public List<Movie> getAll() {
+        List<Movie> movies = movieRepository.findAll();
+        return movies.stream().filter(m -> m.getStatus().equals(Status.ACTIVE)).toList();
     }
 
     @Override

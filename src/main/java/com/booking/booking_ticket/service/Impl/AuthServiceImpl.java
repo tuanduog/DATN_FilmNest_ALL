@@ -8,6 +8,7 @@ import com.booking.booking_ticket.repository.InvalidTokenRepsitory;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.utils.Role;
 import com.booking.booking_ticket.utils.Status;
+import com.booking.booking_ticket.utils.Util;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -39,7 +40,10 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService {
 
     private final UsersRepository usersRepository;
+
     private final PasswordEncoder passwordEncoder;
+
+    private final Util util;
 
     private final InvalidTokenRepsitory invalidTokenRepsitory;
     @NonFinal
@@ -47,12 +51,12 @@ public class AuthServiceImpl implements AuthService {
     protected String SIGNER_KEY;
 
     @Override
-    public AuthResponse isAuthenticated(AuthRequest authRequest) {
-        var account = usersRepository.findByUsername(authRequest.getUsername()).orElseThrow();
+    public AuthResponse isAuthenticated(AuthRequest request) {
+        Users account = usersRepository.findByUsername(request.getUsername()).orElseThrow(() -> new RuntimeException("Username does not exist"));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        boolean isAuth = passwordEncoder.matches(authRequest.getPassword(), account.getPassword());
+        boolean isAuth = passwordEncoder.matches(request.getPassword(), account.getPassword());
 
-        if (account.getStatus().equals(Status.INACTIVE)){
+        if (account.getStatus() == null || account.getStatus().equals(Status.INACTIVE)){
             isAuth = false;
         }
 
@@ -148,14 +152,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void registerCustomer(RegisterRequest registerRequest) {
-
+    public void register(RegisterRequest request) {
+        util.validateUser(request.getUsername(), request.getEmail(), request.getPhone(), null);
         Users user = new Users();
-        user.setUsername(registerRequest.getUsername());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setEmail(registerRequest.getEmail());
-        user.setPhone(registerRequest.getPhone());
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
         user.setRole(Role.USER);
+        user.setStatus(Status.ACTIVE);
 
         usersRepository.save(user);
     }
