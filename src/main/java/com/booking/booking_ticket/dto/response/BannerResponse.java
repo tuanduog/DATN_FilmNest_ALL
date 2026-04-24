@@ -17,6 +17,8 @@ public class BannerResponse {
 
     Integer id;
 
+    String image;
+
     String name;
 
     Instant createdAt;
@@ -24,4 +26,12 @@ public class BannerResponse {
     Instant updatedAt;
 
     Status status;
+
+    public BannerResponse(Integer id, String name, Instant createdAt, Instant updatedAt, Status status) {
+        this.id = id;
+        this.name = name;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.status = status;
+    }
 }

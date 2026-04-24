@@ -21,6 +21,12 @@ public class BannerServiceImpl implements BannerService {
     private final Util util;
 
     public Page<BannerResponse> getList(Pageable pageable, String keyword, Status status) {
+        if (keyword != null){
+            keyword = "%" + keyword.trim().toLowerCase() + "%";
+        } else {
+            keyword = "%";
+        }
+
         return bannerRepository.getList(pageable, keyword, status);
     }
 
@@ -39,6 +45,7 @@ public class BannerServiceImpl implements BannerService {
         BannerResponse response = new BannerResponse();
         response.setId(banner.getId());
         response.setName(banner.getName());
+        response.setImage(banner.getImage());
         response.setCreatedAt(banner.getCreatedAt());
         response.setUpdatedAt(banner.getUpdatedAt());
         response.setStatus(banner.getStatus());
