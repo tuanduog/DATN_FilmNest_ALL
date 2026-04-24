@@ -95,6 +95,13 @@ const admin: NavItemType = {
       type: 'item',
       url: '/admin/showtime',
       icon: icons.contactus
+    },
+    {
+      id: 'banner',
+      title: 'banner',
+      type: 'item',
+      url: '/admin/banner',
+      icon: icons.contactus
     }
   ]
 };

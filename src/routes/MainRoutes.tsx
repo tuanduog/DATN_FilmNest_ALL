@@ -41,6 +41,10 @@ import ShowtimePage from 'pages/showtime-page';
 import AddShowtime from 'sections/showtime/add';
 import EditShowtime from 'sections/showtime/edit';
 import ShowtimeDetail from 'sections/showtime/detail';
+import BannerPage from 'pages/banner-page';
+import AddBanner from 'sections/banner/add';
+import EditBanner from 'sections/banner/edit';
+import BannerDetail from 'sections/banner/detail';
 
 
 // pages routing
@@ -203,6 +207,22 @@ const MainRoutes = {
         {
           path: 'admin/showtime/detail/:id',
           element: <ShowtimeDetail />
+        },
+        {
+          path: 'admin/banner',
+          element: <BannerPage />
+        },
+        {
+          path: 'admin/banner/add',
+          element: <AddBanner />
+        },
+        {
+          path: 'admin/banner/edit/:id',
+          element: <EditBanner />
+        },
+        {
+          path: 'admin/banner/detail/:id',
+          element: <BannerDetail />
         }
       ]
     },
