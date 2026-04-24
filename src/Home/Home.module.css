@@ -8,30 +8,34 @@
 .banner {
     width: 100%;
     overflow: hidden;
-    background-color: #000;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 .banner img {
-    height: 400px;
+    height: 300px;
     object-fit: cover;
     width: 100%;
+    display: block; /* Removes any whitespace below the image */
+    border: none;
 }
 
 @media (min-width: 768px) {
     .banner img {
-        height: 500px;
+        height: 400px;
     }
 }
 
 @media (min-width: 1024px) {
     .banner img {
-        height: 600px;
+        height: 500px;
     }
 }
 
 @media (min-width: 1400px) {
     .banner img {
-        height: 700px;
+        height: 550px;
     }
 }
 
@@ -41,7 +45,7 @@
     justify-content: center;
     gap: 30px;
     margin-bottom: 3rem;
-    margin-top: 3rem;
+    margin-top: 2rem;
 }
 
 .tab {

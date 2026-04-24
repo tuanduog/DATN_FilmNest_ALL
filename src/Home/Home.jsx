@@ -2,21 +2,17 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './Home.module.css';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import banner1 from '../assets/banner1.png';
-import banner2 from '../assets/banner2.png';
-import banner3 from '../assets/banner3.png';
-import banner4 from '../assets/banner4.png';
-import banner6 from '../assets/banner6.jpg';
 import axios from 'axios';
 import { useEffect } from 'react';
 
 function Homepage() {
     const [nowShowing, setNowShowing] = useState(true);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [showingNow, setShowingNow] = useState([]);
     const [commingSoon, setCommingSoon] = useState([]);
@@ -30,9 +26,11 @@ function Homepage() {
     const [selectedTime, setSelectedTime] = useState([]);
     const savedTheater = JSON.parse(localStorage.getItem('theater'));
     const [showChoseLocation, setShowChoseLocation] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState(""); // địa điểm đã chọn
-    const [selectedTheater, setselectedTheater] = useState(""); // thông tin các rạp
+    const [selectedLocation, setSelectedLocation] = useState("");
+    const [selectedTheater, setselectedTheater] = useState("");
+    const [banners, setBanners] = useState([]);
     const [theater, setTheater] = useState([]);
+    const [allTheaters, setAllTheaters] = useState([]);
     const [locations, setLocation] = useState([]);
     const handleCloseModal = () => {
         setShowModal1(false);
@@ -57,12 +55,13 @@ function Homepage() {
         setConfirmPopup(true);
     }
     const handleMovieDetails = (id) => {
-        navigate("/Movie_detail", { state: { id } });
+        navigate(`/movie/detail/${id}`);
+        window.scrollTo(0, 0);
     }
 
     const handleBooking = (movieInfo, date, time) => {
         const user = sessionStorage.getItem('state');
-        console.log('Booking:', { movieInfo, date, time });
+
         const bookingInfo = {
             movieInfo, date, time
         };
@@ -77,43 +76,69 @@ function Homepage() {
         }
     }
 
-    const handleTheater = async (location) => {
-        const url = `http://localhost:8099/theaters/getTheaterByLocation?Location=${encodeURIComponent(location)}`;
+    const [pageRequest, setPageRequest] = useState({
+        page: 0,
+        size: 8,
+        sort: '',
+        keyword: '',
+        status: 'ACTIVE'
+    });
+
+    useEffect(() => {
+        const fetchBanners = async () => {
+            try {
+                const res = await axios.get("http://localhost:8099/api/banner/v1", {
+                    params: pageRequest
+                });
+                const data = res.data.data;
+                setBanners(Array.isArray(data.content) ? data.content : []);
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách banner", error);
+                setBanners([]);
+            }
+        };
+        fetchBanners();
+    }, [pageRequest])
+
+    const handleTheaters = async () => {
+        const url = `http://localhost:8099/api/theater/v1/all`;
         try {
             const res = await axios.get(url, {
                 withCredentials: true
             });
-            if (res.data.status === 200) {
-                setTheater(res.data.data);
-                // thông tin rạp
+            if (res.data.status === 200 && Array.isArray(res.data.data)) {
+                const data = res.data.data;
+                setAllTheaters(data);
+
+                // Extract unique provinces
+                const uniqueProvinces = [];
+                const provinceMap = new Map();
+
+                data.forEach(t => {
+                    if (t.provinceCode && !provinceMap.has(t.provinceCode)) {
+                        provinceMap.set(t.provinceCode, t.provinceName);
+                        uniqueProvinces.push({
+                            code: t.provinceCode,
+                            name: t.provinceName
+                        });
+                    }
+                });
+
+                setLocation(uniqueProvinces);
             } else {
-                setTheater([]);
-            }
-        } catch (err) {
-            setTheater([]);
-            console.error("Fetch theaters failed:", err);
-        }
-    };
-    const handleLocations = async () => {
-        try {
-            const res = await axios.get('http://localhost:8099/theaters/getLocations', {
-                withCredentials: true
-            });
-            if (res.data.status === 200) {
-                setLocation(Array.isArray(res.data.data) ? res.data.data : []);
-                // địa điểm rạp
-                console.log(res.data.data);
-            } else {
+                setAllTheaters([]);
                 setLocation([]);
             }
         } catch (err) {
-            console.error("Fetch locations failed:", err);
+            setAllTheaters([]);
+            setLocation([]);
+            console.error("Fetch theaters failed:", err);
         }
     };
 
     useEffect(() => {
-        handleLocations();
-    }, [location.pathname]);
+        handleTheaters();
+    }, []);
 
     const generateAvailableShowDates = (releasedDateStr, numberOfDays) => {
         const today = new Date();
@@ -138,33 +163,10 @@ function Homepage() {
         return showDates;
     };
 
-    const banners = [
-        {
-            id: 1,
-            url: banner1,
-        },
-        {
-            id: 2,
-            url: banner2,
-        },
-        {
-            id: 3,
-            url: banner3,
-        },
-        {
-            id: 4,
-            url: banner4,
-        }
-        , {
-            id: 6,
-            url: banner6,
-        }
-    ];
-
     const settings = {
         dots: true,
         infinite: true,
-        speed: 500,
+        speed: 600,
         autoplay: true,
         autoplaySpeed: 4000,
         slidesToShow: 1,
@@ -182,14 +184,16 @@ function Homepage() {
     }
     const fetchMovies = async () => {
         try {
-            const res = await axios.get("http://localhost:8099/movie/getAll-movies");
-            const movies = res.data;
+            const res = await axios.get("http://localhost:8099/api/movie/v1/all");
+            const movies = res.data.data;
 
-            const s1 = movies.filter(movie => movie.showing === "Đang chiếu");
-            const c1 = movies.filter(movie => movie.showing === "Sắp chiếu");
+            if (Array.isArray(movies)) {
+                const s1 = movies.filter(movie => movie.showingStatus === "now_showing");
+                const c1 = movies.filter(movie => movie.showingStatus === "coming_soon");
 
-            setShowingNow(s1);
-            setCommingSoon(c1);
+                setShowingNow(s1);
+                setCommingSoon(c1);
+            }
         } catch (error) {
             console.error("Lỗi khi lấy danh sách phim", error);
         }
@@ -214,20 +218,23 @@ function Homepage() {
                             <h4 className="fw-bold mb-4 text-center">Chọn Khu Vực & Rạp</h4>
                             <div className={styles.formRow}>
                                 <div className={styles.formGroup}>
-                                    <label>Tỉnh/ Thành phố</label>
+                                    <label>Tỉnh/Thành phố</label>
                                     <select
                                         value={selectedLocation}
                                         onChange={e => {
-                                            const loc = e.target.value;
-                                            setSelectedLocation(loc);
-                                            handleTheater(loc);
+                                            const provCode = e.target.value;
+                                            setSelectedLocation(provCode);
+                                            // Filter theaters by province code
+                                            const filtered = allTheaters.filter(t => t.provinceCode === provCode);
+                                            setTheater(filtered);
+                                            setselectedTheater(""); // Reset selected theater
                                         }}
                                     >
                                         <option value="">Chọn Tỉnh/ Thành phố</option>
                                         {Array.isArray(locations) &&
                                             locations.map((loc, idx) => (
-                                                <option key={idx} value={loc}>
-                                                    {loc}
+                                                <option key={idx} value={loc.code}>
+                                                    {loc.name}
                                                 </option>
                                             ))}
                                     </select>
@@ -241,11 +248,11 @@ function Homepage() {
                                             const selectedValue = e.target.value;
                                             setselectedTheater(selectedValue);
 
-                                            const selectedObj = theater.find(t => t.theaterId.toString() === selectedValue);
+                                            const selectedObj = theater.find(t => t.id && t.id.toString() === selectedValue);
                                             if (selectedObj) {
                                                 localStorage.setItem('theater', JSON.stringify({
-                                                    theaterId: selectedObj.theaterId,
-                                                    theaterName: selectedObj.theaterName,
+                                                    id: selectedObj.id,
+                                                    name: selectedObj.name,
                                                     theaterLocation: selectedObj.theaterLocation
                                                 }));
                                                 setShowChoseLocation(false);
@@ -256,8 +263,8 @@ function Homepage() {
                                         <option value="">Chọn rạp</option>
                                         {Array.isArray(theater) &&
                                             theater.map((theaterItem, idx) => (
-                                                <option key={idx} value={theaterItem.theaterId}>
-                                                    {theaterItem.theaterName}
+                                                <option key={idx} value={theaterItem.id}>
+                                                    {theaterItem.name}
                                                 </option>
                                             ))}
                                     </select>
@@ -276,7 +283,7 @@ function Homepage() {
                             LỊCH CHIẾU - {movieInfo.movieName}
                         </h3>
 
-                        <h6 className="text-center mb-4 text-secondary fw-semibold">{savedTheater.theaterName}</h6>
+                        <h5 className="text-center mb-4 text-secondary">{savedTheater?.name}</h5>
 
                         <div className="d-flex justify-content-center gap-2 flex-wrap mb-4">
                             {showDates.map((dateStr, i) => (
@@ -363,10 +370,10 @@ function Homepage() {
             )}
             <div className={styles.banner}>
                 <Slider {...settings}>
-                    {banners.map((item) => (
+                    {Array.isArray(banners) && banners.map((item) => (
                         <div key={item.id} style={{ outline: 'none' }}>
                             <img
-                                src={item.url}
+                                src={item.image}
                                 alt={`Banner ${item.id}`}
                             />
                         </div>
@@ -374,7 +381,7 @@ function Homepage() {
                 </Slider>
             </div>
 
-            <div className="container-fluid px-3 px-md-5 mt-4">
+            <div className="container-fluid px-3 px-md-5 mt-2">
                 <div className={styles.tabWrapper}>
                     <div
                         className={`${styles.tab} ${nowShowing ? styles.active : ''}`}
@@ -393,16 +400,16 @@ function Homepage() {
                 {nowShowing ? (
                     <div className="row g-4 justify-content-center mx-auto" style={{ maxWidth: '1440px' }}>
                         {showingNow.map((movie) => (
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={movie.movieId}>
+                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={movie.id}>
                                 <div className={styles.movieCard}>
                                     <img
                                         src={movie.image}
-                                        alt={movie.movieName}
-                                        onClick={() => handleMovieDetails(movie.movieId)}
+                                        alt={movie.name}
+                                        onClick={() => handleMovieDetails(movie.id)}
                                     />
                                     <div className={styles.cardBody}>
-                                        <h6 className={`${styles.cardTitleCustom} ${styles.ellipsis}`} onClick={() => handleMovieDetails(movie.movieId)} title={movie.movieName}>
-                                            {movie.movieName}
+                                        <h6 className={`${styles.cardTitleCustom} ${styles.ellipsis}`} onClick={() => handleMovieDetails(movie.id)} title={movie.name}>
+                                            {movie.name}
                                         </h6>
                                         <p className={`mb-1 text-secondary ${styles.ellipsis}`} style={{ fontSize: '13.5px' }}>
                                             <span className="fw-semibold">Thể loại:</span> {movie.genre}
@@ -421,16 +428,16 @@ function Homepage() {
                 ) : (
                     <div className="row g-4 justify-content-center mx-auto" style={{ maxWidth: '1440px' }}>
                         {commingSoon.map((movie) => (
-                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={movie.movieId}>
+                            <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={movie.id}>
                                 <div className={styles.movieCard}>
                                     <img
                                         src={movie.image}
-                                        alt={movie.movieName}
-                                        onClick={() => handleMovieDetails(movie.movieId)}
+                                        alt={movie.name}
+                                        onClick={() => handleMovieDetails(movie.id)}
                                     />
                                     <div className={styles.cardBody}>
-                                        <h6 className={`${styles.cardTitleCustom} ${styles.ellipsis}`} onClick={() => handleMovieDetails(movie.movieId)} title={movie.movieName}>
-                                            {movie.movieName}
+                                        <h6 className={`${styles.cardTitleCustom} ${styles.ellipsis}`} onClick={() => handleMovieDetails(movie.id)} title={movie.name}>
+                                            {movie.name}
                                         </h6>
                                         <p className={`mb-1 text-secondary ${styles.ellipsis}`} style={{ fontSize: '13.5px' }}>
                                             <span className="fw-semibold">Thể loại:</span> {movie.genre}

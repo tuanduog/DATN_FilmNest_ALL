@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 function Login() {
+  const { t } = useTranslation();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('login');
 
@@ -40,14 +42,15 @@ function Login() {
           withCredentials: true
         });
         if (verify.data.data.role === "User") {
-          toast.success("Đăng nhập thành công");
+          toast.success(t('loginSuccess'));
+          window.dispatchEvent(new Event('authChange'));
           navigate('/');
         } else {
-          toast.error("Đăng nhập thất bại");
+          toast.error(t('loginFail'));
         }
         sessionStorage.setItem('state', 'Login successful');
       } else {
-        toast.error("Vui lòng kiểm tra lại tài khoản hoặc mật khẩu!");
+        toast.error(t('checkAccountOrPassword'));
       }
     } catch (err) {
       console.error(err);
@@ -56,18 +59,30 @@ function Login() {
 
   const handleRegisterSubmit = async e => {
     e.preventDefault();
+
+    if (registerData.password.length < 6) {
+      toast.error(t('passwordTooShort'));
+      return;
+    }
+
+    if (registerData.password !== registerData.retypePassword) {
+      toast.error(t('passwordsDoNotMatch'));
+      return;
+    }
+
     try {
       const res = await axios.post('http://localhost:8099/auth/register', registerData, {
         withCredentials: true
       });
-      if (res.status === 200) {
-        toast.success("Đăng ký thành công!");
+      if (res.data.status === 200) {
+        toast.success(t('registerSuccess'));
         setActiveTab('login');
+        setRegisterData({ username: '', email: '', password: '', retypePassword: '', phone: '' });
       } else {
-        toast.error("Đăng ký không thành công, vui lòng thử lại");
+        toast.error(t(res.data.message));
       }
     } catch (err) {
-      console.error(err);
+      toast.error(t(err.response?.data?.message || 'Error occurred'));
     }
   };
 
@@ -89,70 +104,70 @@ function Login() {
             className={`${styles.tab} ${activeTab === 'login' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('login')}
           >
-            Đăng nhập
+            {t('login')}
           </button>
           <button
             type="button"
             className={`${styles.tab} ${activeTab === 'register' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('register')}
           >
-            Đăng ký
+            {t('register')}
           </button>
         </div>
 
         <div className={styles.formContent}>
           {activeTab === 'login' && (
             <form onSubmit={handleLoginSubmit}>
-              <h2 className={styles.title}>Đăng nhập</h2>
+              <h2 className={styles.title}>{t('login')}</h2>
               <div className={styles.socialContainer}>
                 <a href="#" className={styles.social}><i className="fab fa-facebook-f"></i></a>
                 <a href="#" className={styles.social}><i className="fab fa-google-plus-g"></i></a>
                 <a href="#" className={styles.social}><i className="fab fa-linkedin-in"></i></a>
               </div>
-              <span className={styles.subtitle}>hoặc dùng tài khoản của bạn</span>
+              <span className={styles.subtitle}>{t('orUseYourAccount')}</span>
 
               <div className={styles.inputGroup}>
-                <input type="text" name="username" placeholder="Tên đăng nhập" value={loginData.username} onChange={handleLoginChange} required />
+                <input type="text" name="username" placeholder={t('username')} value={loginData.username} onChange={handleLoginChange} required />
               </div>
               <div className={styles.inputGroup}>
-                <input type="password" name="password" placeholder="Mật khẩu" value={loginData.password} onChange={handleLoginChange} required />
+                <input type="password" name="password" placeholder={t('password')} value={loginData.password} onChange={handleLoginChange} required />
               </div>
 
               <div className="d-flex justify-content-end mb-3">
-                <a href="#" className={styles.forgotPassword}>Quên mật khẩu?</a>
+                <a href="#" className={styles.forgotPassword}>{t('forgotPassword')}</a>
               </div>
 
-              <button type="submit" className={styles.btnSubmit}>Đăng nhập</button>
+              <button type="submit" className={styles.btnSubmit}>{t('login')}</button>
             </form>
           )}
 
           {activeTab === 'register' && (
             <form onSubmit={handleRegisterSubmit}>
-              <h2 className={styles.title}>Tạo tài khoản</h2>
+              <h2 className={styles.title}>{t('createAccount')}</h2>
               <div className={styles.socialContainer}>
                 <a href="#" className={styles.social}><i className="fab fa-facebook-f"></i></a>
                 <a href="#" className={styles.social}><i className="fab fa-google-plus-g"></i></a>
                 <a href="#" className={styles.social}><i className="fab fa-linkedin-in"></i></a>
               </div>
-              <span className={styles.subtitle}>hoặc dùng email để đăng ký</span>
+              <span className={styles.subtitle}>{t('orUseEmailForRegister')}</span>
 
               <div className={styles.inputGroup}>
-                <input type="text" name="username" placeholder="Tên đăng nhập" value={registerData.username} onChange={handleRegisterChange} required />
+                <input type="text" name="username" placeholder={t('username')} value={registerData.username} onChange={handleRegisterChange} required />
               </div>
               <div className={styles.inputGroup}>
-                <input type="email" name="email" placeholder="Email" value={registerData.email} onChange={handleRegisterChange} required />
+                <input type="email" name="email" placeholder={t('email')} value={registerData.email} onChange={handleRegisterChange} required />
               </div>
               <div className={styles.inputGroup}>
-                <input type="password" name="password" placeholder="Mật khẩu" value={registerData.password} onChange={handleRegisterChange} required />
+                <input type="password" name="password" placeholder={t('password')} value={registerData.password} onChange={handleRegisterChange} required />
               </div>
               <div className={styles.inputGroup}>
-                <input type="password" name="retypePassword" placeholder="Nhập lại mật khẩu" value={registerData.retypePassword} onChange={handleRegisterChange} required />
+                <input type="password" name="retypePassword" placeholder={t('retypePassword')} value={registerData.retypePassword} onChange={handleRegisterChange} required />
               </div>
               <div className={styles.inputGroup}>
-                <input type="text" name="phone" placeholder="Số điện thoại" value={registerData.phone} onChange={handleRegisterChange} required />
+                <input type="text" name="phone" placeholder={t('phone')} value={registerData.phone} onChange={handleRegisterChange} required />
               </div>
 
-              <button type="submit" className={styles.btnSubmit}>Đăng ký</button>
+              <button type="submit" className={styles.btnSubmit}>{t('register')}</button>
             </form>
           )}
         </div>

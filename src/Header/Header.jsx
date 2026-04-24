@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -8,6 +9,7 @@ import './Header.css';
 import logo from '../assets/logo.png';
 
 function Header() {
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const [membership, setMembership] = useState(false);
@@ -28,62 +30,45 @@ function Header() {
     };
 
     const [theater, setTheater] = useState([]);
+    const [allTheaters, setAllTheaters] = useState([]);
     const [locations, setLocation] = useState([]);
-    const handleTheater = async (location) => {
-        const url = `http://localhost:8099/theaters/getTheaterByLocation?Location=${encodeURIComponent(location)}`;
+
+    const handleTheaters = async () => {
         try {
-            const res = await axios.get(url, {
+            const res = await axios.get('http://localhost:8099/api/theater/v1/all', {
                 withCredentials: true
             });
-            if (res.data.status === 200) {
-                setTheater(res.data.data);
-                // thông tin rạp
-            } else {
-                setTheater([]);
-            }
-        } catch (err) {
-            setTheater([]);
-            console.error("Fetch theaters failed:", err);
-        }
-    };
 
-    const handleLoc = () => {
-        const theaterSaved = JSON.parse(localStorage.getItem("theater") || null);
-        if (theaterSaved) {
-            navigate("/Theater");
-        } else {
-            setShowChoseLocation(true);
-        }
-    }
+            if (res.data.status === 200 && Array.isArray(res.data.data)) {
+                const data = res.data.data;
+                setAllTheaters(data);
 
-    const handleLocations = async () => {
-        try {
-            const res = await axios.get('http://localhost:8099/theaters/getLocations', {
-                withCredentials: true
-            });
-            if (res.data.status === 200) {
-                setLocation(Array.isArray(res.data.data) ? res.data.data : []);
+                const uniqueProvinces = [];
+                const provinceMap = new Map();
+                data.forEach(t => {
+                    if (t.provinceCode && !provinceMap.has(t.provinceCode)) {
+                        provinceMap.set(t.provinceCode, t.provinceName);
+                        uniqueProvinces.push({ code: t.provinceCode, name: t.provinceName });
+                    }
+                });
+                setLocation(uniqueProvinces);
             } else {
+                setAllTheaters([]);
                 setLocation([]);
             }
         } catch (err) {
-            setUser(null);
-            console.error("Fetch locations failed:", err);
+            console.error("Fetch theaters failed:", err);
         }
     };
 
     useEffect(() => {
         const theaterSaved = JSON.parse(localStorage.getItem("theater") || '{}');
-        if (theaterSaved.theaterLocation) {
-            setSelectedLocation(theaterSaved.theaterLocation);
-        }
-        if (theaterSaved.theaterId) {
-            setselectedTheater(theaterSaved.theaterId);
-            handleTheater(theaterSaved.theaterLocation);
+        if (theaterSaved.id) {
+            setselectedTheater(theaterSaved.id);
         }
     }, [location.pathname]);
 
-    const handleAuth = async () => {
+    const handleAuth = useCallback(async () => {
         try {
             const res = await axios.get('http://localhost:8099/auth/introspect', {
                 withCredentials: true
@@ -100,7 +85,7 @@ function Header() {
             setUser(null);
             console.error("Auth failed:", err);
         }
-    };
+    }, []);
 
     const fetchMember = async () => {
         try {
@@ -139,6 +124,7 @@ function Header() {
             navigate('/');
             setTimeout(() => {
                 handleAuth();
+                window.dispatchEvent(new Event('authChange'));
             }, 100);
         } catch (err) {
             console.error("Logout failed", err);
@@ -147,14 +133,18 @@ function Header() {
     const [selectedLocation, setSelectedLocation] = useState(""); // địa điểm đã chọn
     const [selectedTheater, setselectedTheater] = useState(""); // thông tin các rạp
     useEffect(() => {
+        handleTheaters();
         if (!justLoggedOut) {
             handleAuth();
         } else {
             setJustLoggedOut(false);
         }
+    }, [location.pathname, handleAuth, justLoggedOut]);
 
-        handleLocations();
-    }, [location.pathname]);
+    useEffect(() => {
+        window.addEventListener('authChange', handleAuth);
+        return () => window.removeEventListener('authChange', handleAuth);
+    }, [handleAuth]);
 
     const handleNavigate = (path) => () => navigate(path);
 
@@ -163,6 +153,15 @@ function Header() {
             navigate("/Login");
         } else {
             navigate("/Booking_history");
+        }
+    }
+
+    const handleLoc = () => {
+        const theaterSaved = JSON.parse(localStorage.getItem("theater") || 'null');
+        if (theaterSaved) {
+            navigate("/Theater");
+        } else {
+            setShowChoseLocation(true);
         }
     }
 
@@ -192,16 +191,19 @@ function Header() {
                                         style={{ fontSize: '14px' }}
                                         value={selectedLocation}
                                         onChange={e => {
-                                            const loc = e.target.value;
-                                            setSelectedLocation(loc);
-                                            handleTheater(loc);
+                                            const provCode = e.target.value;
+                                            setSelectedLocation(provCode);
+                                            // Filter theaters by province code
+                                            const filtered = allTheaters.filter(t => t.provinceCode === provCode);
+                                            setTheater(filtered);
+                                            setselectedTheater(""); // Reset selected theater
                                         }}
                                     >
                                         <option value="">Chọn Tỉnh/ Thành phố</option>
                                         {Array.isArray(locations) &&
                                             locations.map((loc, idx) => (
-                                                <option key={idx} value={loc}>
-                                                    {loc}
+                                                <option key={idx} value={loc.code}>
+                                                    {loc.name}
                                                 </option>
                                             ))}
                                     </select>
@@ -215,11 +217,11 @@ function Header() {
                                             const selectedValue = e.target.value;
                                             setselectedTheater(selectedValue);
 
-                                            const selectedObj = theater.find(t => t.theaterId.toString() === selectedValue);
+                                            const selectedObj = theater.find(t => t.id && t.id.toString() === selectedValue);
                                             if (selectedObj) {
                                                 localStorage.setItem('theater', JSON.stringify({
-                                                    theaterId: selectedObj.theaterId,
-                                                    theaterName: selectedObj.theaterName,
+                                                    id: selectedObj.id,
+                                                    name: selectedObj.name,
                                                     theaterLocation: selectedObj.theaterLocation
                                                 }));
                                                 setShowChoseLocation(false);
@@ -230,8 +232,8 @@ function Header() {
                                         <option value="">Chọn rạp</option>
                                         {Array.isArray(theater) &&
                                             theater.map((theaterItem, idx) => (
-                                                <option key={idx} value={theaterItem.theaterId}>
-                                                    {theaterItem.theaterName}
+                                                <option key={idx} value={theaterItem.id}>
+                                                    {theaterItem.name}
                                                 </option>
                                             ))}
                                     </select>
@@ -244,11 +246,30 @@ function Header() {
             {/* Topbar */}
             <div className="topblack">
                 <div className="d-flex justify-content-end align-items-center text-white pe-4" style={{ height: '40px', fontSize: '14px' }}>
+                    {/* Language Switcher */}
+                    <div className="d-flex align-items-center me-4">
+                        <span
+                            className={`mx-1 cursor-pointer ${i18n.language === 'vi' ? 'text-warning fw-bold' : 'text-white-50'}`}
+                            onClick={() => i18n.changeLanguage('vi')}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            VN
+                        </span>
+                        <span className="text-white-50">|</span>
+                        <span
+                            className={`mx-1 cursor-pointer ${i18n.language === 'en' ? 'text-warning fw-bold' : 'text-white-50'}`}
+                            onClick={() => i18n.changeLanguage('en')}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            EN
+                        </span>
+                    </div>
+
                     {!user ? (
                         <>
-                            <p className="mb-0 me-2 top-link" style={{ cursor: 'pointer' }} onClick={() => handleLogin('login')}>Đăng nhập</p>
+                            <p className="mb-0 me-2 top-link" style={{ cursor: 'pointer' }} onClick={() => handleLogin('login')}>{t('login')}</p>
                             <p className="mb-0">|</p>
-                            <p className="mb-0 ms-2 top-link" style={{ cursor: 'pointer' }} onClick={() => handleLogin('register')}>Đăng ký</p>
+                            <p className="mb-0 ms-2 top-link" style={{ cursor: 'pointer' }} onClick={() => handleLogin('register')}>{t('register')}</p>
                         </>
                     ) : (
                         <div className='d-flex align-items-center'>
@@ -259,11 +280,11 @@ function Header() {
                             </span> : <></>}
                             <div className="dropdown">
                                 <span className="mb-0 me-2 fs-6 top-link" style={{ cursor: 'pointer' }} data-bs-toggle="dropdown">
-                                    Xin chào {user && user.data && user.data.username ? user.data.username : 'Tài khoản'}! <i className="bi bi-caret-down-fill"></i>
+                                    {t('hello')} {user && user.data && user.data.username ? user.data.username : 'Tài khoản'}! <i className="bi bi-caret-down-fill"></i>
                                 </span>
                                 <ul className="dropdown-menu dropdown-menu-end">
-                                    <li><button className="dropdown-item" onClick={handleNavigate('/Profile')}>Thông tin cá nhân</button></li>
-                                    <li><button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button></li>
+                                    <li><button className="dropdown-item" onClick={handleNavigate('/Profile')}>{t('profile')}</button></li>
+                                    <li><button className="dropdown-item" onClick={handleLogout}>{t('logout')}</button></li>
                                 </ul>
                             </div>
                         </div>
@@ -291,17 +312,18 @@ function Header() {
                                     style={{ width: '150px', height: '38px', border: '1px solid black', fontSize: '15px', cursor: 'pointer' }}
                                     value={selectedLocation}
                                     onChange={e => {
-                                        const loc = e.target.value;
-                                        setSelectedLocation(loc);
+                                        const locCode = e.target.value;
+                                        setSelectedLocation(locCode);
                                         setselectedTheater(""); // Reset rạp đã chọn
-                                        handleTheater(loc);
+                                        const filtered = allTheaters.filter(t => t.provinceCode === locCode);
+                                        setTheater(filtered);
                                     }}
                                 >
                                     <option value="">Chọn địa điểm</option>
                                     {Array.isArray(locations) &&
                                         locations.map((loc, idx) => (
-                                            <option key={idx} value={loc}>
-                                                {loc}
+                                            <option key={idx} value={loc.code}>
+                                                {loc.name}
                                             </option>
                                         ))}
                                 </select>
@@ -319,11 +341,11 @@ function Header() {
                                         const selectedValue = e.target.value;
                                         setselectedTheater(selectedValue);
 
-                                        const selectedObj = theater.find(t => t.theaterId.toString() === selectedValue);
+                                        const selectedObj = theater.find(t => t.id && t.id.toString() === selectedValue);
                                         if (selectedObj) {
                                             localStorage.setItem('theater', JSON.stringify({
-                                                theaterId: selectedObj.theaterId,
-                                                theaterName: selectedObj.theaterName,
+                                                id: selectedObj.id,
+                                                name: selectedObj.name,
                                                 theaterLocation: selectedObj.theaterLocation
                                             }))
                                         }
@@ -333,8 +355,8 @@ function Header() {
                                     <option value="">Chọn rạp</option>
                                     {Array.isArray(theater) &&
                                         theater.map((theaterItem, idx) => (
-                                            <option key={idx} value={theaterItem.theaterId}>
-                                                {theaterItem.theaterName}
+                                            <option key={idx} value={theaterItem.id}>
+                                                {theaterItem.name}
                                             </option>
                                         ))}
                                 </select>
