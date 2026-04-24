@@ -147,5 +147,18 @@
   "please-select-one-genre": "Please select one genre",
   "showtime": "Showtime",
   "showtime-list": "Showtime List",
-  "add-showtime": "Add Showtime"
+  "add-showtime": "Add Showtime",
+  "banner": "Banner",
+  "banner-list": "Banner List",
+  "add-banner": "Add Banner",
+  "edit-banner": "Edit Banner",
+  "delete-banner": "Delete Banner",
+  "banner-price": "Banner Price",
+  "banner-description": "Banner Description",
+  "banner-status": "Banner Status",
+  "banner-discount": "Banner Discount",
+  "banner-duration": "Banner Duration",
+  "banner-discount-percent": "Banner Discount Percent",
+  "banner-discount-amount": "Banner Discount Amount",
+  "banner-discount-type": "Banner Discount Type"
 }

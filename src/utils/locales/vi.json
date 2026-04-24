@@ -131,5 +131,18 @@
     "showtime-discount": "Giảm giá suất chiếu",
     "showtime-discount-percent": "Phần trăm giảm giá suất chiếu",
     "showtime-discount-amount": "Số tiền giảm giá suất chiếu",
-    "showtime-discount-type": "Loại giảm giá suất chiếu"
+    "showtime-discount-type": "Loại giảm giá suất chiếu",
+    "banner": "Banner",
+    "banner-list": "Danh sách banner",
+    "add-banner": "Thêm banner",
+    "edit-banner": "Sửa banner",
+    "delete-banner": "Xóa banner",
+    "banner-price": "Giá banner",
+    "banner-description": "Mô tả banner",
+    "banner-status": "Trạng thái banner",
+    "banner-discount": "Giảm giá banner",
+    "banner-duration": "Thời hạn banner",
+    "banner-discount-percent": "Phần trăm giảm giá banner",
+    "banner-discount-amount": "Số tiền giảm giá banner",
+    "banner-discount-type": "Loại giảm giá banner"
 }

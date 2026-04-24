@@ -55,7 +55,7 @@ export default function EditBanner() {
 
                 if (response.status === HttpStatusCode.Ok) {
                     setBanner(response.data);
-                    setPreview(response.data.image || '');
+                    setPreview(response.data.imageUrl || response.data.image || '');
                 } else if (response.status === HttpStatusCode.BadRequest) {
                     setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
                 } else {
@@ -120,12 +120,14 @@ export default function EditBanner() {
     const handleGetFileUrl = (e: any) => {
         const selectedFile = e.target.files[0];
         setImage(selectedFile);
+        formik.setFieldValue('image', selectedFile);
         return URL.createObjectURL(selectedFile);
     };
 
     const handleDeleteImage = async () => {
         setImage(null);
         setPreview('');
+        formik.setFieldValue('image', null);
     };
 
     return (
@@ -148,16 +150,16 @@ export default function EditBanner() {
                                             onChange={(url) => {
                                                 setPreview(url);
                                             }}
-                                            width="150px"
-                                            height="150px"
+                                            width="100%"
+                                            height="250px"
                                         />
                                     ) : (
-                                        <Box sx={{ position: 'relative', width: '150px' }}>
+                                        <Box sx={{ position: 'relative', width: '100%' }}>
                                             <Box>
                                                 <img
                                                     alt="image"
                                                     src={preview}
-                                                    style={{ width: '150px', height: '150px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
+                                                    style={{ width: '100%', height: '250px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
                                                 />
                                             </Box>
 

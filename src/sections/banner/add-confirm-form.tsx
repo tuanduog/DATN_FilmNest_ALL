@@ -99,12 +99,12 @@ export default function AddConfirmForm({ handleBack, banner }: ConfirmProps) {
                         {banner.image && (
                             <Grid size={12} sx={{ mb: 2 }}>
                                 <Box sx={{ width: '100%' }}>
-                                    <Box sx={{ position: 'relative', width: '150px' }}>
+                                    <Box sx={{ position: 'relative', width: '100%' }}>
                                         <Box>
                                             <img
                                                 alt="image"
                                                 src={URL.createObjectURL(banner.image!)}
-                                                style={{ width: '150px', height: '150px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
+                                                style={{ width: '100%', height: '250px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
                                             />
                                         </Box>
                                     </Box>

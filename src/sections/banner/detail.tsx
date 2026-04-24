@@ -16,6 +16,7 @@ import { getById } from 'api/banner';
 import { HttpStatusCode } from 'axios';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router';
+import formatDate from 'utils/formatDateTime';
 
 export default function BannerDetail() {
     const { id } = useParams<{ id: string }>();
@@ -63,14 +64,13 @@ export default function BannerDetail() {
                                     <img
                                         src={banner.image}
                                         alt="banner"
-                                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                                        style={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: '5px' }}
                                     />
-                                </Box>
-                            </Grid>
+                                </Box>                            </Grid>
                         )}
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="name" sx={{ mb: 1 }}>
                                 Tên banner
                             </InputLabel>
 
@@ -78,19 +78,19 @@ export default function BannerDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="createdAt" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="createdAt" sx={{ mb: 1 }}>
                                 Ngày tạo
                             </InputLabel>
 
-                            <Typography>{banner?.createdAt}</Typography>
+                            <Typography>{formatDate(banner?.createdAt)}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="updatedAt" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="updatedAt" sx={{ mb: 1 }}>
                                 Ngày cập nhật
                             </InputLabel>
 
-                            <Typography>{banner?.updatedAt}</Typography>
+                            <Typography>{formatDate(banner?.updatedAt)}</Typography>
                         </Grid>
                     </Grid>
                 </Box>

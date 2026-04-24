@@ -79,13 +79,14 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    FormControl,
     Grid,
-    Snackbar
+    Snackbar,
 } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
+import formatDate from 'utils/formatDateTime';
+import { FormControl } from '@mui/material';
 
 const fuzzyFilter: FilterFn<Banner> = (row, columnId, value, addMeta) => {
     // rank the item
@@ -323,6 +324,7 @@ export default function BannerPage() {
                 header: intl.formatMessage({ id: 'created-at' }),
                 accessorKey: 'createdAt',
                 enableGrouping: false,
+                cell: ({ cell }) => formatDate(cell.getValue() as string),
                 meta: { width: '35%' }
             },
             {
@@ -330,6 +332,7 @@ export default function BannerPage() {
                 header: intl.formatMessage({ id: 'updated-at' }),
                 accessorKey: 'updatedAt',
                 enableGrouping: false,
+                cell: ({ cell }) => formatDate(cell.getValue() as string),
                 meta: { width: '35%' }
             },
             {

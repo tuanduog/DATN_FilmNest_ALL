@@ -32,8 +32,7 @@ const validationSchema = Yup.object({
 });
 
 export default function BannerForm({ handleNext, setBanner, banner }: BannerFormProps) {
-    const [image, setImage] = useState<File | null>(banner.image!);
-    const [preview, setPreview] = useState<string | null>(banner.imageUrl || (banner.image ? URL.createObjectURL(banner.image as File) : ''));
+    const [preview, setPreview] = useState<string | null>(banner.imageUrl || (banner.image ? URL.createObjectURL(banner.image as File) : null));
 
     const [alert, setAlert] = useState({
         open: false,
@@ -52,17 +51,13 @@ export default function BannerForm({ handleNext, setBanner, banner }: BannerForm
 
     const handleGetFileUrl = (e: any) => {
         const selectedFile = e.target.files[0];
-        setImage(selectedFile);
         formik.setFieldValue('image', selectedFile);
-        formik.setFieldTouched('image', true);
         return URL.createObjectURL(selectedFile);
     };
 
-    const handleDeleteImage = async () => {
-        setImage(null);
-        setPreview('');
+    const handleDeleteImage = () => {
+        setPreview(null);
         formik.setFieldValue('image', null);
-        formik.setFieldTouched('image', true);
     };
 
     return (
@@ -85,16 +80,16 @@ export default function BannerForm({ handleNext, setBanner, banner }: BannerForm
                                             onChange={(url) => {
                                                 setPreview(url);
                                             }}
-                                            width="150px"
-                                            height="150px"
+                                            width="100%"
+                                            height="250px"
                                         />
                                     ) : (
-                                        <Box sx={{ position: 'relative', width: '150px' }}>
+                                        <Box sx={{ position: 'relative', width: '100%' }}>
                                             <Box>
                                                 <img
                                                     alt="image"
                                                     src={preview}
-                                                    style={{ width: '150px', height: '150px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
+                                                    style={{ width: '100%', height: '250px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
                                                 />
                                             </Box>
 
