@@ -99,7 +99,7 @@ export default function AddConfirmForm({ handleBack, showtime }: AddConfirmFormP
                     </Button>
                     <AnimateButton>
                         <Button variant="contained" onClick={handleSave}>
-                            Xác nhận lưu
+                            Xác nhận
                         </Button>
                     </AnimateButton>
                 </Stack>
