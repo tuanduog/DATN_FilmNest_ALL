@@ -14,16 +14,16 @@ function Theater() {
 
   const fetchRanking = async () => {
     try {
-      const res = await axios.get("http://localhost:8099/reviews/get-Top5Movies");
-      console.log('ranking',res.data);
+      const res = await axios.get("http://localhost:8099/api/review/get-Top5Movies");
+      console.log('ranking', res.data);
       setTop5(res.data);
-    } catch (error){
+    } catch (error) {
       console.error("Không fetch được ranking", error);
     }
   }
   useEffect(() => {
     fetchRanking();
-  },[]);
+  }, []);
 
   const getRank = (index) => {
     if (index === 0) return "#1";
@@ -33,7 +33,7 @@ function Theater() {
   }
 
   const handleMovieDetail = (id) => {
-    navigate("/Movie_detail", { state : { id }});
+    navigate("/Movie_detail", { state: { id } });
   }
 
   useEffect(() => {
@@ -43,7 +43,7 @@ function Theater() {
     }, 500);
     return () => clearInterval(interval);
   })
-  
+
   return (
     <div className={`container ${styles.wrapper} d-flex justify-content-center`}>
       <div className="row w-100" style={{ maxWidth: "1200px" }}>
@@ -61,21 +61,21 @@ function Theater() {
         </div>
 
         {/* Bên phải: Phim đang hot */}
-        
-          <div className="col-lg-5 col-md-12">
-            <h3 className={`${styles.hotTitle} text-center mb-4`}>PHIM ĐANG HOT</h3>
-            <div className="row">
-              {top5.slice(0, 4).map((movie, index) => (
+
+        <div className="col-lg-5 col-md-12">
+          <h3 className={`${styles.hotTitle} text-center mb-4`}>PHIM ĐANG HOT</h3>
+          <div className="row">
+            {top5.slice(0, 4).map((movie, index) => (
               <div className="col-6 d-flex flex-column align-items-center mb-4" key={index}>
                 <div className={styles.movieCard} onClick={() => handleMovieDetail(movie[0])}>
                   <img src={movie[1]} alt="anh" className={`img-fluid ${styles.movieImg}`} />
                   <p className={styles.movieName}><span>{getRank(index)}. </span>{movie[2]}</p>
                 </div>
               </div>
-              ))}
-            </div>
+            ))}
           </div>
-        
+        </div>
+
       </div>
     </div>
   );

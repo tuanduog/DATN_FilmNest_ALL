@@ -10,16 +10,16 @@ function Ranking() {
 
   const fetchRanking = async () => {
     try {
-      const res = await axios.get("http://localhost:8099/reviews/get-Top5Movies");
-      console.log('ranking',res.data);
+      const res = await axios.get("http://localhost:8099/api/review/get-Top5Movies");
+      console.log('ranking', res.data);
       setTop5(res.data);
-    } catch (error){
+    } catch (error) {
       console.error("Không fetch được ranking", error);
     }
   }
   useEffect(() => {
     fetchRanking();
-  },[]);
+  }, []);
 
   const getMedal = (index) => {
     if (index === 0) return "🥇";
@@ -29,7 +29,7 @@ function Ranking() {
   }
 
   const handleMovieDetail = (id) => {
-    navigate("/Movie_detail", { state : { id }});
+    navigate("/Movie_detail", { state: { id } });
   }
 
   return (

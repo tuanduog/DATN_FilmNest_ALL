@@ -2,7 +2,7 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './Home.module.css';
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -12,7 +12,6 @@ import { useEffect } from 'react';
 function Homepage() {
     const [nowShowing, setNowShowing] = useState(true);
     const navigate = useNavigate();
-    const location = useLocation();
 
     const [showingNow, setShowingNow] = useState([]);
     const [commingSoon, setCommingSoon] = useState([]);
@@ -110,7 +109,6 @@ function Homepage() {
                 const data = res.data.data;
                 setAllTheaters(data);
 
-                // Extract unique provinces
                 const uniqueProvinces = [];
                 const provinceMap = new Map();
 
@@ -173,15 +171,17 @@ function Homepage() {
         slidesToScroll: 1,
         arrows: false,
     }
+
     const fetchShowTime = async (movieId) => {
         try {
-            const res = await axios.get(`http://localhost:8099/auth/get-showtime/${movieId}`);
+            const res = await axios.get(`http://localhost:8099/api/showtime/v1/movie/${selectedTheater}/${movieId}`);
 
             setShowTime(res.data);
         } catch (error) {
             console.error("Lỗi khi lấy phim", error);
         }
     }
+
     const fetchMovies = async () => {
         try {
             const res = await axios.get("http://localhost:8099/api/movie/v1/all");

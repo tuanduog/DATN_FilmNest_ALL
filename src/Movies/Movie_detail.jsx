@@ -127,7 +127,7 @@ function Movie_detail() {
         if (userStr) {
             const user = JSON.parse(userStr);
             try {
-                await axios.put(`http://localhost:8099/reviews/update-Rate/${movieId}/${user.userId}`, { starValue }, { withCredentials: true });
+                await axios.put(`http://localhost:8099/api/review/update-Rate/${movieId}/${user.userId}`, { starValue }, { withCredentials: true });
                 setRating(starValue);
             } catch (error) {
                 console.error("Update rate failed", error);
@@ -143,7 +143,7 @@ function Movie_detail() {
             try {
                 const movieId = location.state?.id;
                 const user = JSON.parse(userStr);
-                const res = await axios.get(`http://localhost:8099/reviews/get-Review/${movieId}/${user.userId}`, { withCredentials: true });
+                const res = await axios.get(`http://localhost:8099/api/review/get-Review/${movieId}/${user.userId}`, { withCredentials: true });
                 setRating(res.data.point);
             } catch (error) {
                 console.error("Fetch review failed", error);
