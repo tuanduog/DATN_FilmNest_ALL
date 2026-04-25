@@ -63,13 +63,24 @@ const ShowtimePopup = ({ show, movie, onClose, savedTheater }) => {
 
     const handleBooking = (movieInfo, date, time) => {
         const user = sessionStorage.getItem('state');
+
+        // Đảm bảo có showTimeId và roomid cho màn Booking
+        const timeWithIds = {
+            ...time,
+            showTimeId: time.showTimeId || time.id,
+            roomid: time.roomid || time.roomId || (time.room && time.room.id),
+            surcharge: time.surcharge || 0
+        };
+
+
         const bookingInfo = {
             movieInfo,
             date,
-            time,
+            time: timeWithIds,
             movieId: movieInfo.id,
             theaterId: savedTheater?.id
         };
+
         localStorage.setItem('bookingInfo', JSON.stringify(bookingInfo));
         if (!user) {
             navigate('/Login');
@@ -80,6 +91,7 @@ const ShowtimePopup = ({ show, movie, onClose, savedTheater }) => {
             window.scrollTo(0, 0);
         }
     };
+
 
     const getGroupedShowtimes = () => {
         const filtered = showTime.filter(time => {
@@ -215,7 +227,8 @@ const ShowtimePopup = ({ show, movie, onClose, savedTheater }) => {
                                                         minWidth: '100px',
                                                         backgroundColor: '#fff',
                                                         transition: 'all 0.2s ease',
-                                                        border: '1px solid #e9ecef'
+                                                        border: '1px solid #e9ecef',
+                                                        cursor: 'pointer'
                                                     }}
                                                     onMouseEnter={(e) => {
                                                         e.currentTarget.style.borderColor = '#0d6efd';
@@ -232,6 +245,10 @@ const ShowtimePopup = ({ show, movie, onClose, savedTheater }) => {
                                                 >
                                                     <div className="fw-bold text-dark fs-5 mb-0" style={{ lineHeight: '1.2' }}>{time.startTime.slice(0, 5)}</div>
                                                     <div className="text-muted fw-medium" style={{ fontSize: '11px', marginTop: '2px' }}>{time.capacity || 0} ghế</div>
+                                                    {time.surcharge > 0 && (
+                                                        <div className="text-danger fw-bold" style={{ fontSize: '10px' }}>+{time.surcharge.toLocaleString()}đ</div>
+                                                    )}
+
                                                 </div>
                                             ))}
                                         </div>

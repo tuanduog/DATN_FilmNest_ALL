@@ -76,13 +76,14 @@ function Movie_detail() {
         if (userStr) {
             const user = JSON.parse(userStr);
             try {
-                await axios.put(`http://localhost:8099/api/review/update-Rate/${movieId}/${user.userId}`, { starValue }, { withCredentials: true });
+                await axios.put(`http://localhost:8099/api/review/v1/${movieId}/${user.userId}`, { starValue }, { withCredentials: true });
                 setRating(starValue);
             } catch (error) {
                 console.error("Update rate failed", error);
             }
         } else {
             navigate("/Login");
+            window.scrollTo(0, 0);
         }
     }
 
@@ -91,8 +92,9 @@ function Movie_detail() {
         if (userStr) {
             try {
                 const user = JSON.parse(userStr);
-                const res = await axios.get(`http://localhost:8099/api/review/get-Review/${id}/${user.userId}`, { withCredentials: true });
-                setRating(res.data.point);
+                const res = await axios.get(`http://localhost:8099/api/review/v1/${id}/${user.userId}`, { withCredentials: true });
+                const rate = res.data.data ? res.data.data.point : res.data.point;
+                setRating(rate || 0);
             } catch (error) {
                 console.error("Fetch review failed", error);
             }
@@ -102,45 +104,60 @@ function Movie_detail() {
     const fetchMovie = useCallback(async () => {
         try {
             const res = await axios.get(`http://localhost:8099/api/movie/v1/${id}`);
-            setMovieInfo(res.data.content);
-            fetchComments(id);
+            if (res.data.status === 200 && res.data.data) {
+                setMovieInfo(res.data.data);
+                fetchComments(id);
+            } else {
+                console.error("Lỗi khi lấy thông tin phim hoặc phim không tồn tại:", res.data.message);
+                setMovieInfo({ error: true });
+            }
         } catch (error) {
             console.error("Lỗi khi lấy thông tin phim:", error);
+            setMovieInfo({ error: true });
         }
     }, [id]);
 
     const fetchComments = async (movieId) => {
         try {
             const res = await axios.get(`http://localhost:8099/api/comment/v1/${movieId}`);
-            setDataCmt(res.data);
+            setDataCmt(Array.isArray(res.data.data) ? res.data.data : []);
         } catch (error) {
             console.error("Lỗi lấy comment", error);
         }
     }
 
-    const handleCmt = async (idCmt) => {
+    const handleCmt = async (type, idCmt) => {
         const userStr = sessionStorage.getItem('user');
         if (!userStr) {
             navigate("/Login");
             return;
         }
         const user = JSON.parse(userStr);
-        let content = idCmt === 0 ? message : messSub;
+        let content = "";
+        if (type === 0) content = message;
+        else if (type === 1) content = messSub;
+        else content = messWtag;
+
         let cmt = {
             userId: user.userId,
-            movieId: movieInfo.id,
+            movieId: movieInfo.movieId || movieInfo.id,
             content: content,
-            parentId: idCmt,
-            tag: messWtag
+            parentId: type === 0 ? 0 : idCmt,
+            tag: type === 2 ? messWtag.split(' ')[0] : ""
         };
-        client.current.publish({
-            destination: `/app/comment/${movieInfo.id}`,
-            body: JSON.stringify(cmt),
-        });
+
+        if (client.current && client.current.connected) {
+            client.current.publish({
+                destination: `/app/comment/${movieInfo.movieId || movieInfo.id}`,
+                body: JSON.stringify(cmt),
+            });
+        }
+
         setMessage("");
         setMessSub("");
         setMesWtag("");
     };
+
 
     useEffect(() => {
         fetchMovie();
@@ -151,9 +168,9 @@ function Movie_detail() {
         }
 
         const stompClient = new Client({
-            brokerURL: "ws://localhost:8099/ws",
+            brokerURL: "ws://localhost:8099/wsocket",
             onConnect: () => {
-                stompClient.subscribe(`/topic/comments/${location.state?.id}`, (msg) => {
+                stompClient.subscribe(`/topic/comments/${id}`, (msg) => {
                     const newCmt = JSON.parse(msg.body);
                     setDataCmt((prev) => [newCmt, ...prev]);
                 });
@@ -163,7 +180,16 @@ function Movie_detail() {
         client.current = stompClient;
 
         return () => stompClient.deactivate();
-    }, [fetchMovie, fetchReview, location.state?.id]);
+    }, [fetchMovie, fetchReview, id]);
+
+    if (movieInfo.error) {
+        return (
+            <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+                <h3 className="text-danger">Không tìm thấy thông tin phim hoặc đã có lỗi xảy ra.</h3>
+                <button className="btn btn-primary mt-3" onClick={() => navigate("/")}>Quay lại trang chủ</button>
+            </div>
+        );
+    }
 
     if (!movieInfo || Object.keys(movieInfo).length === 0) {
         return (
@@ -237,10 +263,10 @@ function Movie_detail() {
             <div className="container movie-info-wrapper">
                 <div className="row g-5">
                     <div className="col-lg-3">
-                        <img src={movieInfo.image} alt={movieInfo.movieName} className="poster-img" />
+                        <img src={movieInfo.image} alt={movieInfo.name} className="poster-img" />
                     </div>
                     <div className="col-lg-9 movie-main-info">
-                        <h1 className="movie-title">{movieInfo.movieName}</h1>
+                        <h1 className="movie-title">{movieInfo.name}</h1>
 
                         <div className="star-rating mb-4">
                             {[...Array(5)].map((_, i) => (
@@ -259,7 +285,7 @@ function Movie_detail() {
                                 <div className="meta-item"><i className="bi bi-clock-fill meta-icon"></i><strong>Thời lượng:</strong> {movieInfo.duration}</div>
                             </div>
                             <div className="col-md-6">
-                                <div className="meta-item"><i className="bi bi-calendar-event-fill meta-icon"></i><strong>Khởi chiếu:</strong> {new Date(movieInfo.releaseDate).toLocaleDateString('vi-VN')}</div>
+                                <div className="meta-item"><i className="bi bi-calendar-event-fill meta-icon"></i><strong>Khởi chiếu:</strong> {movieInfo.releaseDate ? new Date(movieInfo.releaseDate).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}</div>
                                 <div className="meta-item"><i className="bi bi-person-badge-fill meta-icon"></i><strong>Đạo diễn:</strong> {movieInfo.director}</div>
                             </div>
                         </div>
@@ -281,16 +307,29 @@ function Movie_detail() {
                         <div className="comment-section">
                             <h3 className="section-title">Bình luận</h3>
                             <div className="mt-4">
-                                {dataCmt.map((cmt) => (
-                                    <CommentItem key={cmt.commentId} cmt={cmt} handleCmt={handleCmt} messSub={messSub} setMessSub={setMessSub} messWtag={messWtag} setMesWtag={setMesWtag} />
+                                {Array.isArray(dataCmt) && dataCmt.map((cmt) => (
+                                    <CommentItem
+                                        key={cmt.commentId}
+                                        cmt={cmt}
+                                        handleCmt={handleCmt}
+                                        messSub={messSub}
+                                        setMessSub={setMessSub}
+                                        messWtag={messWtag}
+                                        setMesWtag={setMesWtag}
+                                    />
                                 ))}
                             </div>
 
-                            <div className="comment-input-wrapper">
-                                <textarea className="form-control border-0 bg-white" rows="3" placeholder="Chia sẻ suy nghĩ của bạn về phim..."
-                                    value={message} onChange={(e) => setMessage(e.target.value)}></textarea>
+                            <div className="comment-input-wrapper mt-5">
+                                <textarea
+                                    className="form-control border-0 bg-white"
+                                    rows="3"
+                                    placeholder="Chia sẻ suy nghĩ của bạn về phim..."
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                ></textarea>
                                 <div className="d-flex justify-content-end mt-3">
-                                    <button className="btn btn-primary px-4" onClick={() => handleCmt(0)}>
+                                    <button className="btn btn-primary px-4" onClick={() => handleCmt(0, 0)}>
                                         <i className="bi bi-send-fill me-2"></i>Gửi bình luận
                                     </button>
                                 </div>
@@ -299,7 +338,7 @@ function Movie_detail() {
                     </div>
 
                     <div className="col-lg-4">
-                        {/* You can add Sidebar content here like Related Movies or Promotions */}
+                        {/* Sidebar content */}
                         <div className="p-4 bg-light rounded-4 sticky-top" style={{ top: '100px' }}>
                             <h5 className="fw-bold mb-3">Lưu ý</h5>
                             <p className="small text-muted mb-0">Vui lòng chọn rạp chiếu để xem lịch và đặt vé. Giá vé có thể thay đổi tùy theo loại ghế và suất chiếu.</p>
@@ -311,11 +350,14 @@ function Movie_detail() {
             {/* Showtime Popup */}
             <ShowtimePopup
                 show={showModal}
-                movieInfo={movieInfo}
+                movie={{ ...movieInfo, name: movieInfo.movieName, id: movieInfo.id }}
                 onClose={handleCloseModal}
+                savedTheater={savedTheater}
             />
         </div>
     );
 }
 
+
 export default Movie_detail;
+

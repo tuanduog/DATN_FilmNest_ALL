@@ -105,8 +105,6 @@ function Homepage() {
         handleTheaters();
     }, []);
 
-
-
     const settings = {
         dots: true,
         infinite: true,
@@ -117,8 +115,6 @@ function Homepage() {
         slidesToScroll: 1,
         arrows: false,
     }
-
-
 
     const fetchMovies = async () => {
         try {

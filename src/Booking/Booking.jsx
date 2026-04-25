@@ -26,22 +26,33 @@ function Booking() {
         return storedTime ? parseInt(storedTime, 10) : 600;
     });
     const [bookeds, setBookeds] = useState([]);
-    const client = useRef(null); // giữ client ko biến mất khi re-render
+    const [seats, setSeats] = useState([]);
+    const client = useRef(null);
     const allowSelect = Object.values(othersSelecting).flat();
-    // phim, 
 
-    const seatPrices = {
-        normal: 70000,
-        vip: 100000,
-        couple: 130000
-    };
+    useEffect(() => {
+        const fetchSeats = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8099/api/seat/v1/room/${bookingInfo.time.roomId}`,
+                    { withCredentials: true });
+                if (res.data && res.data.data) {
+                    setSeats(res.data.data);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách ghế", error);
+            }
+        }
+        fetchSeats();
+    }, [bookingInfo?.time?.roomId]);
 
     const calculateTotal = () => {
-        return selectedSeat.reduce((total, seat) => {
-            const type = getSeatType(seat);
-            return total + (seatPrices[type] || 0);
+        const surcharge = time?.surcharge || 0;
+        return selectedSeat.reduce((total, seatLabel) => {
+            const seat = seats.find(s => s.label === seatLabel);
+            return total + (seat?.price || 0) + surcharge;
         }, 0);
     };
+
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -49,12 +60,10 @@ function Booking() {
     };
     const fetchBBST = async () => {
         try {
-            console.log('time', time.showTimeId);
             const res = await axios.get(`http://localhost:8099/booking/get-byshowtime/${time.showTimeId}`,
                 { withCredentials: true }
             );
             const filterbook = res.data.filter(book => book.date === formattedDate);
-            console.log('booked', filterbook)
             setBookeds(filterbook);
         } catch (error) {
             console.error("Không lấy được booking theo showtimeId", error);
@@ -98,15 +107,11 @@ function Booking() {
         return () => clearInterval(interval);
     }, [timeLeft]);
 
-    const seatTypes = {
-        vip: ['C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'D6', 'D7', 'D8', 'D9']
-    };
-
-    const getSeatType = (seat) => {
-        const row = seat.charAt(0);
-        if (seatTypes.vip.includes(seat)) return "vip";
-        if (row === "G") return "couple";
-        return "normal";
+    const getSeatType = (seatLabel) => {
+        const seat = seats.find(s => s.label === seatLabel);
+        if (!seat) return "normal";
+        const type = (seat.type || seat.seatType || "normal").toLowerCase();
+        return type === "standard" ? "normal" : type;
     };
 
     useEffect(() => {
@@ -242,123 +247,214 @@ function Booking() {
     };
 
     return (
-        <div className="container mt-4">
-            <div className="d-flex flex-wrap p-4 ticket-booking-container gap-5 justify-content-center">
+        <div className="booking-page">
+            <div className="container-fluid py-4">
+                <div className="ticket-booking-container">
 
-                {/* Khu vực chọn ghế */}
-                <div className="seating-layout">
-                    <div className="screen text-center mb-4">MÀN HÌNH CHIẾU</div>
-
-                    <div className="seat-grid">
-                        {['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((row) => (
-                            <div className="seat-row" key={row}>
-                                {Array.from({ length: 14 }, (_, i) => {
-                                    const seatNumber = `${row}${i + 1}`;
-                                    const seatIndex = i + 1;
-                                    const isSold = bookeds.some(booking =>
-                                        booking.chair?.split(', ').includes(seatNumber)
-                                    );
-                                    const type = getSeatType(seatNumber);
-
-                                    if (type === 'couple' && seatIndex % 2 === 0) return null;
-
-                                    return (
-                                        <div
-                                            key={seatNumber}
-                                            className={`seat ${type} ${isSold ? 'sold' :
-                                                    selectedSeat.includes(seatNumber) // ghế mình chọn -> màu xanh dương
-                                                        ? 'selected'
-                                                        : allowSelect.includes(seatNumber) // ghế người khác chọn -> màu xanh nhajt
-                                                            ? 'selecting'
-                                                            : ''}`}
-                                            onClick={() => handleSeatSelection(seatNumber)}
-                                            style={{ cursor: 'pointer', ...(type === 'couple' ? { width: '80px' } : {}) }}
-                                        >
-                                            {seatNumber}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="legend mt-4">
-                        <h6 className="mb-2 fw-bold col-2">Loại ghế:</h6>
-                        <div className="d-flex flex-wrap gap-4">
-                            <div>
-                                <span className="seat normal me-2"></span>
-                                Ghế thường  <span className="text">( 70.000 VNĐ )</span>
-                            </div>
-                            <div>
-                                <span className="seat vip me-2"></span>
-                                Ghế VIP <span className="text">( 100.000 VNĐ )</span>
-                            </div>
-                            <div>
-                                <span className="seat couple me-2"></span>
-                                Ghế đôi <span className="text">( 130.000 VNĐ )</span>
-                            </div>
+                    {/* Khu vực chọn ghế */}
+                    <div className="seating-layout">
+                        <div className="screen-container">
+                            <div className="screen"></div>
+                            <div className="screen-text">Màn hình chiếu</div>
                         </div>
-                    </div>
-                    <div className="legend mt-4">
-                        <h6 className="mb-3 fw-bold col-2">Tình trạng:</h6>
-                        <div className="d-flex flex-wrap gap-4">
-                            <div><span className="seat empty"></span>Ghế trống</div>
-                            <div><span className="seat selected"></span>Đang chọn</div>
-                            <div><span className="seat selecting"></span>Đang bị giữ</div>
-                            <div><span className="seat sold"></span>Đã bán</div>
-                        </div>
-                    </div>
 
-                    <div className="d-flex justify-content-between mt-4 px-2">
-                        <div>
-                            <p className="fw-bold mb-1">Tổng tiền</p>
-                            <h5 className="text-primary">{calculateTotal().toLocaleString('vi-VN')} VNĐ</h5>
-                        </div>
-                        <div>
-                            <p className="fw-bold mb-1">⏳ Thời gian còn lại</p>
-                            <h5 className="text-success">{formatTime(timeLeft)}</h5>
-                        </div>
-                    </div>
-                </div>
+                        <div className="seat-grid">
+                            {seats.length > 0 ? (
+                                Object.entries(
+                                    seats.reduce((acc, seat) => {
+                                        const row = seat.row;
+                                        if (!acc[row]) acc[row] = [];
+                                        acc[row].push(seat);
+                                        return acc;
+                                    }, {})
+                                ).sort(([a], [b]) => parseInt(a) - parseInt(b)).map(([row, rowSeats]) => (
+                                    <div className="seat-row" key={row}>
+                                        <div className="row-label">{String.fromCharCode(65 + parseInt(row))}</div>
+                                        {rowSeats.sort((a, b) => a.col - b.col).map((seat) => {
+                                            const seatLabel = seat.label;
+                                            const isSold = bookeds.some(booking =>
+                                                booking.chair?.split(', ').includes(seatLabel)
+                                            );
+                                            let type = (seat.type || seat.seatType || "normal").toLowerCase();
+                                            if (type === "standard") type = "normal";
 
-                {/* Khu vực thông tin phim */}
-                <div className="ticket-summary">
-                    <img src={movieInfo.image} className="img-fluid mb-3 rounded" alt="Poster" width={220} />
-                    <h5 className="fw-bold text-primary fs-3 mb-2">{movieInfo.movieName}</h5>
-                    <p className="text-muted fst-italic mb-3"><strong>2D Phụ đề</strong></p>
-                    <ul className="list-unstyled lh-lg">
-                        <li><strong className="text-dark">Thể loại:</strong> {movieInfo.genre}</li>
-                        <li><strong className="text-dark">Thời lượng:</strong> {movieInfo.duration}</li>
-                        <li><strong className="text-dark">Rạp chiếu:</strong> {savedTheater.theaterName}</li>
-                        <li><strong className="text-dark">Ngày chiếu:</strong> {date}/2025</li>
-                        <li><strong className="text-dark">Giờ chiếu:</strong> {time?.startTime?.slice(0, 5)}</li>
-                        <li><strong className="text-dark">Phòng chiếu:</strong> {time?.roomName?.roomName}</li>
-                        <li><strong className="text-dark">Ghế ngồi:</strong>
-                            {selectedSeat.length === 0 ? (
-                                <span className="badge bg-secondary"></span>
+                                            return (
+                                                <div
+                                                    key={seat.id}
+                                                    className={`seat ${type} ${isSold ? 'sold' :
+                                                        selectedSeat.includes(seatLabel)
+                                                            ? 'selected'
+                                                            : allowSelect.includes(seatLabel)
+                                                                ? 'selecting'
+                                                                : ''}`}
+                                                    onClick={() => handleSeatSelection(seatLabel)}
+                                                    title={`${seatLabel} - ${type.toUpperCase()}`}
+                                                >
+                                                    {seatLabel}
+                                                </div>
+                                            );
+                                        })}
+                                        <div className="row-label text-end">{String.fromCharCode(65 + parseInt(row))}</div>
+                                    </div>
+                                ))
                             ) : (
-                                <div className="mt-2">
-                                    {[...Array(Math.ceil(selectedSeat.length / 4))].map((_, rowIndex) => (
-                                        <div className="d-flex flex-wrap mb-1" key={rowIndex}>
-                                            {selectedSeat
-                                                .slice(rowIndex * 4, rowIndex * 4 + 4)
-                                                .map((seat) => (
-                                                    <span
-                                                        key={seat}
-                                                        className="badge bg-secondary me-2"
-                                                        style={{ width: '45px', textAlign: 'center' }}
-                                                    >
-                                                        {seat}
-                                                    </span>
-                                                ))}
-                                        </div>
-                                    ))}
-                                </div>
+                                /* Fallback grid */
+                                ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((row) => (
+                                    <div className="seat-row" key={row}>
+                                        <div className="row-label">{row}</div>
+                                        {Array.from({ length: 14 }, (_, i) => {
+                                            const seatLabel = `${row}${i + 1}`;
+                                            const isSold = bookeds.some(booking =>
+                                                booking.chair?.split(', ').includes(seatLabel)
+                                            );
+                                            const type = getSeatType(seatLabel);
+                                            if (type === 'couple' && (i + 1) % 2 === 0) return null;
+                                            return (
+                                                <div
+                                                    key={seatLabel}
+                                                    className={`seat ${type} ${isSold ? 'sold' :
+                                                        selectedSeat.includes(seatLabel)
+                                                            ? 'selected'
+                                                            : allowSelect.includes(seatLabel)
+                                                                ? 'selecting'
+                                                                : ''}`}
+                                                    onClick={() => handleSeatSelection(seatLabel)}
+                                                >
+                                                    {seatLabel}
+                                                </div>
+                                            );
+                                        })}
+                                        <div className="row-label text-end">{row}</div>
+                                    </div>
+                                ))
                             )}
-                        </li>
-                    </ul>
-                    <hr />
-                    <button className="btn btn-primary w-100 mt-2" onClick={handlePaymentInfo}>TIẾP TỤC</button>
+                        </div>
+
+                        {/* Legend Section */}
+                        <div className="legend-container">
+                            <div className="legend-group">
+                                <div className="legend-title">Loại ghế</div>
+                                <div className="d-flex flex-wrap gap-3">
+                                    {seats.some(s => s.type?.toLowerCase() === 'standard') && (
+                                        <div className="legend-item">
+                                            <div className="legend-seat normal">
+                                                <i className="bi bi-person"></i>
+                                            </div>
+                                            <span>Thường: ({(seats.find(s => s.type?.toLowerCase() === 'standard')?.price || 0).toLocaleString()}đ)</span>
+                                        </div>
+                                    )}
+                                    {seats.some(s => s.type?.toLowerCase() === 'vip') && (
+                                        <div className="legend-item">
+                                            <div className="legend-seat vip">
+                                                <i className="bi bi-gem"></i>
+                                            </div>
+                                            <span>VIP: ({(seats.find(s => s.type?.toLowerCase() === 'vip')?.price || 0).toLocaleString()}đ)</span>
+                                        </div>
+                                    )}
+                                    {seats.some(s => s.type?.toLowerCase() === 'sweetbox') && (
+                                        <div className="legend-item">
+                                            <div className="legend-seat couple">
+                                                <i className="bi bi-heart"></i>
+                                            </div>
+                                            <span>Đôi: ({(seats.find(s => s.type?.toLowerCase() === 'sweetbox')?.price || 0).toLocaleString()}đ)</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="legend-group">
+                                <div className="legend-title">Trạng thái</div>
+                                <div className="d-flex flex-wrap gap-3">
+                                    <div className="legend-item">
+                                        <div className="legend-seat empty"></div>
+                                        <span>Trống</span>
+                                    </div>
+                                    <div className="legend-item">
+                                        <div className="legend-seat selected"></div>
+                                        <span>Đang chọn</span>
+                                    </div>
+
+                                    <div className="legend-item">
+                                        <div className="legend-seat selecting"></div>
+                                        <span>Đang giữ</span>
+                                    </div>
+                                    <div className="legend-item">
+                                        <div className="legend-seat sold"></div>
+                                        <span>Đã bán</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                    {/* Sidebar Thông tin vé */}
+                    <aside className="ticket-summary">
+                        <img src={movieInfo.image} className="movie-mini-poster" alt={movieInfo.movieName} />
+                        <h2 className="summary-title">{movieInfo.movieName}</h2>
+
+                        <div className="info-grid">
+                            <div className="info-item">
+                                <span className="info-label"><i className="bi bi-tag me-2"></i>Thể loại</span>
+                                <span className="info-value">{movieInfo.genre}</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-label"><i className="bi bi-clock me-2"></i>Thời lượng</span>
+                                <span className="info-value">{movieInfo.duration} phút</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-label"><i className="bi bi-geo-alt me-2"></i>Rạp</span>
+                                <span className="info-value">{savedTheater?.name}</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-label"><i className="bi bi-calendar-event me-2"></i>Suất chiếu</span>
+                                <span className="info-value">{time?.startTime?.slice(0, 5)} • {date}/{y}</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-label"><i className="bi bi-door-open me-2"></i>Phòng</span>
+                                <span className="info-value">{time?.roomName || "Phòng chiếu"}</span>
+                            </div>
+
+                            <div className="mt-3">
+                                <span className="info-label d-block mb-2">Ghế đã chọn</span>
+                                <div className="selected-seats-badge-container">
+                                    {selectedSeat.length > 0 ? (
+                                        selectedSeat.map(seat => (
+                                            <span key={seat} className="seat-badge">{seat}</span>
+                                        ))
+                                    ) : (
+                                        <></>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="total-section">
+                            <div className="total-label">Tổng cộng tạm tính</div>
+                            <div className="total-amount">
+                                {calculateTotal().toLocaleString('vi-VN')}
+                                <span className="total-currency">VNĐ</span>
+                            </div>
+                        </div>
+
+                        <button
+                            className="btn-checkout"
+                            onClick={handlePaymentInfo}
+                            disabled={selectedSeat.length === 0}
+                        >
+                            {selectedSeat.length > 0 ? "TIẾP TỤC THANH TOÁN" : "VUI LÒNG CHỌN GHẾ"}
+                        </button>
+                    </aside>
+                </div>
+            </div>
+
+            {/* Timer floating */}
+            <div className="timer-floating">
+                <i className="bi bi-hourglass-split timer-icon"></i>
+                <div className="timer-content">
+                    <div className="text-muted" style={{ fontSize: '10px', textTransform: 'uppercase' }}>Thời gian giữ ghế</div>
+                    <div className="timer-value">{formatTime(timeLeft)}</div>
                 </div>
             </div>
         </div>
@@ -366,3 +462,5 @@ function Booking() {
 }
 
 export default Booking;
+
+
