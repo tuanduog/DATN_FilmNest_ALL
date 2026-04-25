@@ -269,8 +269,8 @@ function Booking() {
                                     }, {})
                                 ).sort(([a], [b]) => parseInt(a) - parseInt(b)).map(([row, rowSeats]) => (
                                     <div className="seat-row" key={row}>
-                                        <div className="row-label">{String.fromCharCode(65 + parseInt(row))}</div>
                                         {rowSeats.sort((a, b) => a.col - b.col).map((seat) => {
+
                                             const seatLabel = seat.label;
                                             const isSold = bookeds.some(booking =>
                                                 booking.chair?.split(', ').includes(seatLabel)
@@ -294,15 +294,15 @@ function Booking() {
                                                 </div>
                                             );
                                         })}
-                                        <div className="row-label text-end">{String.fromCharCode(65 + parseInt(row))}</div>
                                     </div>
+
                                 ))
                             ) : (
                                 /* Fallback grid */
                                 ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((row) => (
                                     <div className="seat-row" key={row}>
-                                        <div className="row-label">{row}</div>
                                         {Array.from({ length: 14 }, (_, i) => {
+
                                             const seatLabel = `${row}${i + 1}`;
                                             const isSold = bookeds.some(booking =>
                                                 booking.chair?.split(', ').includes(seatLabel)
@@ -324,8 +324,8 @@ function Booking() {
                                                 </div>
                                             );
                                         })}
-                                        <div className="row-label text-end">{row}</div>
                                     </div>
+
                                 ))
                             )}
                         </div>

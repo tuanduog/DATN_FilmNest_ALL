@@ -124,34 +124,39 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e2e8f0;
+  border: 2px solid #cbd5e1;
   background: #ffffff;
   color: #64748b;
 }
 
+
 .seat:hover:not(.sold) {
   transform: translateY(-2px) scale(1.1);
   border-color: var(--primary-color);
-  color: white;
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
 }
 
+
 .seat.normal {
-  border-color: #e2e8f0;
+  border-color: #cbd5e1;
 }
 
+
 .seat.vip {
-  border-color: rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.5);
   background: rgba(245, 158, 11, 0.05);
   color: var(--vip-color);
 }
 
 .seat.couple {
   width: 94px;
-  border-color: rgba(236, 72, 153, 0.3);
+  border-color: rgba(236, 72, 153, 0.5);
   background: rgba(236, 72, 153, 0.05);
   color: var(--couple-color);
 }
+
 
 .seat.selected {
   background: var(--selected-color) !important;
@@ -244,42 +249,43 @@
 
 .legend-seat.normal {
   background: #ffffff;
-  border-color: #e2e8f0;
+  border: 2px solid #cbd5e1;
 }
 
 .legend-seat.vip {
   background: rgba(245, 158, 11, 0.05);
-  border-color: rgba(245, 158, 11, 0.3);
+  border: 2px solid rgba(245, 158, 11, 0.5);
   color: var(--vip-color);
 }
 
 .legend-seat.couple {
   background: rgba(236, 72, 153, 0.05);
-  border-color: rgba(236, 72, 153, 0.3);
+  border: 2px solid rgba(236, 72, 153, 0.5);
   color: var(--couple-color);
 }
 
 .legend-seat.empty {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 2px solid #cbd5e1;
 }
 
 .legend-seat.selected {
   background: var(--selected-color);
-  border: 1px solid var(--selected-color);
+  border: 2px solid var(--selected-color);
 }
 
 .legend-seat.selecting {
   background: var(--selecting-color);
-  border: 1px solid var(--selecting-color);
+  border: 2px solid var(--selecting-color);
   animation: pulse 1.5s infinite;
 }
 
 .legend-seat.sold {
   background: var(--sold-color);
-  border: 1px solid var(--sold-color);
+  border: 2px solid var(--sold-color);
   opacity: 0.6;
 }
+
 
 /* Ticket Summary Sidebar */
 .ticket-summary {
