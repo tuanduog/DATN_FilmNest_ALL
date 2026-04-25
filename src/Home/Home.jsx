@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from 'axios';
 import { useEffect } from 'react';
+import ShowtimePopup from './Showtime-popup';
 
 function Homepage() {
     const [nowShowing, setNowShowing] = useState(true);
@@ -15,65 +16,31 @@ function Homepage() {
 
     const [showingNow, setShowingNow] = useState([]);
     const [commingSoon, setCommingSoon] = useState([]);
-    const [showModal1, setShowModal1] = useState(false);
-    const [confirmPopup, setConfirmPopup] = useState(false);
-    const [movieInfo, setMovieInfo] = useState([]);
-    const [showDates, setShowDates] = useState([]);
-    const [showTime, setShowTime] = useState([]);
-    const [selectedIndex, setSelectedIndex] = useState(0);
-    const [selectedDate, setSelectedDate] = useState("");
-    const [selectedTime, setSelectedTime] = useState([]);
+    const [movieInfo, setMovieInfo] = useState(null);
+    const [showShowtime, setShowShowtime] = useState(false);
     const savedTheater = JSON.parse(localStorage.getItem('theater'));
     const [showChoseLocation, setShowChoseLocation] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState("");
-    const [selectedTheater, setselectedTheater] = useState("");
+    const [selectedTheater, setselectedTheater] = useState(savedTheater?.id || "");
     const [banners, setBanners] = useState([]);
     const [theater, setTheater] = useState([]);
     const [allTheaters, setAllTheaters] = useState([]);
     const [locations, setLocation] = useState([]);
-    const handleCloseModal = () => {
-        setShowModal1(false);
-    }
     const handleOpenModal = (movie) => {
         if (localStorage.getItem('theater') === null) {
             setShowChoseLocation(true);
             return;
         }
         setMovieInfo(movie);
-        const select = generateAvailableShowDates(movie.releaseDate, movie.dateShow);
-        setShowDates(select);
-        setSelectedIndex(0);
-        setSelectedDate(select[0]);
-        fetchShowTime(movie.movieId);
-        setShowModal1(true);
+        setShowShowtime(true);
     }
-    const handleCloseConfirm = () => {
-        setConfirmPopup(false);
-    }
-    const handleOpenConfirm = () => {
-        setConfirmPopup(true);
-    }
+
     const handleMovieDetails = (id) => {
         navigate(`/movie/detail/${id}`);
         window.scrollTo(0, 0);
     }
 
-    const handleBooking = (movieInfo, date, time) => {
-        const user = sessionStorage.getItem('state');
 
-        const bookingInfo = {
-            movieInfo, date, time
-        };
-        localStorage.setItem('bookingInfo', JSON.stringify(bookingInfo));
-        if (!user) {
-            navigate('/Login');
-        } else {
-            localStorage.removeItem('timeLeft');
-            localStorage.removeItem('paymentId');
-            navigate('/Booking');
-            window.scrollTo(0, 0);
-        }
-    }
 
     const [pageRequest, setPageRequest] = useState({
         page: 0,
@@ -138,28 +105,7 @@ function Homepage() {
         handleTheaters();
     }, []);
 
-    const generateAvailableShowDates = (releasedDateStr, numberOfDays) => {
-        const today = new Date();
-        const releasedDate = new Date(releasedDateStr);
-        const showDates = [];
 
-        const endDate = new Date(releasedDate);
-        endDate.setDate(endDate.getDate() + numberOfDays - 1);
-
-        let current = new Date(Math.max(today, releasedDate));
-
-        let count = 0;
-        while (current <= endDate && count < 7) {
-            const formatted = `${current.getDate().toString().padStart(2, '0')}/${(current.getMonth() + 1)
-                .toString()
-                .padStart(2, '0')}`;
-            showDates.push(formatted);
-            current.setDate(current.getDate() + 1);
-            count++;
-        }
-
-        return showDates;
-    };
 
     const settings = {
         dots: true,
@@ -172,15 +118,7 @@ function Homepage() {
         arrows: false,
     }
 
-    const fetchShowTime = async (movieId) => {
-        try {
-            const res = await axios.get(`http://localhost:8099/api/showtime/v1/movie/${selectedTheater}/${movieId}`);
 
-            setShowTime(res.data);
-        } catch (error) {
-            console.error("Lỗi khi lấy phim", error);
-        }
-    }
 
     const fetchMovies = async () => {
         try {
@@ -274,100 +212,12 @@ function Homepage() {
                     </div>
                 </div>
             )}
-            {showModal1 && (
-                <div className={styles.overlay} onClick={handleCloseModal}>
-                    <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
-                        <button className={styles.closeBtn} onClick={handleCloseModal}>&times;</button>
-
-                        <h3 className="text-uppercase text-center fw-bold mb-2" style={{ color: '#0d6efd' }}>
-                            LỊCH CHIẾU - {movieInfo.movieName}
-                        </h3>
-
-                        <h5 className="text-center mb-4 text-secondary">{savedTheater?.name}</h5>
-
-                        <div className="d-flex justify-content-center gap-2 flex-wrap mb-4">
-                            {showDates.map((dateStr, i) => (
-                                <div
-                                    key={i}
-                                    onClick={() => {
-                                        setSelectedIndex(i);
-                                        setSelectedDate(dateStr);
-                                    }}
-                                    className={`${styles.dateItem} px-3 py-2 rounded ${i === selectedIndex ? styles.activeDate : 'text-dark'}`}
-                                >
-                                    {dateStr}
-                                </div>
-                            ))}
-                        </div>
-
-                        <h6 className="text-uppercase fw-bold mb-3 text-muted text-center" style={{ letterSpacing: '1px' }}>2D Phụ Đề</h6>
-
-                        <div className="d-flex flex-wrap gap-3 justify-content-center">
-                            {showTime.length === 0 ? (
-                                <div className="text-muted fst-italic">Không có lịch chiếu</div>
-                            ) : (
-                                showTime.map((time, index) => (
-                                    <div
-                                        key={index}
-                                        className={styles.showtime}
-                                        onClick={() => {
-                                            handleOpenConfirm();
-                                            setSelectedTime(time);
-                                        }}
-                                    >
-                                        <div className="fw-bold fs-5 mb-1" style={{ color: '#1a1a1a' }}>
-                                            {time.startTime.slice(0, 5)}
-                                        </div>
-                                        <div className="seats text-secondary" style={{ fontSize: '12px', fontWeight: '500' }}>91 ghế ngồi</div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-            {confirmPopup && (
-                <div className={styles.overlay} onClick={handleCloseConfirm}>
-                    <div className={styles.popup} style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
-                        <button className={styles.closeBtn} onClick={handleCloseConfirm}>&times;</button>
-
-                        <h6 className="text-center text-uppercase mt-2 mb-2 text-muted fw-bold" style={{ letterSpacing: '0.5px' }}>
-                            Xác nhận đặt vé
-                        </h6>
-                        <h4 className="text-center text-primary fw-bold mb-4">
-                            {movieInfo.movieName || "Tên phim"}
-                        </h4>
-
-                        <div className="table-responsive rounded shadow-sm mb-4 border">
-                            <table className="table table-hover text-center align-middle mb-0">
-                                <thead className={styles.tableHeader}>
-                                    <tr>
-                                        <th className="py-3">Rạp chiếu</th>
-                                        <th className="py-3">Ngày chiếu</th>
-                                        <th className="py-3">Giờ chiếu</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td className="py-3 text-dark fw-bold">{savedTheater.theaterName}</td>
-                                        <td className="py-3 text-dark fw-bold">{selectedDate}/2025</td>
-                                        <td className="py-3 text-primary fw-bold">{selectedTime.startTime.slice(0, 5)}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div className="text-center">
-                            <button
-                                className={`btn btn-success px-5 py-2 w-100 ${styles.btnBook}`}
-                                onClick={() => handleBooking(movieInfo, selectedDate, selectedTime)}
-                            >
-                                ĐỒNG Ý
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ShowtimePopup
+                show={showShowtime}
+                movie={movieInfo}
+                onClose={() => setShowShowtime(false)}
+                savedTheater={savedTheater}
+            />
             <div className={styles.banner}>
                 <Slider {...settings}>
                     {Array.isArray(banners) && banners.map((item) => (

@@ -1,159 +1,193 @@
 /* Member.module.css */
 .container {
   text-align: center;
-  padding: 60px 20px;
-  background-color: #f8f9fa;
-  min-height: calc(100vh - 150px);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 80px 20px;
+  background: radial-gradient(circle at top, #1a1c20 0%, #0f1012 100%);
+  min-height: 100vh;
+  color: #fff;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(13, 110, 253, 0.15) 0%, transparent 70%);
+  filter: blur(50px);
+  z-index: 0;
+}
+
+.container::after {
+  content: '';
+  position: absolute;
+  bottom: -10%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(245, 176, 65, 0.1) 0%, transparent 70%);
+  filter: blur(50px);
+  z-index: 0;
+}
+
+.headerContent {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 60px;
 }
 
 .title {
-  font-size: 2.2rem;
-  margin-bottom: 10px;
-  font-weight: 800;
-  color: #111;
+  font-size: 3.5rem;
+  margin-bottom: 15px;
+  font-weight: 900;
+  background: linear-gradient(to right, #fff, #a5a5a5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: -1px;
 }
 
 .subtitle {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 50px;
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .cardContainer {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 40px;
+  align-items: stretch;
+  gap: 30px;
   flex-wrap: wrap;
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .card {
   position: relative;
-  background: #fff;
-  border-radius: 16px;
-  padding: 40px 30px;
-  width: 360px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 50px 40px;
+  width: 380px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
   flex-direction: column;
-  border: 1px solid #eaeaea;
 }
 
 .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-15px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
 }
 
 .vipMonth {
-  background: linear-gradient(145deg, #ffffff, #f0f4f8);
-  border-top: 4px solid #0d6efd;
+  background: linear-gradient(180deg, rgba(13, 110, 253, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
 
 .vipYear {
-  background: linear-gradient(145deg, #1f2123, #2f3236);
-  color: #fff;
-  border-top: 4px solid #f5b041;
+  background: linear-gradient(180deg, rgba(245, 176, 65, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: rgba(245, 176, 65, 0.3);
   transform: scale(1.05);
-  /* slightly larger to emphasize */
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
 }
 
 .vipYear:hover {
-  transform: scale(1.05) translateY(-8px);
-  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05) translateY(-15px);
+  border-color: rgba(245, 176, 65, 0.5);
 }
 
 .name {
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 15px;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  display: inline-block;
+  margin: 0 auto 30px;
 }
 
 .vipMonth .name {
-  color: #0d6efd;
+  background: rgba(13, 110, 253, 0.15);
+  color: #3d8bff;
 }
 
 .vipYear .name {
+  background: rgba(245, 176, 65, 0.15);
   color: #f5b041;
 }
 
+.priceContainer {
+  margin-bottom: 40px;
+}
+
 .price {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   font-weight: 800;
-  margin-bottom: 5px;
+  margin-bottom: 0;
   display: flex;
   justify-content: center;
   align-items: baseline;
-  gap: 5px;
-}
-
-.priceCurrency {
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.vipMonth .price {
-  color: #111;
-}
-
-.vipYear .price {
   color: #fff;
 }
 
-.duration {
-  font-size: 0.95rem;
-  color: #888;
-  margin-bottom: 30px;
-  font-weight: 500;
+.priceCurrency {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-left: 4px;
 }
 
-.vipYear .duration {
-  color: #bbb;
+.duration {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
 }
 
 .benefitList {
   list-style: none;
   padding: 0;
-  margin: 0 0 35px;
+  margin: 0 0 45px;
   text-align: left;
-  line-height: 1.6;
-  font-size: 1rem;
+  font-size: 0.95rem;
   flex-grow: 1;
 }
 
-.vipMonth .benefitList {
-  color: #444;
-}
-
-.vipYear .benefitList {
-  color: #e0e0e0;
-}
-
 .benefitList li {
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 15px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .checkIcon {
-  font-weight: bold;
-  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  flex-shrink: 0;
 }
 
 .vipMonth .checkIcon {
-  color: #0d6efd;
+  background: rgba(13, 110, 253, 0.2);
+  color: #3d8bff;
 }
 
 .vipYear .checkIcon {
+  background: rgba(245, 176, 65, 0.2);
   color: #f5b041;
 }
 
@@ -163,72 +197,75 @@
 
 .subscribeBtn {
   width: 100%;
-  padding: 14px 20px;
+  padding: 18px 24px;
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: 16px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   transition: all 0.3s ease;
   border: none;
+  position: relative;
+  overflow: hidden;
 }
 
 .vipMonth .subscribeBtn {
-  background-color: #e7f1ff;
-  color: #0d6efd;
+  background: #0d6efd;
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(13, 110, 253, 0.3);
 }
 
 .vipMonth .subscribeBtn:hover:not(.disabled) {
-  background-color: #0d6efd;
-  color: #fff;
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(13, 110, 253, 0.4);
 }
 
 .vipYear .subscribeBtn {
-  background-color: #f5b041;
-  color: #111;
+  background: #f5b041;
+  color: #000;
+  box-shadow: 0 10px 20px rgba(245, 176, 65, 0.3);
 }
 
 .vipYear .subscribeBtn:hover:not(.disabled) {
-  background-color: #d4ac0d;
-  color: #111;
+  background: #e69d25;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(245, 176, 65, 0.5);
 }
 
 .disabled {
-  background-color: #e0e0e0 !important;
-  color: #999 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
   cursor: not-allowed;
-  pointer-events: none;
+  box-shadow: none !important;
 }
 
-.statusText {
+.dayLeftText {
   margin-top: 15px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.vipMonth .statusText {
-  color: #0d6efd;
-}
-
-.vipYear .statusText {
-  color: #f5b041;
-}
-
-/* Ribbon Best Value */
+/* Ribbon Premium */
 .ribbon {
   position: absolute;
-  top: 25px;
-  right: -35px;
-  background: #f5b041;
-  color: #111;
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 6px 40px;
-  transform: rotate(45deg);
-  letter-spacing: 1px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(45deg, #f5b041, #ffecb3);
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 100px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
+  box-shadow: 0 4px 10px rgba(245, 176, 65, 0.3);
 }
 
 /* Modal and Overlays */
@@ -238,154 +275,153 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1050;
-  animation: fadeIn 0.3s ease;
+  z-index: 2000;
+  animation: fadeIn 0.4s ease;
 }
 
 .confirmBox {
-  background: white;
-  padding: 35px 30px;
-  border-radius: 16px;
-  width: 650px;
+  background: #1a1c20;
+  padding: 45px;
+  border-radius: 32px;
+  width: 700px;
   max-width: 95%;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease;
-  text-align: left;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-align: center;
+  color: #fff;
 }
 
 .confirmBox h4 {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 800;
-  color: #111;
-  margin-bottom: 10px;
-  text-align: center;
+  margin-bottom: 15px;
 }
 
 .confirmBox p {
-  color: #555;
-  text-align: center;
-  margin-bottom: 25px;
-  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 30px;
+  font-size: 1.1rem;
 }
 
 .terms {
-  background: #f8f9fa;
-  border: 1px solid #eaeaea;
-  padding: 20px;
-  border-radius: 8px;
-  max-height: 250px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 25px;
+  border-radius: 20px;
+  max-height: 300px;
   overflow-y: auto;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #444;
-  margin-bottom: 20px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 30px;
+  text-align: left;
 }
 
-.terms ul {
-  padding-left: 20px;
-  margin-top: 10px;
+.terms::-webkit-scrollbar {
+  width: 6px;
 }
 
-.terms li {
-  margin-bottom: 8px;
+.terms::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
 
 .agreeContainer {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 25px;
+  margin-bottom: 35px;
   font-weight: 600;
   cursor: pointer;
-  color: #111;
+  color: #fff;
+  gap: 12px;
 }
 
 .agreeContainer input {
-  width: 18px;
-  height: 18px;
-  margin-right: 10px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
+  accent-color: #0d6efd;
 }
 
 .buttonGroup {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .cancelBtn,
 .confirmBtn {
-  padding: 12px 30px;
-  border-radius: 8px;
-  font-weight: 700;
+  padding: 16px 40px;
+  border-radius: 16px;
+  font-weight: 800;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   border: none;
+  min-width: 160px;
 }
 
 .cancelBtn {
-  background-color: #f1f3f5;
-  color: #333;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
 }
 
 .cancelBtn:hover {
-  background-color: #e9ecef;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .confirmBtn {
   background-color: #0d6efd;
   color: white;
+  box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
 }
 
 .confirmBtn:hover:not(:disabled) {
-  background-color: #0b5ed7;
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(13, 110, 253, 0.3);
 }
 
 .confirmBtn:disabled {
-  background-color: #cccccc;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 992px) {
   .cardContainer {
     flex-direction: column;
     align-items: center;
-    gap: 25px;
   }
-
+  
   .vipYear {
     transform: scale(1);
+    order: -1;
+    margin-bottom: 40px;
   }
-
+  
   .vipYear:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px);
+  }
+  
+  .title {
+    font-size: 2.5rem;
   }
 }

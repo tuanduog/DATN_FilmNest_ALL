@@ -7,21 +7,16 @@ import axios from 'axios';
 import { Client } from "@stomp/stompjs";
 import CommentItem from './CommentItem';
 import { useParams } from 'react-router-dom';
+import ShowtimePopup from '../Home/Showtime-popup';
 
 function Movie_detail() {
     const { id } = useParams();
 
     const [showModal, setShowModal] = useState(false);
-    const [confirmPopup, setConfirmPopup] = useState(false);
     const [movieInfo, setMovieInfo] = useState({});
     const [showTrailer, setShowTrailer] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    const [showDates, setShowDates] = useState([]);
-    const [showTime, setShowTime] = useState([]);
-    const [selectedIndex, setSelectedIndex] = useState(0);
-    const [selectedDate, setSelectedDate] = useState("");
-    const [selectedTime, setSelectedTime] = useState([]);
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
     const savedTheater = JSON.parse(localStorage.getItem('theater'));
@@ -46,30 +41,10 @@ function Movie_detail() {
             setShowChoseLocation(true);
             return;
         }
-        const select = generateAvailableShowDates(movieInfo.releaseDate, movieInfo.dateShow);
-        setShowDates(select);
-        setSelectedIndex(0);
-        setSelectedDate(select[0]);
-        fetchShowTime(movieInfo.id);
         setShowModal(true);
     }
 
-    const handleCloseConfirm = () => setConfirmPopup(false);
-    const handleOpenConfirm = () => setConfirmPopup(true);
     const handleCloseTrailer = () => setShowTrailer(false);
-
-    const handleBooking = (movieInfo, date, time) => {
-        const user = sessionStorage.getItem('state');
-        const bookingInfo = { movieInfo, date, time };
-        localStorage.setItem('bookingInfo', JSON.stringify(bookingInfo));
-        if (!user) {
-            navigate("/Login");
-        } else {
-            localStorage.removeItem('timeLeft');
-            navigate('/Booking');
-            window.scrollTo(0, 0);
-        }
-    }
 
     const handleTheaters = async () => {
         try {
@@ -96,32 +71,6 @@ function Movie_detail() {
         handleTheaters();
     }, []);
 
-    const generateAvailableShowDates = (releasedDateStr, numberOfDays) => {
-        const today = new Date();
-        const releasedDate = new Date(releasedDateStr);
-        const dates = [];
-        const endDate = new Date(releasedDate);
-        endDate.setDate(endDate.getDate() + numberOfDays - 1);
-
-        let current = new Date(Math.max(today, releasedDate));
-        let count = 0;
-        while (current <= endDate && count < 7) {
-            dates.push(`${current.getDate().toString().padStart(2, '0')}/${(current.getMonth() + 1).toString().padStart(2, '0')}`);
-            current.setDate(current.getDate() + 1);
-            count++;
-        }
-        return dates;
-    };
-
-    const fetchShowTime = async (movieId) => {
-        try {
-            const res = await axios.get(`http://localhost:8099/auth/get-showtime/${movieId}`);
-            setShowTime(res.data);
-        } catch (error) {
-            console.error("Lỗi khi lấy lịch chiếu", error);
-        }
-    }
-
     const updateOrCreateRate = async (starValue, movieId) => {
         const userStr = sessionStorage.getItem('user');
         if (userStr) {
@@ -141,9 +90,8 @@ function Movie_detail() {
         const userStr = sessionStorage.getItem('user');
         if (userStr) {
             try {
-                const movieId = location.state?.id;
                 const user = JSON.parse(userStr);
-                const res = await axios.get(`http://localhost:8099/api/review/get-Review/${movieId}/${user.userId}`, { withCredentials: true });
+                const res = await axios.get(`http://localhost:8099/api/review/get-Review/${id}/${user.userId}`, { withCredentials: true });
                 setRating(res.data.point);
             } catch (error) {
                 console.error("Fetch review failed", error);
@@ -163,7 +111,7 @@ function Movie_detail() {
 
     const fetchComments = async (movieId) => {
         try {
-            const res = await axios.get(`http://localhost:8099/auth/get-Comment/${movieId}`);
+            const res = await axios.get(`http://localhost:8099/api/comment/v1/${movieId}`);
             setDataCmt(res.data);
         } catch (error) {
             console.error("Lỗi lấy comment", error);
@@ -217,6 +165,16 @@ function Movie_detail() {
         return () => stompClient.deactivate();
     }, [fetchMovie, fetchReview, location.state?.id]);
 
+    if (!movieInfo || Object.keys(movieInfo).length === 0) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Đang tải...</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="movie-detail-container">
             {/* Modal Trailer */}
@@ -269,37 +227,7 @@ function Movie_detail() {
                 </div>
             )}
 
-            {/* Modal Lịch Chiếu */}
-            {showModal && (
-                <div className="modal-overlay" onClick={handleCloseModal}>
-                    <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-                        <span className="close-btn" onClick={handleCloseModal}><i className="bi bi-x-lg"></i></span>
-                        <h3 className="section-title mb-4">Lịch chiếu - {movieInfo.movieName}</h3>
-                        <p className="text-muted mb-4"><i className="bi bi-geo-alt-fill me-2"></i>{savedTheater?.name}</p>
 
-                        <div className="date-list d-flex gap-2 overflow-auto pb-3 mb-4">
-                            {showDates.map((date, i) => (
-                                <div key={i} onClick={() => { setSelectedIndex(i); setSelectedDate(date); }}
-                                    className={`px-3 py-2 rounded pointer ${i === selectedIndex ? 'bg-primary text-white shadow' : 'bg-light'}`}
-                                    style={{ cursor: 'pointer', minWidth: '75px', textAlign: 'center' }}>
-                                    {date}
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="showtimes d-flex flex-wrap gap-3">
-                            {showTime.length === 0 ? <p className="text-muted">Không có lịch chiếu</p> :
-                                showTime.map((time, i) => (
-                                    <div key={i} className="showtime" onClick={() => { handleOpenConfirm(); setSelectedTime(time); }}>
-                                        <div className="fw-bold fs-5">{time.startTime.slice(0, 5)}</div>
-                                        <div className="seats small text-muted">91 ghế trống</div>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Backdrop & Info Section */}
             <div className="movie-backdrop" style={{ backgroundImage: `url(${movieInfo.image})` }}>
@@ -380,36 +308,12 @@ function Movie_detail() {
                 </div>
             </div>
 
-            {/* Modal Xác Nhận */}
-            {confirmPopup && (
-                <div className="modal-overlay" onClick={handleCloseConfirm}>
-                    <div className="modal-box" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
-                        <span className="close-btn" onClick={handleCloseConfirm}><i className="bi bi-x-lg"></i></span>
-                        <h4 className="text-center fw-bold mb-4">XÁC NHẬN ĐẶT VÉ</h4>
-                        <div className="bg-light p-4 rounded-3 mb-4">
-                            <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                <span className="text-muted">Phim:</span>
-                                <span className="fw-bold">{movieInfo.movieName}</span>
-                            </div>
-                            <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                <span className="text-muted">Rạp:</span>
-                                <span className="fw-bold">{savedTheater?.name}</span>
-                            </div>
-                            <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
-                                <span className="text-muted">Ngày:</span>
-                                <span className="fw-bold">{selectedDate}/2025</span>
-                            </div>
-                            <div className="d-flex justify-content-between">
-                                <span className="text-muted">Suất chiếu:</span>
-                                <span className="fw-bold text-primary fs-5">{selectedTime.startTime?.slice(0, 5)}</span>
-                            </div>
-                        </div>
-                        <button className="btn btn-primary w-100 py-3 fw-bold" onClick={() => handleBooking(movieInfo, selectedDate, selectedTime)}>
-                            XÁC NHẬN ĐẶT VÉ
-                        </button>
-                    </div>
-                </div>
-            )}
+            {/* Showtime Popup */}
+            <ShowtimePopup
+                show={showModal}
+                movieInfo={movieInfo}
+                onClose={handleCloseModal}
+            />
         </div>
     );
 }
