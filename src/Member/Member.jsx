@@ -63,7 +63,7 @@ function Member() {
                 returnUrl: "http://localhost:5173/Member",
                 cancelUrl: "http://localhost:5173/Member",
             }, { withCredentials: true });
-            
+
             const payUrl = res.data?.data?.checkoutUrl;
             if (payUrl) {
                 window.location.href = payUrl;
@@ -139,7 +139,7 @@ function Member() {
                 try {
                     const member = JSON.parse(localStorage.getItem('member'));
                     if (!member) return;
-                    
+
                     await axios.put(`http://localhost:8099/auth/update-Membership/${user.userId}`,
                         member,
                         { withCredentials: true }
@@ -160,70 +160,78 @@ function Member() {
     }, [status, cancel, code, user?.userId, navigate]);
 
     return (
-        <div className={styles.container}>
-            <div className={styles.headerContent}>
-                <h2 className={styles.title}>TRỞ THÀNH HỘI VIÊN</h2>
-                <p className={styles.subtitle}>Mở khóa toàn bộ đặc quyền cao cấp và tận hưởng trải nghiệm điện ảnh xứng tầm tại FilmNest.</p>
-            </div>
-
-            <div className={styles.cardContainer}>
-                {/* Gói VIP Tháng */}
-                <div className={`${styles.card} ${styles.vipMonth}`}>
-                    <h3 className={styles.name}>THÀNH VIÊN BẠC</h3>
-                    <div className={styles.priceContainer}>
-                        <p className={styles.price}>99.000<span className={styles.priceCurrency}>đ</span></p>
-                        <p className={styles.duration}>Sử dụng trong 30 ngày</p>
-                    </div>
-                    <ul className={styles.benefitList}>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Xem không giới hạn phim 2D</li>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Quầy thanh toán ưu tiên</li>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Giảm 15% khi mua bắp nước</li>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Tích luỹ điểm thưởng x1.5</li>
-                    </ul>
-                    <div className={styles.buttonWrapper}>
-                        <button
-                            className={`${styles.subscribeBtn} ${membership === "vip tháng" ? styles.disabled : ""}`}
-                            onClick={membership === "vip tháng" ? null : handleVipThang}
-                            disabled={membership === "vip tháng"}
-                        >
-                            {membership === "vip tháng" ? "Đang sử dụng" : "Nâng cấp ngay"}
-                        </button>
-                        {membership === "vip tháng" && (
-                            <p className={styles.dayLeftText}>
-                                <i className="bi bi-clock-history"></i> Còn {dayLeft} ngày
-                            </p>
-                        )}
+        <div className={styles.pageWrapper}>
+            {/* Hero Section */}
+            <header className={styles.heroSection}>
+                <div className="container">
+                    <div className={styles.headerContent}>
+                        <h2 className={styles.title}>TRỞ THÀNH HỘI VIÊN</h2>
+                        <p className={styles.subtitle}>Mở khóa toàn bộ đặc quyền cao cấp và tận hưởng trải nghiệm điện ảnh xứng tầm tại FilmNest.</p>
                     </div>
                 </div>
+            </header>
 
-                {/* Gói VIP Năm */}
-                <div className={`${styles.card} ${styles.vipYear}`}>
-                    <div className={styles.ribbon}>Đề xuất</div>
-                    <h3 className={styles.name}>THÀNH VIÊN VIP</h3>
-                    <div className={styles.priceContainer}>
-                        <p className={styles.price}>899.000<span className={styles.priceCurrency}>đ</span></p>
-                        <p className={styles.duration}>Sử dụng trong 365 ngày</p>
+            <div className="container" style={{ marginTop: '-80px', position: 'relative', zIndex: 10 }}>
+                <div className={styles.cardContainer}>
+
+                    {/* Gói VIP Tháng */}
+                    <div className={`${styles.card} ${styles.vipMonth}`}>
+                        <h3 className={styles.name}>THÀNH VIÊN BẠC</h3>
+                        <div className={styles.priceContainer}>
+                            <p className={styles.price}>99.000<span className={styles.priceCurrency}>đ</span></p>
+                            <p className={styles.duration}>Sử dụng trong 30 ngày</p>
+                        </div>
+                        <ul className={styles.benefitList}>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Xem không giới hạn phim 2D</li>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Quầy thanh toán ưu tiên</li>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Giảm 15% khi mua bắp nước</li>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Tích luỹ điểm thưởng x1.5</li>
+                        </ul>
+                        <div className={styles.buttonWrapper}>
+                            <button
+                                className={`${styles.subscribeBtn} ${membership === "vip tháng" ? styles.disabled : ""}`}
+                                onClick={membership === "vip tháng" ? null : handleVipThang}
+                                disabled={membership === "vip tháng"}
+                            >
+                                {membership === "vip tháng" ? "Đang sử dụng" : "Nâng cấp ngay"}
+                            </button>
+                            {membership === "vip tháng" && (
+                                <p className={styles.dayLeftText}>
+                                    <i className="bi bi-clock-history"></i> Còn {dayLeft} ngày
+                                </p>
+                            )}
+                        </div>
                     </div>
-                    <ul className={styles.benefitList}>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Toàn quyền của Thành viên Bạc</li>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Tặng 4 vé xem phim 2D/IMAX</li>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Giảm 25% khi mua bắp nước</li>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Quà tặng sinh nhật đặc biệt</li>
-                        <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Ưu tiên đặt chỗ hàng ghế VIP</li>
-                    </ul>
-                    <div className={styles.buttonWrapper}>
-                        <button
-                            className={`${styles.subscribeBtn} ${membership === "vip năm" ? styles.disabled : ""}`}
-                            onClick={membership === "vip năm" ? null : handleVipNam}
-                            disabled={membership === "vip năm"}
-                        >
-                            {membership === "vip năm" ? "Đang sử dụng" : "Đăng ký ngay"}
-                        </button>
-                        {membership === "vip năm" && (
-                            <p className={styles.dayLeftText}>
-                                <i className="bi bi-clock-history"></i> Còn {dayLeft} ngày
-                            </p>
-                        )}
+
+                    {/* Gói VIP Năm */}
+                    <div className={`${styles.card} ${styles.vipYear}`}>
+                        <div className={styles.ribbon}>Đề xuất</div>
+                        <h3 className={styles.name}>THÀNH VIÊN VIP</h3>
+                        <div className={styles.priceContainer}>
+                            <p className={styles.price}>899.000<span className={styles.priceCurrency}>đ</span></p>
+                            <p className={styles.duration}>Sử dụng trong 365 ngày</p>
+                        </div>
+                        <ul className={styles.benefitList}>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Toàn quyền của Thành viên Bạc</li>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Tặng 4 vé xem phim 2D/IMAX</li>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Giảm 25% khi mua bắp nước</li>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Quà tặng sinh nhật đặc biệt</li>
+                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Ưu tiên đặt chỗ hàng ghế VIP</li>
+                        </ul>
+                        <div className={styles.buttonWrapper}>
+                            <button
+                                className={`${styles.subscribeBtn} ${membership === "vip năm" ? styles.disabled : ""}`}
+                                onClick={membership === "vip năm" ? null : handleVipNam}
+                                disabled={membership === "vip năm"}
+                            >
+                                {membership === "vip năm" ? "Đang sử dụng" : "Đăng ký ngay"}
+                            </button>
+                            {membership === "vip năm" && (
+                                <p className={styles.dayLeftText}>
+                                    <i className="bi bi-clock-history"></i> Còn {dayLeft} ngày
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,11 +240,15 @@ function Member() {
             {showConfirm && (
                 <div className={styles.overlay}>
                     <div className={styles.confirmBox}>
+                        <button className={styles.closeBtn} onClick={handleClose}>
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+
                         <h4>Xác nhận nâng cấp</h4>
                         <p>Bạn đang chọn đăng ký gói {selectedPlan === "vip tháng" ? "Hội viên Bạc" : "Hội viên VIP"}.</p>
-                        
+
                         <div className={styles.terms}>
-                            <p className="fw-bold mb-3 text-white">Điều khoản và Chính sách Hội viên</p>
+                            <p className="fw-bold mb-3 text-dark">Điều khoản và Chính sách Hội viên</p>
                             <ul className="list-unstyled">
                                 <li className="mb-2">• Gói dịch vụ có hiệu lực ngay sau khi thanh toán thành công.</li>
                                 <li className="mb-2">• Các ưu đãi giảm giá bắp nước áp dụng trực tiếp tại quầy hoặc ứng dụng.</li>

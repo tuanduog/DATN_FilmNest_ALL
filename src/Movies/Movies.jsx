@@ -96,75 +96,69 @@ function Movies() {
     }, []);
 
     return (
-        <div>
+        <div className={styles.pageWrapper}>
+            {/* Modal Chọn Rạp */}
             {showChoseLocation && (
                 <div className={styles.overlay}>
                     <div className={styles.popup}>
-                        {/* Nút đóng */}
                         <button className={styles.closeBtn} onClick={() => setShowChoseLocation(false)}>
-                            &times;
+                            <i className="bi bi-x-lg"></i>
                         </button>
-
-                        {/* Nội dung */}
+                        
                         <div className={styles.content}>
-                            <div className={styles.formRow} style={{ marginBottom: '35px', marginLeft: '20px', marginRight: '20px' }}>
-                                <div className={styles.formGroup}>
-                                    <label>Tỉnh/ Thành phố</label>
-                                    <select
-                                        style={{ fontSize: '14px' }}
-                                        value={selectedLocation}
-                                        onChange={e => {
-                                            const provCode = e.target.value;
-                                            setSelectedLocation(provCode);
-                                            const filtered = allTheaters.filter(t => t.provinceCode === provCode);
-                                            setTheater(filtered);
-                                            setselectedTheater("");
-                                        }}
-                                    >
-                                        <option value="">Chọn Tỉnh/ Thành phố</option>
-                                        {Array.isArray(locations) &&
-                                            locations.map((loc, idx) => (
-                                                <option key={idx} value={loc.code}>
-                                                    {loc.name}
-                                                </option>
-                                            ))}
-                                    </select>
-                                </div>
+                            <h4 className="text-center fw-bold mb-4">Chọn Rạp Của Bạn</h4>
+                            <div className={styles.formGroup}>
+                                <label>Tỉnh/ Thành phố</label>
+                                <select
+                                    value={selectedLocation}
+                                    onChange={e => {
+                                        const provCode = e.target.value;
+                                        setSelectedLocation(provCode);
+                                        const filtered = allTheaters.filter(t => t.provinceCode === provCode);
+                                        setTheater(filtered);
+                                        setselectedTheater("");
+                                    }}
+                                >
+                                    <option value="">Chọn Tỉnh/ Thành phố</option>
+                                    {Array.isArray(locations) &&
+                                        locations.map((loc, idx) => (
+                                            <option key={idx} value={loc.code}>{loc.name}</option>
+                                        ))}
+                                </select>
+                            </div>
 
-                                <div className={styles.formGroup}>
-                                    <label>Tên rạp</label>
-                                    <select style={{ fontSize: '14px' }}
-                                        value={selectedTheater}
-                                        onChange={e => {
-                                            const selectedValue = e.target.value;
-                                            setselectedTheater(selectedValue);
-
-                                            const selectedObj = theater.find(t => t.id.toString() === selectedValue);
-                                            if (selectedObj) {
-                                                localStorage.setItem('theater', JSON.stringify({
-                                                    id: selectedObj.id,
-                                                    name: selectedObj.name,
-                                                    theaterLocation: selectedObj.theaterLocation
-                                                }));
-                                                setShowChoseLocation(false);
-                                                window.location.reload();
-                                            }
-
-                                        }}>
-                                        <option value="">Chọn rạp</option>
-                                        {Array.isArray(theater) &&
-                                            theater.map((theaterItem, idx) => (
-                                                <option key={idx} value={theaterItem.id}>
-                                                    {theaterItem.name}
-                                                </option>
-                                            ))}
-                                    </select>
-                                </div>
+                            <div className={styles.formGroup}>
+                                <label>Tên rạp</label>
+                                <select
+                                    value={selectedTheater}
+                                    onChange={e => {
+                                        const selectedValue = e.target.value;
+                                        setselectedTheater(selectedValue);
+                                        const selectedObj = theater.find(t => t.id.toString() === selectedValue);
+                                        if (selectedObj) {
+                                            localStorage.setItem('theater', JSON.stringify({
+                                                id: selectedObj.id,
+                                                name: selectedObj.name,
+                                                theaterLocation: selectedObj.theaterLocation
+                                            }));
+                                            setShowChoseLocation(false);
+                                            window.location.reload();
+                                        }
+                                    }}
+                                >
+                                    <option value="">Chọn rạp</option>
+                                    {Array.isArray(theater) &&
+                                        theater.map((theaterItem, idx) => (
+                                            <option key={idx} value={theaterItem.id}>{theaterItem.name}</option>
+                                        ))}
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Popup Suất Chiếu */}
             <ShowtimePopup
                 show={showModal1}
                 movie={{ ...movieInfo, name: movieInfo.movieName, id: movieInfo.movieId || movieInfo.id }}
@@ -172,8 +166,16 @@ function Movies() {
                 savedTheater={savedTheater}
             />
 
+            {/* Hero Section */}
+            <header className={styles.heroSection}>
+                <div className="container">
+                    <h1 className={styles.heroTitle}>Thế Giới Điện Ảnh</h1>
+                    <p className={styles.heroSubtitle}>KHÁM PHÁ NHỮNG SIÊU PHẨM MỚI NHẤT TẠI FILMNEST</p>
+                </div>
+            </header>
 
-            <div className="container mt-5">
+            <div className="container">
+                {/* Tab Navigation */}
                 <div className={styles['tab-wrapper']}>
                     <div
                         className={`${styles.tab} ${nowShowing ? styles.active : ''}`}
@@ -189,93 +191,60 @@ function Movies() {
                     </div>
                 </div>
 
-                {nowShowing ? (
-                    <div className="row d-flex justify-content-center" style={{ maxWidth: '1400px', gap: '24px' }}>
-                        {showingNow.map((movie) => (
-                            <div className="col-md-2 mb-4" key={movie.movieId}>
-                                <div
-                                    className="card h-100 shadow-sm border-0"
-                                    style={{
-                                        borderRadius: '12px',
-                                        overflow: 'hidden',
-                                        transition: 'transform 0.3s ease',
-                                    }}
-                                >
-                                    <img
-                                        src={movie.image}
-                                        className="card-img-top"
-                                        alt={movie.movieName}
-                                        style={{
-                                            height: '320px',
-                                            objectFit: 'cover',
-                                            borderRadius: '12px',
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={() => handleMovieDetails(movie.movieId)}
-                                    />
-                                    <div className="card-body px-3 py-2 ps-0 pe-0">
-                                        <h6 className={`card-title pb-2 fw-bold ${styles.ellipsis} `} style={{ color: '#0d6efd', cursor: 'pointer' }} onClick={() => handleMovieDetails(movie.movieId)}>
-                                            {movie.movieName}
-                                        </h6>
-                                        <p className={`mb-1 ${styles.ellipsis}`} style={{ fontSize: '14px' }}>
-                                            <strong>Thể loại:</strong> {movie.genre}
-                                        </p>
-                                        <p className={`mb-2 ${styles.ellipsis}`} style={{ fontSize: '14px' }}>
-                                            <strong>Thời lượng:</strong> {movie.duration}
-                                        </p>
-                                        <button className="btn btn-primary btn-sm w-100 rounded" onClick={() => handleOpenModal(movie)}>
-                                            Đặt vé
-                                        </button>
-                                    </div>
-                                </div>
+                {/* Movie Grid */}
+                <div className={styles.movieGrid}>
+                    {(nowShowing ? showingNow : commingSoon).map((movie) => (
+                        <article className={styles.movieCard} key={movie.movieId || movie.id}>
+                            <div className={styles.imageContainer}>
+                                <img
+                                    src={movie.image}
+                                    className={styles.movieImage}
+                                    alt={movie.movieName || movie.name}
+                                    onClick={() => handleMovieDetails(movie.movieId || movie.id)}
+                                />
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="row d-flex justify-content-center" style={{ maxWidth: '1400px', gap: '24px' }}>
-                        {commingSoon.map((movie) => (
-                            <div className="col-md-2 mb-4" key={movie.id}>
-                                <div
-                                    className="card h-100 shadow-sm border-0"
-                                    style={{
-                                        borderRadius: '12px',
-                                        overflow: 'hidden',
-                                        transition: 'transform 0.3s ease',
-                                    }}
+                            
+                            <div className={styles.cardBody}>
+                                <h6 
+                                    className={styles.movieTitle} 
+                                    onClick={() => handleMovieDetails(movie.movieId || movie.id)}
                                 >
-                                    <img
-                                        src={movie.image}
-                                        className="card-img-top"
-                                        alt={movie.name}
-                                        style={{
-                                            height: '300px',
-                                            objectFit: 'cover',
-                                            borderRadius: '12px',
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={() => handleMovieDetails(movie.id)}
-                                    />
-                                    <div className="card-body px-3 py-2 pe-0 ps-0" style={{ minWidth: 0 }}>
-                                        <h6 className={`card-title pb-2 fw-bold ${styles.ellipsis} `} style={{ color: '#0d6efd', cursor: 'pointer' }} onClick={() => handleMovieDetails(movie.movieId)}>
-                                            {movie.name}
-                                        </h6>
-                                        <p className={`mb-1 ${styles.ellipsis}`} style={{ fontSize: '14px' }}>
-                                            <strong>Thể loại:</strong> {movie.genre}
-                                        </p>
-                                        <p className={`mb-2 ${styles.ellipsis}`} style={{ fontSize: '14px' }}>
-                                            <strong>Ngày khởi chiếu:</strong> {new Date(movie.releaseDate).toLocaleDateString('vi-VN', {
-                                                day: '2-digit',
-                                                month: '2-digit',
-                                                year: 'numeric'
+                                    {movie.movieName || movie.name}
+                                </h6>
+                                
+                                <div className={styles.infoRow}>
+                                    <span className={styles.infoLabel}>Thể loại</span>
+                                    <span className={styles.ellipsis}>{movie.genre}</span>
+                                </div>
+                                
+                                {nowShowing ? (
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Thời lượng</span>
+                                        <span>{movie.duration} phút</span>
+                                    </div>
+                                ) : (
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Khởi chiếu</span>
+                                        <span>
+                                            {new Date(movie.releaseDate).toLocaleDateString('vi-VN', {
+                                                day: '2-digit', month: '2-digit', year: 'numeric'
                                             })}
-                                        </p>
-                                        <button className="btn btn-primary btn-sm w-100 rounded" onClick={() => handleOpenModal(movie)}>
-                                            Đặt vé
-                                        </button>
+                                        </span>
                                     </div>
-                                </div>
+                                )}
+                                
+                                <button className={styles.btnBooking} onClick={() => handleOpenModal(movie)}>
+                                    {nowShowing ? "ĐẶT VÉ NGAY" : "XEM THÔNG TIN"}
+                                </button>
                             </div>
-                        ))}
+                        </article>
+                    ))}
+                </div>
+                
+                {(nowShowing ? showingNow : commingSoon).length === 0 && (
+                    <div className="text-center py-5">
+                        <i className="bi bi-film text-muted fs-1 mb-3"></i>
+                        <h5 className="text-muted">Hiện chưa có phim nào trong danh mục này.</h5>
                     </div>
                 )}
             </div>
