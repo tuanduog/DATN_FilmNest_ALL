@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface ShowTimeService {
 
-    public List<ShowTimeDTO> getByMovieId(int movieId);
+    public List<ShowTimeDTO> getByMovieId(int theaterId, int movieId);
 
     public List<ShowTimeResponse> getShowTime();
 
@@ -26,4 +26,6 @@ public interface ShowTimeService {
     public void deleteShowTime(Integer id);
 
     public List<ShowTimeResponse> getShowtimeByRoomId(int id);
+
+
 }

@@ -38,7 +38,7 @@ public class SecurityConfig {
             "/movie/**", "/wsocket/**", "/topic/**", "/app/**", "/sockjs/**", "/api/theater/**", "/api/membership/**",
             "/movie/get-movie/**", "/api/room/**", "/api/employee/**", "/api/movie/**", "/api/showtime/**", "/api/banner/**",
             "/auth/get-showtime/**", "/api/files/upload/image", "/booking/**", "/reviews/get-Top5Movies",
-            "/comments/getAll-Comments/**" };
+            "/api/comment/**", "/api/review/**" };
 
     @Bean
     public JwtCookieFilter jwtCookieFilter() {

@@ -132,7 +132,7 @@ public class TheaterServiceImpl implements TheaterService {
 
     @Override
     public void deleteTheater(int id) {
-        Theater theater = theaterRepository.findById(id).get();
+        Theater theater = theaterRepository.findById(id).orElseThrow(() -> new RuntimeException("Theater does not exist"));
         theater.setStatus(Status.INACTIVE);
 
         theaterRepository.save(theater);

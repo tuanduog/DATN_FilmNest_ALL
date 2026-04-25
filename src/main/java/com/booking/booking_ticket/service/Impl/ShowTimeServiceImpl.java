@@ -1,8 +1,6 @@
 package com.booking.booking_ticket.service.Impl;
 
-import com.booking.booking_ticket.dto.RoomDTO;
 import com.booking.booking_ticket.dto.ShowTimeDTO;
-import com.booking.booking_ticket.dto.TheaterDTO;
 import com.booking.booking_ticket.dto.request.ShowTimeRequest;
 import com.booking.booking_ticket.dto.response.ShowTimeResponse;
 import com.booking.booking_ticket.entity.Movie;
@@ -22,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,30 +34,8 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     private final Util util;
 
     @Override
-    public List<ShowTimeDTO> getByMovieId(int movieId) {
-        List<ShowTime> entities = showTimeRepository.findByMovie_Id(movieId);
-
-        return entities.stream().map(show -> {
-            Room room = show.getRoom();
-            Theater theater = room.getTheater();
-
-            TheaterDTO theaterDTO = new TheaterDTO(
-                    theater.getId(),
-                    theater.getName(),
-                    theater.getAddress());
-
-            RoomDTO roomDTO = new RoomDTO(
-                    room.getId(),
-                    room.getName(),
-                    room.getCapacity(),
-                    room.getType(),
-                    theaterDTO);
-
-            return new ShowTimeDTO(
-                    show.getId(),
-                    show.getStartTime(),
-                    roomDTO);
-        }).toList();
+    public List<ShowTimeDTO> getByMovieId(int theaterId, int movieId) {
+        return showTimeRepository.findAllByTheaterIdAndMovieId(theaterId, movieId);
     }
 
     @Override

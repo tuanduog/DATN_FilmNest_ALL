@@ -20,6 +20,4 @@ public class RoomDTO {
     Integer capacity;
 
     RoomType roomType;
-
-    TheaterDTO theater;
 }

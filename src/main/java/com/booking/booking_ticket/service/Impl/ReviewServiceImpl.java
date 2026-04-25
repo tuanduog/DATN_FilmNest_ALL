@@ -7,6 +7,7 @@ import com.booking.booking_ticket.repository.MovieRepository;
 import com.booking.booking_ticket.repository.ReviewRepository;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.service.ReviewService;
+import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,19 +40,20 @@ public class ReviewServiceImpl implements ReviewService {
                     review.setUpdatedAt(Instant.now());
                     return reviewRepository.save(review);
                 }).orElseGet(() -> {
-                    Review newReviews = new Review();
-                    newReviews.setPoint(newPoint);
-                    newReviews.setCreatedAt(Instant.now());
-                    newReviews.setUpdatedAt(Instant.now());
+                    Review newReview = new Review();
+                    newReview.setPoint(newPoint);
+                    newReview.setCreatedAt(Instant.now());
+                    newReview.setUpdatedAt(Instant.now());
 
                     Users user = usersRepository.findById(userId)
                             .orElseThrow(() -> new RuntimeException("User không tồn tại"));
                     Movie movie = movieRepository.findById(movieId)
                             .orElseThrow(() -> new RuntimeException("Movie không tồn tại"));
 
-                    newReviews.setUser(user);
-                    newReviews.setMovie(movie);
-                    return reviewRepository.save(newReviews);
+                    newReview.setUser(user);
+                    newReview.setMovie(movie);
+                    newReview.setStatus(Status.ACTIVE);
+                    return reviewRepository.save(newReview);
                 });
     }
 
@@ -66,6 +68,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<Object[]> getTop5Movies(){
-        return reviewRepository.findTop10MoviesByAverageRating(PageRequest.of(0, 5));
+        return reviewRepository.findTop5Movies(PageRequest.of(0, 5));
     }
 }

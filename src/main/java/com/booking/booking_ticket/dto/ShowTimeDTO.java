@@ -1,7 +1,9 @@
 package com.booking.booking_ticket.dto;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.booking.booking_ticket.utils.RoomType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,9 +14,17 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShowTimeDTO {
 
-    Integer showTimeId;
+    Integer id;
+
+    LocalDate showDate;
 
     LocalTime startTime;
 
-    RoomDTO roomName;
+    Integer roomId;
+
+    String roomName;
+
+    RoomType roomType;
+
+    Integer capacity;
 }

@@ -17,14 +17,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
-@RequestMapping("/reviews")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/review")
 public class ReviewController {
 
     @Autowired
     private ReviewService reviewService;
 
-    @PutMapping("/update-Rate/{movieId}/{userId}")
+    @PutMapping("/v1/{movieId}/{userId}")
     public ResponseEntity<?> updateOrCreateRate(@PathVariable Integer movieId, @PathVariable Integer userId, @RequestBody Map<String, Object> payload) {
         Integer starValue = (Integer) payload.get("starValue");
         Review review = reviewService.updateOrCreateReviews(movieId, userId, starValue);
@@ -32,7 +31,7 @@ public class ReviewController {
         return ResponseEntity.ok(review);
     }
 
-    @GetMapping("/get-Review/{movieId}/{userId}")
+    @GetMapping("/v1/{movieId}/{userId}")
     public ResponseEntity<?> getReview(@PathVariable Integer movieId, @PathVariable Integer userId) {
         Review rv = reviewService.getReview(movieId, userId);
         if(rv != null){
@@ -41,7 +40,7 @@ public class ReviewController {
         return ResponseEntity.badRequest().body("Không tìm thấy review");
     }
 
-    @GetMapping("/get-Top5Movies")
+    @GetMapping("/v1/top")
     public ResponseEntity<?> getTop5Movies() {
         List<Object[]> top5 = reviewService.getTop5Movies();
 

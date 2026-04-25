@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.repository;
 
+import com.booking.booking_ticket.dto.ShowTimeDTO;
 import com.booking.booking_ticket.dto.response.ShowTimeResponse;
 import com.booking.booking_ticket.utils.Status;
 import org.springframework.data.domain.Page;
@@ -28,9 +29,6 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer>{
             "JOIN s.movie m")
     List<ShowTimeResponse> findAllShowtimes();
 
-    @Query("SELECT s f from ShowTime  s where s.room.id = :roomId")
-    List<ShowTime> findShowtimeByRoomId(Integer roomId);
-
     @Query("SELECT new com.booking.booking_ticket.dto.response.ShowTimeResponse(s.id, s.showDate, s.startTime) " +
             "FROM ShowTime s " +
             "JOIN s.room r " +
@@ -56,4 +54,14 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer>{
             AND (:id IS NULL OR s.id <> :id)
     """)
     Optional<ShowTime> validateShowTime(LocalDate showDate, LocalTime startTime, int movieId, int roomId, Integer id);
+
+    @Query("""
+        SELECT new com.booking.booking_ticket.dto.ShowTimeDTO(st.id, st.showDate, st.startTime, r.id, r.name, r.type, r.capacity)
+        FROM ShowTime st
+            JOIN Movie m ON m.id = st.movie.id
+            JOIN Room r ON r.id = st.room.id
+        WHERE r.theater.id = :theaterId
+            AND m.id = :movieId
+    """)
+    List<ShowTimeDTO> findAllByTheaterIdAndMovieId(int theaterId, int movieId);
 }

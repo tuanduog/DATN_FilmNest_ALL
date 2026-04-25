@@ -12,18 +12,17 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-@CrossOrigin(origins = "http://localhost:5173")
-@RequestMapping("/comments")
+@RequestMapping("/api/comment")
 public class CmtRestController {
 
     @Autowired
     private CommentService commentService;
 
-    @GetMapping("/getAll-Comments/{movieId}")
+    @GetMapping("/v1/{movieId}")
     public ResponseEntity<?> getAllComments(@PathVariable Integer movieId) {
         try {
-            List<CommentDTO> cmts = commentService.getAllComment(movieId);
-            return ResponseEntity.ok(cmts);
+            List<CommentDTO> comments = commentService.getAllComment(movieId);
+            return ResponseEntity.ok(comments);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error get comments: " + e.getMessage());

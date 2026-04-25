@@ -21,13 +21,13 @@ import com.booking.booking_ticket.dto.ShowTimeDTO;
 @RequestMapping("/api/showtime")
 @Slf4j
 public class ShowTimeController {
+
     @Autowired
     private ShowTimeService showTimeService;
 
-    @GetMapping("/get-showtime/{id}")
-        public ResponseEntity<?> getMovie(@PathVariable int id) {
-        List<ShowTimeDTO> showTimes = showTimeService.getByMovieId(id);
-        return ResponseEntity.ok(showTimes);
+    @GetMapping("/v1/movie/{theaterId}/{movieId}")
+    public ResponseData<?> getByMovieId(@PathVariable int theaterId, @PathVariable int movieId){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", showTimeService.getByMovieId(theaterId, movieId));
     }
 
     @GetMapping("/get-showtime-ByRoomId")
