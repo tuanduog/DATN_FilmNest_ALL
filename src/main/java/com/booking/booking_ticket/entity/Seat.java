@@ -2,7 +2,6 @@ package com.booking.booking_ticket.entity;
 
 import com.booking.booking_ticket.utils.SeatStatus;
 import com.booking.booking_ticket.utils.SeatType;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

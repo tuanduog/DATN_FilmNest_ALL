@@ -31,5 +31,4 @@ public class SeatSelectingController {
                 + "/" + seatSelectingDTO.getDate(), lockedSeats);
         return seatSelectingDTO;
     }
-
 }
