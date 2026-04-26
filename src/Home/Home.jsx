@@ -18,7 +18,7 @@ function Homepage() {
     const [commingSoon, setCommingSoon] = useState([]);
     const [movieInfo, setMovieInfo] = useState(null);
     const [showShowtime, setShowShowtime] = useState(false);
-    const savedTheater = JSON.parse(localStorage.getItem('theater'));
+    const [savedTheater, setSavedTheater] = useState(JSON.parse(localStorage.getItem('theater')));
     const [showChoseLocation, setShowChoseLocation] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState("");
     const [selectedTheater, setselectedTheater] = useState(savedTheater?.id || "");
@@ -102,6 +102,13 @@ function Homepage() {
 
     useEffect(() => {
         handleTheaters();
+        const handleTheaterChange = () => {
+            const updated = JSON.parse(localStorage.getItem('theater'));
+            setSavedTheater(updated);
+            setselectedTheater(updated?.id || "");
+        };
+        window.addEventListener('theaterChange', handleTheaterChange);
+        return () => window.removeEventListener('theaterChange', handleTheaterChange);
     }, []);
 
     const settings = {
@@ -147,7 +154,7 @@ function Homepage() {
                         <button className={styles.closeBtn} onClick={() => setShowChoseLocation(false)}>
                             <i className="bi bi-x-lg"></i>
                         </button>
-                        
+
                         <div className={styles.content}>
                             <h4 className="fw-bold mb-4 text-center">Chọn Khu Vực & Rạp</h4>
                             <div className={styles.formGroup}>
@@ -185,7 +192,7 @@ function Homepage() {
                                                 theaterLocation: selectedObj.theaterLocation
                                             }));
                                             setShowChoseLocation(false);
-                                            window.location.reload();
+                                            window.dispatchEvent(new Event('theaterChange'));
                                         }
                                     }}
                                 >
@@ -252,19 +259,19 @@ function Homepage() {
                                     onClick={() => handleMovieDetails(movie.id)}
                                 />
                                 <div className={styles.cardBody}>
-                                    <h6 
-                                        className={styles.cardTitleCustom} 
-                                        onClick={() => handleMovieDetails(movie.id)} 
+                                    <h6
+                                        className={styles.cardTitleCustom}
+                                        onClick={() => handleMovieDetails(movie.id)}
                                         title={movie.name}
                                     >
                                         {movie.name}
                                     </h6>
-                                    
+
                                     <div className={styles.infoRow}>
                                         <span className={styles.infoLabel}>Thể loại</span>
                                         <span className={styles.ellipsis}>{movie.genre}</span>
                                     </div>
-                                    
+
                                     {nowShowing ? (
                                         <div className={styles.infoRow}>
                                             <span className={styles.infoLabel}>Thời lượng</span>
@@ -280,16 +287,16 @@ function Homepage() {
                                             </span>
                                         </div>
                                     )}
-                                    
+
                                     <button className={styles.btnBook} onClick={() => handleOpenModal(movie)}>
-                                        {nowShowing ? "ĐẶT VÉ NGAY" : "XEM THÔNG TIN"}
+                                        ĐẶT VÉ NGAY
                                     </button>
                                 </div>
                             </article>
                         </div>
                     ))}
                 </div>
-                
+
                 {(nowShowing ? showingNow : commingSoon).length === 0 && (
                     <div className="text-center py-5">
                         <i className="bi bi-film text-muted fs-1 mb-3"></i>

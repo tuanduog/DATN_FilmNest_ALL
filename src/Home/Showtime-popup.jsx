@@ -22,7 +22,7 @@ const ShowtimePopup = ({ show, movie, onClose, savedTheater }) => {
             }
             fetchShowTime(movie.id);
         }
-    }, [show, movie]);
+    }, [show, movie, savedTheater]);
 
     const generateAvailableShowDates = (releasedDateStr, numberOfDays) => {
         const today = new Date();
@@ -55,6 +55,7 @@ const ShowtimePopup = ({ show, movie, onClose, savedTheater }) => {
         try {
             const res = await axios.get(`http://localhost:8099/api/showtime/v1/movie/${savedTheater?.id}/${movieId}`);
             setShowTime(res.data.data);
+            console.log(res.data.data);
         } catch (error) {
             console.error("Lỗi khi lấy lịch chiếu", error);
             setShowTime([]);
@@ -285,7 +286,7 @@ const ShowtimePopup = ({ show, movie, onClose, savedTheater }) => {
                                 <tbody>
                                     <tr>
                                         <td className="py-3 text-dark fw-bold">{savedTheater?.name}</td>
-                                        <td className="py-3 text-dark fw-bold">{selectedDate}/2025</td>
+                                        <td className="py-3 text-dark fw-bold">{selectedDate}/2026</td>
                                         <td className="py-3 text-primary fw-bold">{selectedTime?.startTime.slice(0, 5)}</td>
                                     </tr>
                                 </tbody>

@@ -48,6 +48,15 @@ function Theater() {
     fetchTheater();
   }, [theater.id]);
 
+  useEffect(() => {
+    const handleTheaterChange = () => {
+      const updatedTheater = JSON.parse(localStorage.getItem('theater')) || {};
+      setTheater(updatedTheater);
+    };
+    window.addEventListener('theaterChange', handleTheaterChange);
+    return () => window.removeEventListener('theaterChange', handleTheaterChange);
+  }, []);
+
   const handleMovieDetail = (id) => {
     navigate(`/movie/detail/${id}`);
     window.scrollTo(0, 0);
@@ -126,9 +135,9 @@ function Theater() {
                       {theater.address}
                     </p>
                     {theater.latitude && theater.longitude && (
-                      <a 
-                        href={`https://www.google.com/maps?q=${theater.latitude},${theater.longitude}`} 
-                        target="_blank" 
+                      <a
+                        href={`https://www.google.com/maps?q=${theater.latitude},${theater.longitude}`}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className={styles.googleMapsBtn}
                       >

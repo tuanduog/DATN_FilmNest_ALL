@@ -150,8 +150,30 @@ function Header() {
 
     useEffect(() => {
         window.addEventListener('authChange', handleAuth);
-        return () => window.removeEventListener('authChange', handleAuth);
-    }, [handleAuth]);
+        
+        const handleTheaterChange = () => {
+            const theaterSaved = JSON.parse(localStorage.getItem("theater") || '{}');
+            if (theaterSaved.id) {
+                setselectedTheater(theaterSaved.id.toString());
+                const found = allTheaters.find(t => t.id.toString() === theaterSaved.id.toString());
+                if (found) {
+                    setSelectedLocation(found.provinceCode);
+                    const filtered = allTheaters.filter(t => t.provinceCode === found.provinceCode);
+                    setTheater(filtered);
+                }
+            } else {
+                setselectedTheater("");
+                setSelectedLocation("");
+                setTheater([]);
+            }
+        };
+        window.addEventListener('theaterChange', handleTheaterChange);
+
+        return () => {
+            window.removeEventListener('authChange', handleAuth);
+            window.removeEventListener('theaterChange', handleTheaterChange);
+        };
+    }, [handleAuth, allTheaters]);
 
     const handleNavigate = (path) => () => navigate(path);
 
@@ -231,7 +253,7 @@ function Header() {
                                                     theaterLocation: selectedObj.theaterLocation
                                                 }));
                                                 setShowChoseLocation(false);
-                                                window.location.reload();
+                                                window.dispatchEvent(new Event('theaterChange'));
                                             }
 
                                         }}>
@@ -388,7 +410,7 @@ function Header() {
                                                         name: selectedObj.name,
                                                         theaterLocation: selectedObj.theaterLocation
                                                     }));
-                                                    window.location.reload();
+                                                    window.dispatchEvent(new Event('theaterChange'));
                                                 }
                                             }}
                                         >

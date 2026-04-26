@@ -19,7 +19,7 @@ function Movie_detail() {
     const location = useLocation();
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
-    const savedTheater = JSON.parse(localStorage.getItem('theater'));
+    const [savedTheater, setSavedTheater] = useState(JSON.parse(localStorage.getItem('theater')));
     const [showChoseLocation, setShowChoseLocation] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState("");
     const [selectedTheater, setselectedTheater] = useState("");
@@ -69,6 +69,11 @@ function Movie_detail() {
 
     useEffect(() => {
         handleTheaters();
+        const handleTheaterChange = () => {
+            setSavedTheater(JSON.parse(localStorage.getItem('theater')));
+        };
+        window.addEventListener('theaterChange', handleTheaterChange);
+        return () => window.removeEventListener('theaterChange', handleTheaterChange);
     }, []);
 
     const updateOrCreateRate = async (starValue, movieId) => {
@@ -241,7 +246,7 @@ function Movie_detail() {
                                     const selected = theater.find(t => t.id && t.id.toString() === val);
                                     if (selected) {
                                         localStorage.setItem('theater', JSON.stringify({ id: selected.id, name: selected.name, theaterLocation: selected.theaterLocation }));
-                                        window.location.reload();
+                                        window.dispatchEvent(new Event('theaterChange'));
                                     }
                                 }}>
                                     <option value="">Chọn rạp</option>

@@ -1,120 +1,94 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import styles from '../Payment/Payment_info.module.css';
-import { FaPlus, FaMinus, FaUser } from "react-icons/fa";
+import { FaPlus, FaMinus, FaUser, FaTicketAlt, FaClock, FaTag, FaInfoCircle, FaHourglassHalf } from "react-icons/fa";
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import vnpay_logo from '../assets/vnpay_logo.png';
-// import momo_logo from '../assets/MoMo_Logo.png';
-import { useLocation } from "react-router-dom";
-import pic1 from '../assets/familycombo.png';
-import pic2 from '../assets/sweetcombo.png';
-import pic3 from '../assets/betacombo.png';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { GiConsoleController } from "react-icons/gi";
 import { toast } from "react-toastify";
 
 function PaymentInfo() {
-  const userInfo = JSON.parse(sessionStorage.getItem('user'));
+  const userInfo = useMemo(() => JSON.parse(sessionStorage.getItem('user')) || {}, []);
+  const bookingInfo = useMemo(() => JSON.parse(localStorage.getItem('bookingInfo')) || {}, []);
+  const savedTheater = useMemo(() => JSON.parse(localStorage.getItem('theater')) || {}, []);
+
   const [membership, setMembership] = useState({});
+  const [combos, setCombos] = useState([]);
+  const [comboCounts, setComboCounts] = useState({}); // Use ID as key
+
   const location = useLocation();
   const navigate = useNavigate();
-  const { total, selectedSeats, seatTypes } = location.state;
+
+  // Get data from location state or fallback
+  const { total = 0, selectedSeats = [], seatTypes = [] } = location.state || {};
+
   const [totalPrice, setTotalPrice] = useState(total);
   const [voucher, setVoucher] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
-  const [text, setText] = useState("");
-  const [textOk, setTextOk] = useState("");
+  const [voucherStatus, setVoucherStatus] = useState({ show: false, ok: false, text: "" });
   const [discount, setDiscount] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(() => {
-          const storedTime = localStorage.getItem('timeLeft');
-          return storedTime ? parseInt(storedTime, 10) : 600;
-      });
-  const seatsWithType = selectedSeats.map((seat, index) => ({
-    seat,
-    type: seatTypes[index]
-  }));
 
-  const vipSeats = seatsWithType.filter(item => item.type === "vip");
-  const normalSeats = seatsWithType.filter(item => item.type === "normal");
-  const coupleSeats = seatsWithType.filter(item => item.type === "couple");
-  const [comboCounts, setComboCounts] = useState({
-    family: 0,
-    sweet: 0,
-    beta: 0
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const storedTime = localStorage.getItem('timeLeft');
+    return storedTime ? parseInt(storedTime, 10) : 600;
   });
 
-  const handleIncrement = (key) => {
-  setComboCounts(prev => ({
-    ...prev,
-    [key]: prev[key] + 1
-  }));
-};
+  const seatsWithType = useMemo(() => selectedSeats.map((seat, index) => ({
+    seat,
+    type: seatTypes[index] || "normal"
+  })), [selectedSeats, seatTypes]);
 
-const handleDecrement = (key) => {
-  setComboCounts(prev => ({
-    ...prev,
-    [key]: Math.max(0, prev[key] - 1)
-  }));
-};
-useEffect(() => {
-  const comboPrices = {
-    family: 113000,
-    sweet: 80000,
-    beta: 60000
-  }
-  let vipDiscount = 1;
-  if(membership.membership === "vip tháng") vipDiscount = 0.85;
-  if(membership.membership === "vip năm") vipDiscount = 0.8;
+  const handleIncrement = (id) => {
+    setComboCounts(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  };
 
-  const res = comboPrices.family * comboCounts.family
-  + comboPrices.sweet * comboCounts.sweet + comboPrices.beta * comboCounts.beta;
+  const handleDecrement = (id) => {
+    setComboCounts(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 0) - 1) }));
+  };
 
-  const newTotal = total + res * vipDiscount;
-  setTotalPrice(newTotal);
-},[comboCounts, membership, total]);
+  useEffect(() => {
+    let comboDiscountRate = 1;
+    if (membership.membership === "vip tháng") comboDiscountRate = 0.85;
+    if (membership.membership === "vip năm") comboDiscountRate = 0.8;
 
-const handleVoucher = () => {
-  setShowAlert(true);
-  if(voucher === 'DHDT01'){
-    if(totalPrice < 200000){
-      setText("Voucher không áp dụng được với đơn hàng của bạn!!");
-      setTextOk("");
-      setDiscount(false);
+    const comboTotal = combos.reduce((acc, combo) => {
+      const count = comboCounts[combo.id] || 0;
+      return acc + (combo.price * count);
+    }, 0) * comboDiscountRate;
+
+    setTotalPrice(total + comboTotal);
+  }, [comboCounts, membership, total, combos]);
+
+  const handleVoucher = () => {
+    if (voucher === 'DHDT01') {
+      if (totalPrice < 200000) {
+        setVoucherStatus({ show: true, ok: false, text: "Voucher chỉ áp dụng cho đơn hàng từ 200.000 VNĐ" });
+        setDiscount(false);
+      } else {
+        setVoucherStatus({ show: true, ok: true, text: "Áp dụng voucher thành công! Giảm 15%" });
+        setDiscount(true);
+      }
     } else {
-      setTextOk("Áp dụng voucher thành công!!");
-      setText("");
-      setDiscount(true);
+      setVoucherStatus({ show: true, ok: false, text: "Mã voucher không hợp lệ" });
+      setDiscount(false);
     }
-  } else {
-    setText("Nhập sai voucher!!");
-    setTextOk("");
-    setDiscount(false);
-  }
-}
-  const generatePaymentId = () => {
-      return 'xxxxxxxx-xxxx-xxxx'.replace(/[x]/g, () =>
-        Math.floor(Math.random() * 16).toString(16)
-      );
-    }
-    const [paymentId, setPaymentId] = useState(() => {
-      const storedId = localStorage.getItem('paymentId');
-      if(storedId) return storedId;
-      const newId = generatePaymentId();
-      localStorage.setItem('paymentId', newId);
-      return newId;
-    })
+  };
+
   const handlePayment = async () => {
     const finalPrice = discount ? totalPrice * 0.85 : totalPrice;
     localStorage.setItem('price', finalPrice);
+
     try {
+      const paymentId = localStorage.getItem('paymentId') ||
+        'xxxxxxxx-xxxx-xxxx'.replace(/[x]/g, () => Math.floor(Math.random() * 16).toString(16));
+      localStorage.setItem('paymentId', paymentId);
+
       const res = await axios.post("http://localhost:8099/Order/create", {
         productName: 'Đơn hàng: ' + paymentId,
-        description: 'Thanh toán đơn hàng',
+        description: 'Thanh toán vé xem phim FilmNest',
         price: finalPrice,
         returnUrl: "http://localhost:5173/Booking_history",
         cancelUrl: "http://localhost:5173",
       }, { withCredentials: true });
-      console.log("res.data:", res.data);
+
       const payUrl = res.data?.data?.checkoutUrl;
       if (payUrl) {
         window.location.href = payUrl;
@@ -126,266 +100,248 @@ const handleVoucher = () => {
       toast.error("Tạo đơn thanh toán thất bại!");
     }
   };
-  useEffect(() => {
-  const selectedCombos = [];
-
-  if (comboCounts.family > 0) {
-    selectedCombos.push(`Family Combo x${comboCounts.family}`);
-  }
-  if (comboCounts.sweet > 0) {
-    selectedCombos.push(`Sweet Combo x${comboCounts.sweet}`);
-  }
-  if (comboCounts.beta > 0) {
-    selectedCombos.push(`Beta Combo x${comboCounts.beta}`);
-  }
-
-  const comboString = selectedCombos.join(', ');
-  localStorage.setItem('selectedCombos', comboString); 
-}, [comboCounts]);
 
   useEffect(() => {
-    if(totalPrice < 200000){
-      setDiscount(false);
-    }
-  });
-  const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    const fetchCombo = async () => {
+      try {
+        const res = await axios.get("http://localhost:8099/api/combo/v1", {
+          params: { page: 0, size: 100, status: 'ACTIVE' }
+        });
+        setCombos(res.data.data.content);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách combo", error);
+      }
     };
-  useEffect(() => {
-          if (timeLeft <= 0) {
-              localStorage.removeItem("timeLeft");
-              navigate("/");
-          } else {
-              localStorage.setItem('timeLeft', timeLeft);
-          }
-  
-          const interval = setInterval(() => {
-              setTimeLeft(prev => prev - 1);
-          }, 1000);
-  
-          return () => clearInterval(interval); 
-      }, [timeLeft]);
+    fetchCombo();
+  }, []);
 
-  const fetchMember = async () => {
-        try {
-            const res = await axios.get(`http://localhost:8099/auth/get-Membership/${userInfo.userId}`, 
-                { withCredentials: true}
-            )
-            setMembership(res.data);
-            console.log(res.data);
-        } catch (error) {   
-            console.error("Khong lay duoc membership", error);
-        }
+  useEffect(() => {
+    const selectedCombosStr = combos
+      .filter(combo => comboCounts[combo.id] > 0)
+      .map(combo => `${combo.name} x${comboCounts[combo.id]}`)
+      .join(', ');
+    localStorage.setItem('selectedCombos', selectedCombosStr);
+  }, [comboCounts, combos]);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      localStorage.removeItem("timeLeft");
+      navigate("/");
+    } else {
+      localStorage.setItem('timeLeft', timeLeft);
     }
-    useEffect(() => {
-      fetchMember();
-    },[]);
+    const interval = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    return () => clearInterval(interval);
+  }, [timeLeft, navigate]);
+
+  useEffect(() => {
+    const fetchMember = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8099/auth/get-Membership/${userInfo.userId}`, { withCredentials: true });
+        setMembership(res.data);
+      } catch (error) {
+        console.error("Không lấy được membership", error);
+      }
+    };
+    if (userInfo.userId) fetchMember();
+  }, [userInfo.userId]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  if (!location.state) {
+    return (
+      <div className="container py-5 text-center">
+        <h3>Không tìm thấy thông tin thanh toán!</h3>
+        <button className="btn btn-primary mt-3" onClick={() => navigate("/")}>Quay lại trang chủ</button>
+      </div>
+    );
+  }
+
+  const finalAmount = discount ? totalPrice * 0.85 : totalPrice;
+  const comboTotalCalculated = combos.reduce((acc, combo) => acc + (combo.price * (comboCounts[combo.id] || 0)), 0);
 
   return (
-    <div className={styles.container}>
-      {/* Thông tin thanh toán */}
-      <div className={styles.box}>
-        <h5 className={styles.title}>
-          <FaUser className={styles.icon} /> THÔNG TIN THANH TOÁN
-        </h5>
-        <div className={styles.infoRow}>
-          <div><strong>Họ Tên:</strong> {userInfo.username}</div>
-          <div><strong>Số điện thoại:</strong> {userInfo.phoneNumber}</div>
-          <div><strong>Email:</strong> {userInfo.email}</div>
-        </div>
-        <hr />
-        {vipSeats.length > 0 && (
-          <div className={styles.infoRow}>
-            <h6><strong>GHẾ VIP</strong></h6>
-            <p className={styles.priceRow}>{vipSeats.length} x 100000 = {vipSeats.length * 100000} VNĐ</p>
-          </div>
-        )}
-        {normalSeats.length > 0 && (
-          <div className={styles.infoRow}>
-            <h6><strong>GHẾ THƯỜNG</strong></h6>
-            <p className={styles.priceRow}>{normalSeats.length} x 70000 = {normalSeats.length * 70000} VNĐ</p>
-          </div>
-        )}
-        {coupleSeats.length > 0 && (
-          <div className={styles.infoRow}>
-            <h6><strong>GHẾ COUPLE</strong></h6>
-            <p className={styles.priceRow}>{coupleSeats.length} x 130000 = {coupleSeats.length * 130000} VNĐ</p>
-          </div>
-        )}
-      </div>
+    <div className={styles.paymentPage}>
+      <div className={styles.container}>
+        <div className={styles.layout}>
 
-      {/* Combo ưu đãi */}
-      <div className={styles.box}>
-        <h5 className={styles.title}>
-          <img
-            src="https://img.icons8.com/ios/24/000000/popcorn.png"
-            alt="combo"
-            className={styles.icon}
-          />
-          COMBO ƯU ĐÃI 
-          {membership.membership === "vip tháng" ?
-          <span style={{fontWeight: 'normal', fontSize: '15px', color: 'red'}}>
-            <span style={{textTransform: 'uppercase', fontWeight: 'bold'}}>{membership.membership}</span> giảm giá 15%</span> : <></>}
-          {membership.membership === "vip năm" ?
-          <span style={{fontWeight: 'normal', fontSize: '15px', color: 'red'}}>
-            <span style={{textTransform: 'uppercase', fontWeight: 'bold'}}>{membership.membership}</span> giảm giá 20%</span> : <></>}
-        </h5>
+          {/* Main Content Area */}
+          <main className={styles.mainContent}>
 
-        <table className={styles.comboTable}>
-          <thead>
-            <tr>
-              <th>Tên Combo</th>
-              <th>Mô tả</th>
-              <th>Số lượng</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Combo 1 */}
-            <tr>
-              <td className={styles.comboInfo}>
-                <img src={pic1} alt="Combo" className={styles.comboImg} />
-                <span>Family Combo 113K</span>
-              </td>
-              <td>
-                <span className={styles.discount}>TIẾT KIỆM 65K!!!</span><br />
-                Gồm: 2 Bắp (69oz) + 4 Nước có gaz (22oz) + 2 Snack Oishi (80g) (22oz)
-              </td>
-              <td>
-                <div className={styles.quantityControl}>
-                  <button onClick={() => handleDecrement("family", membership.membership)}> <FaMinus /> </button>
-                  <span>{comboCounts.family}</span>
-                  <button onClick={() => handleIncrement("family", membership.membership)}> <FaPlus /> </button>
+            {/* User Info Section */}
+            <section className={styles.sectionBox}>
+              <h2 className={styles.sectionTitle}><FaUser /> THÔNG TIN KHÁCH HÀNG</h2>
+              <div className={styles.userInfoGrid}>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Họ và tên</span>
+                  <span className={styles.infoValue}>{userInfo.username}</span>
                 </div>
-              </td>
-            </tr>
-
-            {/* Combo 2 */}
-            <tr>
-              <td className={styles.comboInfo}>
-                <img src={pic2} alt="Sweet Combo" className={styles.comboImg} />
-                <span>Sweet Combo 80K</span>
-              </td>
-              <td>
-                <span className={styles.discount}>TIẾT KIỆM 42K!!!</span><br />
-                Gồm: 1 Bắp (69oz) + 2 Nước có gaz (22oz)
-              </td>
-              <td>
-                <div className={styles.quantityControl}>
-                  <button onClick={() => handleDecrement("sweet")}> <FaMinus /> </button>
-                  <span>{comboCounts.sweet}</span>
-                  <button onClick={() => handleIncrement("sweet")}> <FaPlus /> </button>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Số điện thoại</span>
+                  <span className={styles.infoValue}>{userInfo.phoneNumber}</span>
                 </div>
-              </td>
-            </tr>
-            {/* Combo 3 */}
-            <tr>
-              <td className={styles.comboInfo}>
-                <img src={pic3} alt="Beta Combo" className={styles.comboImg} />
-                <span>Beta Combo 60K</span>
-              </td>
-              <td>
-                <span className={styles.discount}>TIẾT KIỆM 28K!!!</span><br />
-                Gồm: 1 Bắp (69oz) + 1 Nước có gaz (22oz)
-              </td>
-              <td>
-                <div className={styles.quantityControl}>
-                  <button onClick={() => handleDecrement("beta")}> <FaMinus /> </button>
-                  <span>{comboCounts.beta}</span>
-                  <button onClick={() => handleIncrement("beta")}> <FaPlus /> </button>
+                <div className={styles.infoItem}>
+                  <span className={styles.infoLabel}>Email</span>
+                  <span className={styles.infoValue}>{userInfo.email}</span>
                 </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+            </section>
+
+            {/* Combos Section */}
+            <section className={styles.sectionBox}>
+              <h2 className={styles.sectionTitle}>
+                <img src="https://img.icons8.com/ios/24/ff4d4f/popcorn.png" alt="" style={{ width: 24 }} />
+                COMBO ƯU ĐÃI
+                {membership.membership && (
+                  <span className={styles.membershipBadge}>
+                    Hội viên {membership.membership} - Giảm {membership.membership === "vip tháng" ? "15%" : "20%"} combo
+                  </span>
+                )}
+              </h2>
+
+              <div className={styles.comboGrid}>
+                {combos.map((combo) => (
+                  <div className={styles.comboCard} key={combo.id}>
+                    <img src={combo.image} alt={combo.name} className={styles.comboImage} />
+                    <div className={styles.comboDetails}>
+                      <div className={styles.comboName}>{combo.name}</div>
+                      <div className={styles.comboDesc}>{combo.description}</div>
+                    </div>
+                    <div className={styles.comboActions}>
+                      <div className={styles.pricePerCombo}>{combo.price.toLocaleString()}đ</div>
+                      <div className={styles.quantityControl}>
+                        <button className={styles.quantityBtn} onClick={() => handleDecrement(combo.id)}><FaMinus /></button>
+                        <span className={styles.quantityValue}>{comboCounts[combo.id] || 0}</span>
+                        <button className={styles.quantityBtn} onClick={() => handleIncrement(combo.id)}><FaPlus /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {combos.length === 0 && <p className="text-muted text-center py-4">Đang tải danh sách combo...</p>}
+              </div>
+            </section>
+
+            {/* Voucher Section */}
+            <section className={styles.sectionBox}>
+              <h2 className={styles.sectionTitle}><FaTag /> MÃ GIẢM GIÁ</h2>
+              <div className={styles.voucherInputGroup}>
+                <input
+                  type="text"
+                  placeholder="Nhập mã voucher (ví dụ: DHDT01)"
+                  className={styles.voucherInput}
+                  value={voucher}
+                  onChange={(e) => setVoucher(e.target.value)}
+                />
+                <button className={styles.voucherApplyBtn} onClick={handleVoucher}>ÁP DỤNG</button>
+              </div>
+              {voucherStatus.show && (
+                <p style={{ color: voucherStatus.ok ? '#52c41a' : '#ff4d4f', fontSize: '0.9rem', marginTop: -10, marginBottom: 15 }}>
+                  <FaInfoCircle /> {voucherStatus.text}
+                </p>
+              )}
+
+              <div className="table-responsive">
+                <table className="table table-sm table-borderless align-middle" style={{ fontSize: '0.9rem' }}>
+                  <thead className="table-light">
+                    <tr>
+                      <th>Mã voucher</th>
+                      <th>Ưu đãi</th>
+                      <th>Hạn dùng</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="fw-bold text-primary">DHDT01</td>
+                      <td>Giảm 15% cho đơn từ 200K</td>
+                      <td className="text-muted">31/12/2025</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </main>
+
+          {/* Sidebar Area */}
+          <aside className={styles.sidebar}>
+            <div className={styles.sectionBox}>
+              <div className={styles.timerBox}>
+                <FaHourglassHalf className={styles.timerIcon} />
+                <span>Thời gian giữ ghế: {formatTime(timeLeft)}</span>
+              </div>
+
+              <h2 className={styles.summaryTitle}>ĐƠN HÀNG</h2>
+
+              {/* Movie Info Recap */}
+              <div className="mb-4 text-center">
+                <img
+                  src={bookingInfo.movieInfo?.image}
+                  alt=""
+                  style={{ width: '100%', borderRadius: 12, marginBottom: 15, boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }}
+                />
+                <h4 className="fw-bold mb-1">{bookingInfo.movieInfo?.movieName}</h4>
+                <p className="text-muted small">{bookingInfo.movieInfo?.genre} • {bookingInfo.movieInfo?.duration} Phút</p>
+              </div>
+
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}><FaTicketAlt /> Rạp</span>
+                <span className={styles.summaryValue}>{savedTheater.name}</span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}><FaClock /> Suất chiếu</span>
+                <span className={styles.summaryValue}>{bookingInfo.time?.startTime?.slice(0, 5)} • {bookingInfo.date}</span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Ghế ({selectedSeats.length})</span>
+                <span className={styles.summaryValue}>{selectedSeats.join(', ')}</span>
+              </div>
+
+              <div className={styles.summaryDivider}></div>
+
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Tạm tính vé</span>
+                <span className={styles.summaryValue}>{total.toLocaleString()}đ</span>
+              </div>
+
+              {comboTotalCalculated > 0 && (
+                <div className={styles.summaryItem}>
+                  <span className={styles.summaryLabel}>Combo {membership.membership && <span className="text-danger">(-{membership.membership === "vip tháng" ? "15%" : "20%"})</span>}</span>
+                  <span className={styles.summaryValue}>{(totalPrice - total).toLocaleString()}đ</span>
+                </div>
+              )}
+
+              {discount && (
+                <div className={styles.summaryItem}>
+                  <span className={styles.summaryLabel}>Voucher giảm giá (15%)</span>
+                  <span className={styles.summaryValue} style={{ color: '#52c41a' }}>-{(totalPrice * 0.15).toLocaleString()}đ</span>
+                </div>
+              )}
+
+              <div className={styles.summaryDivider}></div>
+
+              <div className={styles.totalRow}>
+                <span className={styles.totalLabel}>Tổng cộng</span>
+                <span className={styles.totalAmount}>{Math.round(finalAmount).toLocaleString()}đ</span>
+              </div>
+
+              <button
+                className={styles.checkoutBtn}
+                onClick={handlePayment}
+                disabled={timeLeft <= 0}
+              >
+                THANH TOÁN NGAY
+              </button>
+
+              <p className="text-center text-muted small mt-3">
+                Nhấn "Thanh toán ngay" đồng nghĩa với việc bạn đồng ý với Điều khoản dịch vụ của chúng tôi.
+              </p>
+            </div>
+          </aside>
+        </div>
       </div>
-      {/* mã giảm giá */}
-       <div className={styles.box}>
-        <h5 className={styles.title}>
-          <FaUser className={styles.icon} /> MÃ GIẢM GIÁ
-        </h5>
-        <div className={styles.voucherInputRow}>
-          <input type="text" placeholder="Mã Voucher" className={styles.voucherInput} value={voucher} onChange={(e) => setVoucher(e.target.value)}/>
-          <button className={styles.voucherButton} onClick={handleVoucher}>ÁP DỤNG</button>
-        </div>
-        {showAlert && (
-          <p style={{color: textOk ? 'green' : 'red', fontSize: '14px', marginTop: '-9px', fontStyle: 'italic'}}>
-            {textOk || text}
-          </p>
-        )}
-        <h6 className={styles.sectionLabel}>VOUCHER CỦA BẠN</h6>
-
-        <table className={styles.voucherTable}>
-          <thead>
-            <tr>
-              <th>Mã voucher</th>
-              <th>Nội dung voucher</th>
-              <th>Ngày hết hạn</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>DHDT01</td>
-              <td>Giảm giá 10% cho đơn hàng trên 200K</td>
-              <td>31/12/2025</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div className={styles.box} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-  {/* Bên trái: Thông tin thanh toán */}
-  <div>
-    <strong style={{ display: 'block', marginBottom: '10px' }}>
-      Tổng tiền: <span style={{ color: 'red' }}>{totalPrice.toLocaleString('vi-VN')} VNĐ</span>
-    </strong>
-
-    <strong style={{ display: 'block', marginBottom: '10px' }}>
-      Số tiền được giảm:  
-      <span style={{ color: 'red' }}>
-        {discount ? (totalPrice * 0.15).toLocaleString('vi-VN') : ' 0'} VNĐ
-      </span>
-    </strong>
-
-    <strong style={{ display: 'block' }}>
-      Số tiền cần thanh toán: <span style={{ color: 'red' }}>
-         {(discount ? (totalPrice * 0.85) : totalPrice).toLocaleString('vi-VN')} VNĐ
-      </span>
-    </strong>
-  </div>
-
-  {/* Bên phải: Thời gian còn lại */}
-  <div style={{ textAlign: 'right' }}>
-    <p className="fw-bold mb-1">⏳ Thời gian còn lại</p>
-    <h5 className="text-success mb-0">{formatTime(timeLeft)}</h5>
-  </div>
-  </div>
-
-
-        {/* phương thức thanh toán */}
-        {/* <div className={styles.box}>
-        <h5 className={styles.title}>
-            <FaUser className={styles.icon} /> PHƯƠNG THỨC THANH TOÁN
-        </h5>
-
-        <div className={styles.paymentMethods}>
-            <label className={styles.paymentOption}>
-            <input type="radio" name="payment" />
-            <img src={payos_logo} alt="PayOS" />
-            <span>Thanh toán qua PayOS</span>
-            </label>
-
-            <label className={styles.paymentOption}>
-            <input type="radio" name="payment" />
-            <img src={vnpay_logo} alt="VNPay" />
-            <span>Thanh toán qua VNPay</span>
-            </label>
-        </div>
-        </div> */}
-
-        <div className="d-flex justify-content-center">
-            <button className="btn btn-primary w-75 mt-2" onClick={handlePayment}>TIẾP TỤC</button>
-        </div>
     </div>
   );
 }

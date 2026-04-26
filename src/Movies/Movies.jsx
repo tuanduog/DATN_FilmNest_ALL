@@ -16,7 +16,7 @@ function Movies() {
     const [commingSoon, setCommingSoon] = useState([]);
     const [showModal1, setShowModal1] = useState(false);
     const [movieInfo, setMovieInfo] = useState([]);
-    const savedTheater = JSON.parse(localStorage.getItem('theater'));
+    const [savedTheater, setSavedTheater] = useState(JSON.parse(localStorage.getItem('theater')));
 
     const [showChoseLocation, setShowChoseLocation] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState("");
@@ -68,6 +68,11 @@ function Movies() {
 
     useEffect(() => {
         handleTheaters();
+        const handleTheaterChange = () => {
+            setSavedTheater(JSON.parse(localStorage.getItem('theater')));
+        };
+        window.addEventListener('theaterChange', handleTheaterChange);
+        return () => window.removeEventListener('theaterChange', handleTheaterChange);
     }, []);
 
     const handleMovieDetails = (id) => {
@@ -104,7 +109,7 @@ function Movies() {
                         <button className={styles.closeBtn} onClick={() => setShowChoseLocation(false)}>
                             <i className="bi bi-x-lg"></i>
                         </button>
-                        
+
                         <div className={styles.content}>
                             <h4 className="text-center fw-bold mb-4">Chọn Rạp Của Bạn</h4>
                             <div className={styles.formGroup}>
@@ -136,14 +141,14 @@ function Movies() {
                                         setselectedTheater(selectedValue);
                                         const selectedObj = theater.find(t => t.id.toString() === selectedValue);
                                         if (selectedObj) {
-                                            localStorage.setItem('theater', JSON.stringify({
-                                                id: selectedObj.id,
-                                                name: selectedObj.name,
-                                                theaterLocation: selectedObj.theaterLocation
-                                            }));
-                                            setShowChoseLocation(false);
-                                            window.location.reload();
-                                        }
+                                                localStorage.setItem('theater', JSON.stringify({
+                                                    id: selectedObj.id,
+                                                    name: selectedObj.name,
+                                                    theaterLocation: selectedObj.theaterLocation
+                                                }));
+                                                setShowChoseLocation(false);
+                                                window.dispatchEvent(new Event('theaterChange'));
+                                            }
                                     }}
                                 >
                                     <option value="">Chọn rạp</option>
@@ -203,20 +208,20 @@ function Movies() {
                                     onClick={() => handleMovieDetails(movie.movieId || movie.id)}
                                 />
                             </div>
-                            
+
                             <div className={styles.cardBody}>
-                                <h6 
-                                    className={styles.movieTitle} 
+                                <h6
+                                    className={styles.movieTitle}
                                     onClick={() => handleMovieDetails(movie.movieId || movie.id)}
                                 >
                                     {movie.movieName || movie.name}
                                 </h6>
-                                
+
                                 <div className={styles.infoRow}>
                                     <span className={styles.infoLabel}>Thể loại</span>
                                     <span className={styles.ellipsis}>{movie.genre}</span>
                                 </div>
-                                
+
                                 {nowShowing ? (
                                     <div className={styles.infoRow}>
                                         <span className={styles.infoLabel}>Thời lượng</span>
@@ -232,15 +237,15 @@ function Movies() {
                                         </span>
                                     </div>
                                 )}
-                                
+
                                 <button className={styles.btnBooking} onClick={() => handleOpenModal(movie)}>
-                                    {nowShowing ? "ĐẶT VÉ NGAY" : "XEM THÔNG TIN"}
+                                    ĐẶT VÉ NGAY
                                 </button>
                             </div>
                         </article>
                     ))}
                 </div>
-                
+
                 {(nowShowing ? showingNow : commingSoon).length === 0 && (
                     <div className="text-center py-5">
                         <i className="bi bi-film text-muted fs-1 mb-3"></i>

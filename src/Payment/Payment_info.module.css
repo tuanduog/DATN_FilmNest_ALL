@@ -1,187 +1,350 @@
+.paymentPage {
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  padding: 40px 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 .container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  background-color: #f8f9fa;
+  padding: 0 20px;
 }
 
-.box {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 24px;
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 30px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Common Box Style */
+.sectionBox {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
   margin-bottom: 30px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.title {
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 25px;
   display: flex;
   align-items: center;
-  font-weight: bold;
-  font-size: 18px;
-  margin-bottom: 20px;
-  gap: 10px;
-}
-
-.icon {
-  width: 24px;
-  height: 24px;
-}
-
-.infoRow {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 12px;
+  border-bottom: 2px solid #f0f2f5;
+  padding-bottom: 15px;
 }
 
-.sectionLabel {
-  margin-top: 16px;
-  font-weight: 600;
+.sectionTitle i {
+  color: #ff4d4f;
 }
 
-.priceRow {
-  margin: 0;
+/* User Info */
+.userInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
 
-.comboTable {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.comboTable th, .comboTable td {
-  padding: 12px;
-  vertical-align: middle;
-  border-top: 1px solid #eaeaea;
-}
-
-.comboInfo {
+.infoItem {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoLabel {
+  font-size: 0.85rem;
+  color: #8c8c8c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.infoValue {
+  font-weight: 600;
+  color: #262626;
+}
+
+/* Combo Section */
+.comboGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.comboCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #f0f2f5;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.comboCard:hover {
+  border-color: #ff4d4f;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.comboImage {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.comboDetails {
+  flex: 1;
+}
+
+.comboName {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.comboDesc {
+  font-size: 0.9rem;
+  color: #595959;
+  line-height: 1.4;
+}
+
+.comboSavings {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #52c41a;
+  background: #f6ffed;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #b7eb8f;
+}
+
+.comboActions {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 10px;
 }
 
-.comboImg {
-  width: 60px;
-  border-radius: 8px;
+.pricePerCombo {
+  font-weight: 700;
+  color: #ff4d4f;
 }
 
-.discount {
-  color: green;
-  font-weight: bold;
-}
-
+/* Quantity Control */
 .quantityControl {
   display: flex;
   align-items: center;
-  gap: 8px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #d9d9d9;
+  overflow: hidden;
 }
 
-.quantityControl button {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
+.quantityBtn {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #595959;
+  transition: all 0.2s;
 }
 
-.quantityControl button:hover {
-  background-color: #f0f0f0;
+.quantityBtn:hover {
+  background: #f5f5f5;
+  color: #ff4d4f;
 }
 
-.voucherInputRow {
+.quantityValue {
+  width: 40px;
+  text-align: center;
+  font-weight: 600;
+  border-left: 1px solid #d9d9d9;
+  border-right: 1px solid #d9d9d9;
+}
+
+/* Voucher Section */
+.voucherInputGroup {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
 }
 
 .voucherInput {
   flex: 1;
-  min-width: 200px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #d9d9d9;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
 }
 
-.voucherButton {
-  background: linear-gradient(to right, #ff512f, #f09819);
-  border: none;
+.voucherInput:focus {
+  border-color: #ff4d4f;
+}
+
+.voucherApplyBtn {
+  padding: 0 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
   color: white;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-weight: bold;
+  border: none;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.3s;
-  white-space: nowrap;
+  transition: transform 0.2s;
 }
 
-.voucherButton:hover {
-  opacity: 0.9;
+.voucherApplyBtn:hover {
+  transform: scale(1.02);
 }
 
-.voucherTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
+/* Order Summary Sidebar */
+.sidebar {
+  position: sticky;
+  top: 40px;
 }
 
-.voucherTable th,
-.voucherTable td {
-  padding: 12px;
-  text-align: left;
+.summaryTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  color: #1a1a1a;
+  text-align: center;
 }
 
-.voucherTable th {
-  background-color: #f9f9f9;
-  color: #333;
-}
-
-.voucherTable tr:nth-child(even) {
-  background-color: #f4f4f4;
-}
-
-.paymentMethods {
+.summaryItem {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 10px;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
 }
 
-.paymentOption {
+.summaryLabel {
+  color: #8c8c8c;
+}
+
+.summaryValue {
+  font-weight: 600;
+  color: #262626;
+  text-align: right;
+}
+
+.summaryDivider {
+  height: 1px;
+  background: #f0f2f5;
+  margin: 20px 0;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.totalLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.totalAmount {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ff4d4f;
+}
+
+/* Timer */
+.timerBox {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 10px;
   padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  background: #fff1f0;
+  border: 1px solid #ffa39e;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  color: #cf1322;
+  font-weight: 700;
+}
+
+.timerIcon {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Checkout Button */
+.checkoutBtn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #f759ab 100%);
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: border 0.3s, background-color 0.3s;
+  transition: all 0.3s;
+  box-shadow: 0 10px 20px rgba(255, 77, 79, 0.3);
 }
 
-.paymentOption:hover {
-  background-color: #f9f9f9;
-  border-color: #888;
+.checkoutBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(255, 77, 79, 0.4);
 }
 
-.paymentOption input[type="radio"] {
-  transform: scale(1.2);
+.checkoutBtn:disabled {
+  background: #d9d9d9;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.paymentOption img {
-  width: 40px;
-  height: auto;
-  object-fit: contain;
+/* Membership Badge */
+.membershipBadge {
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: #fff7e6;
+  color: #d46b08;
+  border: 1px solid #ffd591;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.paymentOption span {
-  font-weight: 500;
-  color: #333;
+.membershipDiscount {
+  color: #cf1322;
+  font-weight: 700;
 }
-

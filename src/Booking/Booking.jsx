@@ -1,7 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import '../Booking/Booking.css';
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import axios from "axios";
 import { Client } from "@stomp/stompjs";
 import { toast } from "react-toastify";
@@ -12,23 +11,34 @@ function Booking() {
     const [time, setTime] = useState({});
     const [date, setDate] = useState("");
     const [selectedSeat, setSelectedSeat] = useState([]);
-    const user = JSON.parse(sessionStorage.getItem("user")) || {};
-    const savedTheater = JSON.parse(localStorage.getItem("theater"));
-    const bookingInfo = JSON.parse(localStorage.getItem('bookingInfo'));
     const [othersSelecting, setOthersSelecting] = useState({});
-    const d = new Date();
-    const y = d.getFullYear();
-    const savedDate = bookingInfo.date + "/" + y;
-    const [day, month, year] = savedDate.split('/');
-    const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    const [bookeds, setBookeds] = useState([]);
+    const [seats, setSeats] = useState([]);
+    const client = useRef(null);
+
+    const user = useMemo(() => JSON.parse(sessionStorage.getItem("user")) || {}, []);
+    const savedTheater = useMemo(() => JSON.parse(localStorage.getItem("theater")) || {}, []);
+    const bookingInfo = useMemo(() => JSON.parse(localStorage.getItem('bookingInfo')) || {}, []);
+
+    const formattedDate = useMemo(() => {
+        if (!bookingInfo.date) return "";
+        const d = new Date();
+        const y = d.getFullYear();
+        const savedDate = bookingInfo.date.includes('/') ? (bookingInfo.date + "/" + y) : bookingInfo.date;
+        const parts = savedDate.split('/');
+        if (parts.length < 3) return bookingInfo.date; // Fallback
+        const [day, month, year] = parts;
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }, [bookingInfo.date]);
+
+    const yearLabel = useMemo(() => new Date().getFullYear(), []);
+
     const [timeLeft, setTimeLeft] = useState(() => {
         const storedTime = localStorage.getItem('timeLeft');
         return storedTime ? parseInt(storedTime, 10) : 600;
     });
-    const [bookeds, setBookeds] = useState([]);
-    const [seats, setSeats] = useState([]);
-    const client = useRef(null);
-    const allowSelect = Object.values(othersSelecting).flat();
+
+    const allowSelect = useMemo(() => Object.values(othersSelecting).flat(), [othersSelecting]);
 
     useEffect(() => {
         const fetchSeats = async () => {
@@ -59,12 +69,15 @@ function Booking() {
         return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
     };
     const fetchBBST = async () => {
+        if (!time?.showTimeId || !formattedDate) return;
         try {
             const res = await axios.get(`http://localhost:8099/booking/get-byshowtime/${time.showTimeId}`,
                 { withCredentials: true }
             );
-            const filterbook = res.data.filter(book => book.date === formattedDate);
-            setBookeds(filterbook);
+            if (res.data) {
+                const filterbook = res.data.filter(book => book.date === formattedDate);
+                setBookeds(filterbook);
+            }
         } catch (error) {
             console.error("Không lấy được booking theo showtimeId", error);
         }
@@ -86,11 +99,10 @@ function Booking() {
     }, []);
 
     useEffect(() => {
-        if (time?.showTimeId) {
+        if (time?.showTimeId && formattedDate) {
             fetchBBST();
-
         }
-    }, [time?.showTimeId]);
+    }, [time?.showTimeId, formattedDate]);
 
     useEffect(() => {
         if (timeLeft <= 0) {
@@ -115,7 +127,7 @@ function Booking() {
     };
 
     useEffect(() => {
-        if (!time?.showTimeId || !movieInfo.movieId) return;
+        if (!time?.showTimeId || !movieInfo.id) return;
 
         if (client.current) {
             client.current.deactivate();
@@ -130,16 +142,29 @@ function Booking() {
             onConnect: () => {
                 console.log("Connected to WS!");
                 client.current.subscribe(
-                    `/topic/seats/${movieInfo.movieId}/${time.showTimeId}/${formattedDate}`,
+                    `/topic/seats/${movieInfo.id}/${time.showTimeId}/${formattedDate}`,
                     (message) => {
-                        const seatSelecting = JSON.parse(message.body);
-                        console.log("Seat selecting:", seatSelecting);
-                        const [userId, seats] = Object.entries(seatSelecting)[0];
-                        const seatList = seats ? seats.split(',').map(s => s.trim()) : [];
-                        setOthersSelecting(prev => ({
-                            ...prev,
-                            [userId]: userId === String(user.userId) ? [] : seatList
-                        }));
+                        try {
+                            const seatSelecting = JSON.parse(message.body);
+                            console.log("Seat selecting:", seatSelecting);
+                            if (!seatSelecting || Object.keys(seatSelecting).length === 0) return;
+                            
+                            const entries = Object.entries(seatSelecting);
+                            const updates = {};
+                            entries.forEach(([uid, seatsStr]) => {
+                                const seatList = seatsStr ? seatsStr.split(',').map(s => s.trim()) : [];
+                                if (uid !== String(user.userId)) {
+                                    updates[uid] = seatList;
+                                }
+                            });
+                            
+                            setOthersSelecting(prev => ({
+                                ...prev,
+                                ...updates
+                            }));
+                        } catch (e) {
+                            console.error("Error parsing WS message", e);
+                        }
                     }
                 );
             }
@@ -152,14 +177,14 @@ function Booking() {
                 client.current.deactivate();
             }
         };
-    }, [movieInfo.movieId, time.showTimeId, formattedDate]);
+    }, [movieInfo.id, time.showTimeId, formattedDate]);
 
 
     useEffect(() => {
-        if (!time?.showTimeId || !movieInfo.movieId) return;
+        if (!time?.showTimeId || !movieInfo.id) return;
         if (!client.current) return;
 
-        axios.get(`http://localhost:8099/booking/seats-locking/${movieInfo.movieId}/${time.showTimeId}/${formattedDate}`,
+        axios.get(`http://localhost:8099/booking/seats-locking/${movieInfo.id}/${time.showTimeId}/${formattedDate}`,
             { withCredentials: true })
             .then(response => {
                 const data = response.data || {};
@@ -182,7 +207,7 @@ function Booking() {
                 console.error("Không lấy được ghế đang bị giữ", error);
             });
 
-    }, [movieInfo.movieId, time.showTimeId, formattedDate]); // chạy lại khi movieId, showTimeId hoặc formattedDate thay đổi
+    }, [movieInfo.id, time.showTimeId, formattedDate, user.userId]);
 
 
     const handleSeatSelection = (seatNumber) => {
@@ -213,11 +238,11 @@ function Booking() {
             // xác định ngày đang đặt, giờ đặt, phim, user, ghế -> showtime, user, date
 
             const seatInfo = {
-                movieId: movieInfo.movieId,
-                date: formattedDate, // ngày chọn
+                movieId: movieInfo.id, // Consistent with URL params
+                date: formattedDate,
                 showTimeId: time.showTimeId,
                 userId: user.userId,
-                seats: newSeats.join(', '), // ghế đang chọn
+                seats: newSeats.join(', '),
                 created_at: new Date().toISOString()
             }
 
@@ -409,7 +434,7 @@ function Booking() {
                             </div>
                             <div className="info-item">
                                 <span className="info-label"><i className="bi bi-calendar-event me-2"></i>Suất chiếu</span>
-                                <span className="info-value">{time?.startTime?.slice(0, 5)} • {date}/{y}</span>
+                                <span className="info-value">{time?.startTime?.slice(0, 5)} • {date}/{yearLabel}</span>
                             </div>
                             <div className="info-item">
                                 <span className="info-label"><i className="bi bi-door-open me-2"></i>Phòng</span>

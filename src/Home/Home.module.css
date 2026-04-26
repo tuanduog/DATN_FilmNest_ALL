@@ -6,7 +6,7 @@
 
 /* Banner Styling */
 .bannerContainer {
-  padding: 20px 0;
+  padding: 20px 0 20px 0;
   max-width: 1440px;
   margin: 0 auto;
 }
@@ -15,7 +15,7 @@
   width: 100%;
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   background: white;
 }
 
@@ -27,15 +27,21 @@
 }
 
 @media (min-width: 768px) {
-  .banner img { height: 400px; }
+  .banner img {
+    height: 400px;
+  }
 }
 
 @media (min-width: 1024px) {
-  .banner img { height: 500px; }
+  .banner img {
+    height: 500px;
+  }
 }
 
 @media (min-width: 1400px) {
-  .banner img { height: 550px; }
+  .banner img {
+    height: 550px;
+  }
 }
 
 /* Tab Menu Styling */
@@ -44,10 +50,10 @@
   justify-content: center;
   background: white;
   width: fit-content;
-  margin: 50px auto 40px auto;
+  margin: 20px auto 40px auto;
   padding: 6px;
   border-radius: 50px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .tab {
@@ -78,9 +84,9 @@
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 1px solid rgba(0,0,0,0.03);
+  border: 1px solid rgba(0, 0, 0, 0.03);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -88,7 +94,7 @@
 
 .movieCard:hover {
   transform: translateY(-12px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .movieCard img {
