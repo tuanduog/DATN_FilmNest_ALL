@@ -25,20 +25,15 @@ public class MembershipResponse {
 
     Double price;
 
-    Integer discount;
-
     Integer duration;
-
-    String description;
 
     Status status;
 
-    public MembershipResponse(int id, String name, MembershipType type, Double price, Integer discount, Integer duration, Status status) {
+    public MembershipResponse(int id, String name, MembershipType type, Double price, Integer duration, Status status) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.price = price;
-        this.discount = discount;
         this.duration = duration;
         this.status = status;
     }

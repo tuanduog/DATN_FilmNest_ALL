@@ -25,7 +25,7 @@ public interface MembershipRepository extends JpaRepository<Membership, Integer>
     Optional<Membership> findByName(String name);
 
     @Query("""
-        SELECT new com.booking.booking_ticket.dto.response.MembershipResponse(m.id, m.name, m.type, m. price, m.discount, m.duration, m.status)
+        SELECT new com.booking.booking_ticket.dto.response.MembershipResponse(m.id, m.name, m.type, m. price, m.duration, m.status)
         FROM Membership m
         WHERE (LOWER(m.name) LIKE :keyword)
         AND (:status IS NULL OR m.status = :status)

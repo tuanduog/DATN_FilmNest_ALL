@@ -1,14 +1,8 @@
 package com.booking.booking_ticket.utils;
 
 import com.booking.booking_ticket.dto.request.ShowTimeRequest;
-import com.booking.booking_ticket.entity.Banner;
-import com.booking.booking_ticket.entity.Employee;
-import com.booking.booking_ticket.entity.ShowTime;
-import com.booking.booking_ticket.entity.Users;
-import com.booking.booking_ticket.repository.BannerRepository;
-import com.booking.booking_ticket.repository.EmployeeRepository;
-import com.booking.booking_ticket.repository.ShowTimeRepository;
-import com.booking.booking_ticket.repository.UsersRepository;
+import com.booking.booking_ticket.entity.*;
+import com.booking.booking_ticket.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +19,8 @@ public class Util {
     private final ShowTimeRepository showTimeRepository;
 
     private final BannerRepository bannerRepository;
+
+    private final VoucherRepository voucherRepository;
 
     public void validateUser(String username, String email, String phone, Integer id){
         Optional<Users> user = usersRepository.validateUsername(username, id);
@@ -86,6 +82,13 @@ public class Util {
         Optional<Banner> banner = bannerRepository.validateByName(name, id);
         if(banner.isPresent()){
             throw new RuntimeException("Banner already exists");
+        }
+    }
+
+    public void validateVoucher(String code, Integer id){
+        Optional<Voucher> voucher = voucherRepository.validateVoucher(code, id);
+        if(voucher.isPresent()){
+            throw new RuntimeException("Voucher already exists");
         }
     }
 }

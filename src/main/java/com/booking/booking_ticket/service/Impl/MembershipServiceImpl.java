@@ -38,14 +38,14 @@ public class MembershipServiceImpl implements MembershipService {
         }
         Membership membership = new Membership();
 
-        membership.setImage(request.getImage());
-        membership.setName(request.getName());
-        membership.setType(request.getType());
-        membership.setPrice(request.getPrice());
-        membership.setDiscount(request.getDiscount());
-        membership.setDuration(request.getDuration());
-        membership.setDescription(request.getDescription());
-        membership.setStatus(Status.ACTIVE);
+//        membership.setImage(request.getImage());
+//        membership.setName(request.getName());
+//        membership.setType(request.getType());
+//        membership.setPrice(request.getPrice());
+//        membership.setDiscount(request.getDiscount());
+//        membership.setDuration(request.getDuration());
+//        membership.setDescription(request.getDescription());
+//        membership.setStatus(Status.ACTIVE);
 
         membershipRepository.save(membership);
     }
@@ -70,17 +70,17 @@ public class MembershipServiceImpl implements MembershipService {
             membership.setPrice(request.getPrice());
         }
 
-        if (request.getDiscount() != null){
-            membership.setDiscount(request.getDiscount());
-        }
-
-        if (request.getDuration() != null){
-            membership.setDuration(request.getDuration());
-        }
-
-        if (request.getDescription() != null){
-            membership.setDescription(request.getDescription());
-        }
+//        if (request.getDiscount() != null){
+//            membership.setDiscount(request.getDiscount());
+//        }
+//
+//        if (request.getDuration() != null){
+//            membership.setDuration(request.getDuration());
+//        }
+//
+//        if (request.getDescription() != null){
+//            membership.setDescription(request.getDescription());
+//        }
 
         membershipRepository.save(membership);
     }
@@ -96,9 +96,9 @@ public class MembershipServiceImpl implements MembershipService {
             response.setName(membership.getName());
             response.setType(membership.getType());
             response.setPrice(membership.getPrice());
-            response.setDiscount(membership.getDiscount());
-            response.setDuration(membership.getDuration());
-            response.setDescription(membership.getDescription());
+//            response.setDiscount(membership.getDiscount());
+//            response.setDuration(membership.getDuration());
+//            response.setDescription(membership.getDescription());
             response.setStatus(membership.getStatus());
         } else return null;
 

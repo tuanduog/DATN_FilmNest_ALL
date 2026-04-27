@@ -23,10 +23,5 @@ public class Membership extends BaseEntity{
 
     Double price;
 
-    Integer discount;
-
     Integer duration;
-
-    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
-    String description;
 }

@@ -26,10 +26,4 @@ public class UsersMembership extends BaseEntity{
 
     @Column(name = "end_date", nullable = false)
     private LocalDateTime expiredDate;
-
-    @Column(name = "auto_renew")
-    private Boolean autoRenew;
-
-    @Column(name = "price_paid")
-    private Double pricePaid;
 }
