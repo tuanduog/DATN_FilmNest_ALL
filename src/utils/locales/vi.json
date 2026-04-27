@@ -157,5 +157,7 @@
     "voucher-duration": "Thời hạn Voucher",
     "voucher-discount-percent": "Phần trăm giảm giá Voucher",
     "voucher-discount-amount": "Số tiền giảm giá Voucher",
-    "voucher-discount-type": "Loại giảm giá Voucher"
+    "voucher-discount-type": "Loại giảm giá Voucher",
+    "public": "Công khai",
+    "private": "Riêng tư"
 }

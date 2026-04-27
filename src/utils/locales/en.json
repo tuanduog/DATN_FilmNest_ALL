@@ -173,5 +173,7 @@
   "voucher-duration": "Voucher Duration",
   "voucher-discount-percent": "Voucher Discount Percent",
   "voucher-discount-amount": "Voucher Discount Amount",
-  "voucher-discount-type": "Voucher Discount Type"
+  "voucher-discount-type": "Voucher Discount Type",
+  "public": "Public",
+  "private": "Private"
 }

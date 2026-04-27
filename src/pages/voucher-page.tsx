@@ -326,6 +326,15 @@ export default function VoucherPage() {
                 accessorKey: 'type',
                 dataType: 'text',
                 enableGrouping: false,
+                cell: (cell) => {
+                    const { type } = cell.row.original;
+                    return (
+                        <Chip
+                            label={type.toUpperCase() === 'PUBLIC' ? intl.formatMessage({ id: 'public' }) : intl.formatMessage({ id: 'private' })}
+                            color={type.toUpperCase() === 'PUBLIC' ? 'success' : 'error'}
+                        />
+                    );
+                },
                 meta: { width: '35%' }
             },
             {
@@ -346,9 +355,9 @@ export default function VoucherPage() {
                     return (
                         <Chip
                             label={
-                                status === 'ACTIVE' ? intl.formatMessage({ id: 'active' }) : status === 'INACTIVE' ? intl.formatMessage({ id: 'inactive' }) : 'UNKNOWN'
+                                status?.toUpperCase() === 'ACTIVE' ? intl.formatMessage({ id: 'active' }) : status?.toUpperCase() === 'INACTIVE' ? intl.formatMessage({ id: 'inactive' }) : 'UNKNOWN'
                             }
-                            color={status === 'ACTIVE' ? 'success' : 'error'}
+                            color={status?.toUpperCase() === 'ACTIVE' ? 'success' : 'error'}
                         />
                     );
                 },
