@@ -45,6 +45,10 @@ import BannerPage from 'pages/banner-page';
 import AddBanner from 'sections/banner/add';
 import EditBanner from 'sections/banner/edit';
 import BannerDetail from 'sections/banner/detail';
+import AddVoucher from 'sections/voucher/add';
+import EditVoucher from 'sections/voucher/edit';
+import VoucherPage from 'pages/voucher-page';
+import VoucherDetail from 'sections/voucher/detail';
 
 
 // pages routing
@@ -223,6 +227,22 @@ const MainRoutes = {
         {
           path: 'admin/banner/detail/:id',
           element: <BannerDetail />
+        },
+        {
+          path: 'admin/voucher',
+          element: <VoucherPage />
+        },
+        {
+          path: 'admin/voucher/add',
+          element: <AddVoucher />
+        },
+        {
+          path: 'admin/voucher/edit/:id',
+          element: <EditVoucher />
+        },
+        {
+          path: 'admin/voucher/detail/:id',
+          element: <VoucherDetail />
         }
       ]
     },

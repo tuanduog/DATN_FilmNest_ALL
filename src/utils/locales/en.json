@@ -160,5 +160,18 @@
   "banner-duration": "Banner Duration",
   "banner-discount-percent": "Banner Discount Percent",
   "banner-discount-amount": "Banner Discount Amount",
-  "banner-discount-type": "Banner Discount Type"
+  "banner-discount-type": "Banner Discount Type",
+  "voucher": "Voucher",
+  "voucher-list": "Voucher List",
+  "add-voucher": "Add Voucher",
+  "edit-voucher": "Edit Voucher",
+  "delete-voucher": "Delete Voucher",
+  "voucher-price": "Voucher Price",
+  "voucher-description": "Voucher Description",
+  "voucher-status": "Voucher Status",
+  "voucher-discount": "Voucher Discount",
+  "voucher-duration": "Voucher Duration",
+  "voucher-discount-percent": "Voucher Discount Percent",
+  "voucher-discount-amount": "Voucher Discount Amount",
+  "voucher-discount-type": "Voucher Discount Type"
 }

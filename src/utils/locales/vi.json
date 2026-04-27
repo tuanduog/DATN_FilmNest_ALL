@@ -144,5 +144,18 @@
     "banner-duration": "Thời hạn banner",
     "banner-discount-percent": "Phần trăm giảm giá banner",
     "banner-discount-amount": "Số tiền giảm giá banner",
-    "banner-discount-type": "Loại giảm giá banner"
+    "banner-discount-type": "Loại giảm giá banner",
+    "voucher": "Voucher",
+    "voucher-list": "Danh sách Voucher",
+    "add-voucher": "Thêm Voucher",
+    "edit-voucher": "Sửa Voucher",
+    "delete-voucher": "Xóa Voucher",
+    "voucher-price": "Giá Voucher",
+    "voucher-description": "Mô tả Voucher",
+    "voucher-status": "Trạng thái Voucher",
+    "voucher-discount": "Giảm giá Voucher",
+    "voucher-duration": "Thời hạn Voucher",
+    "voucher-discount-percent": "Phần trăm giảm giá Voucher",
+    "voucher-discount-amount": "Số tiền giảm giá Voucher",
+    "voucher-discount-type": "Loại giảm giá Voucher"
 }

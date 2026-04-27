@@ -102,6 +102,13 @@ const admin: NavItemType = {
       type: 'item',
       url: '/admin/banner',
       icon: icons.contactus
+    },
+    {
+      id: 'voucher',
+      title: 'voucher',
+      type: 'item',
+      url: '/admin/voucher',
+      icon: icons.contactus
     }
   ]
 };
