@@ -114,25 +114,36 @@
   background: #ffffff;
 }
 
-.vipMonth {
-  border-top: 8px solid #3b82f6;
-}
-
-.vipYear {
-  border-top: 8px solid #f59e0b;
+.isRecommended {
   transform: scale(1.05);
 }
 
-.vipYear:hover {
+.isRecommended:hover {
   transform: scale(1.05) translateY(-15px);
 }
+
+/* Color Themes */
+.vipStandard { border-top: 8px solid #3b82f6; }
+.vipStandard .name { background: #eff6ff; color: #2563eb; }
+
+.vipSilver { border-top: 8px solid #94a3b8; }
+.vipSilver .name { background: #f1f5f9; color: #475569; }
+
+.vipGold { border-top: 8px solid #f59e0b; }
+.vipGold .name { background: #fffbeb; color: #d97706; }
+
+.vipPremium { border-top: 8px solid #ec4899; }
+.vipPremium .name { background: #fdf2f8; color: #be185d; }
+
+.vipDiamond { border-top: 8px solid #06b6d4; }
+.vipDiamond .name { background: #ecfeff; color: #0891b2; }
 
 .name {
   font-size: 0.9rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 35px;
+  margin-bottom: 10px;
   padding: 10px 25px;
   border-radius: 100px;
   display: inline-block;
@@ -140,18 +151,19 @@
   margin-right: auto;
 }
 
-.vipMonth .name {
-  background: #eff6ff;
-  color: #2563eb;
-}
-
-.vipYear .name {
-  background: #fffbeb;
-  color: #d97706;
+.packageType {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .priceContainer {
   margin-bottom: 40px;
+  text-align: center;
 }
 
 .price {
@@ -206,15 +218,11 @@
   flex-shrink: 0;
 }
 
-.vipMonth .checkIcon {
-  background: #3b82f6;
-  color: white;
-}
-
-.vipYear .checkIcon {
-  background: #f59e0b;
-  color: white;
-}
+.vipStandard .checkIcon { background: #3b82f6; color: white; }
+.vipSilver .checkIcon { background: #94a3b8; color: white; }
+.vipGold .checkIcon { background: #f59e0b; color: white; }
+.vipPremium .checkIcon { background: #ec4899; color: white; }
+.vipDiamond .checkIcon { background: #06b6d4; color: white; }
 
 .buttonWrapper {
   margin-top: auto;
@@ -233,16 +241,34 @@
   border: none;
 }
 
-.vipMonth .subscribeBtn {
+.vipStandard .subscribeBtn {
   background: linear-gradient(135deg, #2563eb, #60a5fa);
   color: white;
   box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
 }
 
-.vipYear .subscribeBtn {
+.vipSilver .subscribeBtn {
+  background: linear-gradient(135deg, #94a3b8, #cbd5e1);
+  color: white;
+  box-shadow: 0 10px 20px rgba(148, 163, 184, 0.2);
+}
+
+.vipGold .subscribeBtn {
   background: linear-gradient(135deg, #d97706, #fbbf24);
   color: white;
   box-shadow: 0 10px 20px rgba(217, 119, 6, 0.2);
+}
+
+.vipPremium .subscribeBtn {
+  background: linear-gradient(135deg, #be185d, #f472b6);
+  color: white;
+  box-shadow: 0 10px 20px rgba(236, 72, 153, 0.2);
+}
+
+.vipDiamond .subscribeBtn {
+  background: linear-gradient(135deg, #0891b2, #22d3ee);
+  color: white;
+  box-shadow: 0 10px 20px rgba(6, 182, 212, 0.2);
 }
 
 .subscribeBtn:hover:not(.disabled) {
@@ -410,7 +436,7 @@
     margin-top: -60px !important;
   }
   
-  .vipYear {
+  .isRecommended {
     transform: scale(1);
     order: -1;
   }

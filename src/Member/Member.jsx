@@ -22,30 +22,40 @@ function Member() {
     const [startDate, setStartDate] = useState("");
     const today = new Date();
 
-    const handleVipThang = () => {
-        if (sessionStorage.getItem('state') === 'Login successful') {
-            setSelectedPlan("vip tháng");
-            setPrice(99000);
-            const member = {
-                vip: 'vip tháng',
-                startDate: today.toISOString(),
-                expire: 30
-            }
-            localStorage.setItem('member', JSON.stringify(member));
-            setShowConfirm(true);
-        } else {
-            navigate("/Login");
-        }
-    };
+    const [pageRequest, setPageRequest] = useState({
+        page: 0,
+        size: 100,
+        sort: '',
+        keyword: '',
+        status: 'ACTIVE'
+    });
 
-    const handleVipNam = () => {
+    const [memberships, setMemberships] = useState([]);
+
+    useEffect(() => {
+        const fetchMemberships = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8099/api/membership/v1/all`);
+                if (res.data && res.data.data) {
+                    setMemberships(res.data.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch memberships:", error);
+            }
+        };
+
+        fetchMemberships();
+    }, []);
+
+    const handleSelectPlan = (plan) => {
         if (sessionStorage.getItem('state') === 'Login successful') {
-            setSelectedPlan("vip năm");
-            setPrice(899000);
+            setSelectedPlan(plan.name);
+            setPrice(plan.price);
             const member = {
-                vip: 'vip năm',
+                id: plan.id,
+                vip: plan.name,
                 startDate: today.toISOString(),
-                expire: 365
+                expire: plan.duration
             }
             localStorage.setItem('member', JSON.stringify(member));
             setShowConfirm(true);
@@ -91,14 +101,26 @@ function Member() {
     const fetchMember = async () => {
         if (!user) return;
         try {
-            const res = await axios.get(`http://localhost:8099/auth/get-Membership/${user.userId}`,
+            const res = await axios.get(`http://localhost:8099/api/membership/v1/user`,
                 { withCredentials: true }
-            )
-            setMembership(res.data.membership);
-            setStartDate(res.data.startDate);
-            setTotalDay(res.data.expired);
+            );
+            if (res.data && res.data.data) {
+                const data = res.data.data;
+                setMembership(data.name);
+                setTotalDay(data.duration);
+                if (data.startDate) setStartDate(data.startDate);
+                if (data.endDate) {
+                    const end = new Date(data.endDate);
+                    const now = new Date();
+                    const diffTime = end - now;
+                    const diffDays = diffTime > 0 ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : 0;
+                    setDayLeft(diffDays);
+                } else {
+                    setDayLeft(data.duration || 0);
+                }
+            }
         } catch (error) {
-            console.error("Khong lay duoc membership", error);
+            console.error(error);
         }
     }
 
@@ -109,41 +131,16 @@ function Member() {
     }, [user]);
 
     useEffect(() => {
-        if (startDate && totalDay) {
-            const today = new Date();
-            const start = new Date(startDate);
-            const passDay = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-            const dayLeft = totalDay - passDay;
-
-            if (dayLeft <= 0) {
-                setMembership("no membership");
-                axios.put(`http://localhost:8099/auth/update-Membership/${user.userId}`,
-                    {
-                        vip: 'no membership',
-                        startDate: null,
-                        expired: null
-                    }, { withCredentials: true })
-                    .catch((error) => {
-                        console.error("Lỗi cập nhật membership:", error);
-                    });
-
-            } else {
-                setDayLeft(dayLeft);
-            }
-        }
-    }, [startDate, totalDay, user?.userId])
-
-    useEffect(() => {
         const updateMembership = async () => {
             if (status === "PAID" && cancel === "false" && code === "00") {
                 try {
                     const member = JSON.parse(localStorage.getItem('member'));
                     if (!member) return;
 
-                    await axios.put(`http://localhost:8099/auth/update-Membership/${user.userId}`,
-                        member,
+                    await axios.post(`http://localhost:8099/api/user-membership/v1/payment/${user.userId}/${member.id}`,
+                        {},
                         { withCredentials: true }
-                    )
+                    );
                     toast.success(`Đăng ký gói ${member.vip} thành công!`);
                     localStorage.removeItem('member');
                     // Refresh data
@@ -174,65 +171,71 @@ function Member() {
             <div className="container" style={{ marginTop: '-80px', position: 'relative', zIndex: 10 }}>
                 <div className={styles.cardContainer}>
 
-                    {/* Gói VIP Tháng */}
-                    <div className={`${styles.card} ${styles.vipMonth}`}>
-                        <h3 className={styles.name}>THÀNH VIÊN BẠC</h3>
-                        <div className={styles.priceContainer}>
-                            <p className={styles.price}>99.000<span className={styles.priceCurrency}>đ</span></p>
-                            <p className={styles.duration}>Sử dụng trong 30 ngày</p>
-                        </div>
-                        <ul className={styles.benefitList}>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Xem không giới hạn phim 2D</li>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Quầy thanh toán ưu tiên</li>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Giảm 15% khi mua bắp nước</li>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Tích luỹ điểm thưởng x1.5</li>
-                        </ul>
-                        <div className={styles.buttonWrapper}>
-                            <button
-                                className={`${styles.subscribeBtn} ${membership === "vip tháng" ? styles.disabled : ""}`}
-                                onClick={membership === "vip tháng" ? null : handleVipThang}
-                                disabled={membership === "vip tháng"}
-                            >
-                                {membership === "vip tháng" ? "Đang sử dụng" : "Nâng cấp ngay"}
-                            </button>
-                            {membership === "vip tháng" && (
-                                <p className={styles.dayLeftText}>
-                                    <i className="bi bi-clock-history"></i> Còn {dayLeft} ngày
-                                </p>
-                            )}
-                        </div>
-                    </div>
+                    {memberships.map((plan, index) => {
+                        const lowerType = plan.type?.toLowerCase() || '';
+                        let cardClass = styles.vipStandard;
+                        if (lowerType.includes('gold')) cardClass = styles.vipGold;
+                        else if (lowerType.includes('premium')) cardClass = styles.vipPremium;
+                        else if (lowerType.includes('silver')) cardClass = styles.vipSilver;
+                        else if (lowerType.includes('diamond') || lowerType.includes('platinum')) cardClass = styles.vipDiamond;
 
-                    {/* Gói VIP Năm */}
-                    <div className={`${styles.card} ${styles.vipYear}`}>
-                        <div className={styles.ribbon}>Đề xuất</div>
-                        <h3 className={styles.name}>THÀNH VIÊN VIP</h3>
-                        <div className={styles.priceContainer}>
-                            <p className={styles.price}>899.000<span className={styles.priceCurrency}>đ</span></p>
-                            <p className={styles.duration}>Sử dụng trong 365 ngày</p>
-                        </div>
-                        <ul className={styles.benefitList}>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Toàn quyền của Thành viên Bạc</li>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Tặng 4 vé xem phim 2D/IMAX</li>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Giảm 25% khi mua bắp nước</li>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Quà tặng sinh nhật đặc biệt</li>
-                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Ưu tiên đặt chỗ hàng ghế VIP</li>
-                        </ul>
-                        <div className={styles.buttonWrapper}>
-                            <button
-                                className={`${styles.subscribeBtn} ${membership === "vip năm" ? styles.disabled : ""}`}
-                                onClick={membership === "vip năm" ? null : handleVipNam}
-                                disabled={membership === "vip năm"}
-                            >
-                                {membership === "vip năm" ? "Đang sử dụng" : "Đăng ký ngay"}
-                            </button>
-                            {membership === "vip năm" && (
-                                <p className={styles.dayLeftText}>
-                                    <i className="bi bi-clock-history"></i> Còn {dayLeft} ngày
-                                </p>
-                            )}
-                        </div>
-                    </div>
+                        const isRecommended = index === 1;
+
+                        return (
+                            <div key={plan.id || index} className={`${styles.card} ${cardClass} ${isRecommended ? styles.isRecommended : ''}`}>
+                                {isRecommended && <div className={styles.ribbon}>Đề xuất</div>}
+                                <h3 className={styles.name}>{plan.name ? plan.name.toUpperCase() : "GÓI HỘI VIÊN"}</h3>
+                                <div className={styles.packageType}>{plan.type ? plan.type.toUpperCase() : "CƠ BẢN"}</div>
+                                <div className={styles.priceContainer}>
+                                    <p className={styles.price}>{plan.price ? plan.price.toLocaleString('vi-VN') : 0}<span className={styles.priceCurrency}>đ</span></p>
+                                    <p className={styles.duration}>Sử dụng trong {plan.duration} ngày</p>
+                                </div>
+                                <ul className={styles.benefitList}>
+                                    {plan.benefits && Array.isArray(plan.benefits) && plan.benefits.length > 0 ? (
+                                        plan.benefits.map((benefit, bIndex) => {
+                                            let text = "Quyền lợi";
+                                            if (benefit.type === 'direct') {
+                                                text = benefit.description;
+                                            } else if (benefit.type === 'voucher' && benefit.voucher) {
+                                                text = `Tặng Voucher ${benefit.voucher.code} - ${benefit.voucher.description || ''}`;
+                                            } else if (benefit.type === 'combo' && benefit.combo) {
+                                                text = `Tặng Combo ${benefit.combo.name}`;
+                                            } else {
+                                                text = benefit.description || benefit.type || "Quyền lợi";
+                                            }
+
+                                            return (
+                                                <li key={bIndex}>
+                                                    <span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span>
+                                                    {text}
+                                                </li>
+                                            );
+                                        })
+                                    ) : (
+                                        <>
+                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Xem phim không giới hạn</li>
+                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Ưu tiên quầy dịch vụ</li>
+                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Tích điểm đổi quà</li>
+                                        </>
+                                    )}
+                                </ul>
+                                <div className={styles.buttonWrapper}>
+                                    <button
+                                        className={`${styles.subscribeBtn} ${membership === plan.name ? styles.disabled : ""}`}
+                                        onClick={membership === plan.name ? null : () => handleSelectPlan(plan)}
+                                        disabled={membership === plan.name}
+                                    >
+                                        {membership === plan.name ? "Đang sử dụng" : "Đăng ký ngay"}
+                                    </button>
+                                    {membership === plan.name && (
+                                        <p className={styles.dayLeftText}>
+                                            <i className="bi bi-clock-history"></i> Còn {dayLeft} ngày
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -245,7 +248,7 @@ function Member() {
                         </button>
 
                         <h4>Xác nhận nâng cấp</h4>
-                        <p>Bạn đang chọn đăng ký gói {selectedPlan === "vip tháng" ? "Hội viên Bạc" : "Hội viên VIP"}.</p>
+                        <p>Bạn đang chọn đăng ký gói {selectedPlan}.</p>
 
                         <div className={styles.terms}>
                             <p className="fw-bold mb-3 text-dark">Điều khoản và Chính sách Hội viên</p>
