@@ -4,23 +4,21 @@ import com.booking.booking_ticket.dto.request.MembershipBenefitRequest;
 import com.booking.booking_ticket.dto.request.MembershipRequest;
 import com.booking.booking_ticket.dto.response.MembershipBenefitResponse;
 import com.booking.booking_ticket.dto.response.MembershipResponse;
-import com.booking.booking_ticket.entity.Combo;
-import com.booking.booking_ticket.entity.Membership;
-import com.booking.booking_ticket.entity.MembershipBenefit;
-import com.booking.booking_ticket.entity.Voucher;
-import com.booking.booking_ticket.repository.ComboRepository;
-import com.booking.booking_ticket.repository.MembershipBenefitRepository;
-import com.booking.booking_ticket.repository.MembershipRepository;
-import com.booking.booking_ticket.repository.VoucherRepository;
+import com.booking.booking_ticket.entity.*;
+import com.booking.booking_ticket.repository.*;
 import com.booking.booking_ticket.service.MembershipService;
 import com.booking.booking_ticket.utils.BenefitType;
+import com.booking.booking_ticket.utils.MembershipPaymentStatus;
 import com.booking.booking_ticket.utils.Status;
+import com.booking.booking_ticket.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +38,15 @@ public class MembershipServiceImpl implements MembershipService {
 
     @Autowired
     private VoucherRepository voucherRepository;
+
+    @Autowired
+    private Util util;
+
+    @Autowired
+    private UsersMembershipRepository usersMembershipRepository;
+
+    @Autowired
+    private UsersRepository usersRepository;
 
     @Override
     public Page<MembershipResponse> getList(Pageable pageable, String keyword, Status status){
@@ -174,5 +181,59 @@ public class MembershipServiceImpl implements MembershipService {
             membership.get().setStatus(Status.INACTIVE);
             membershipRepository.save(membership.get());
         }
+    }
+
+    @Override
+    public List<MembershipResponse> getAll() {
+        List<Membership> memberships = membershipRepository.findAllMembership(Status.ACTIVE);
+
+        List<MembershipResponse> response = new ArrayList<>();
+        for (Membership m : memberships){
+            MembershipResponse r = getById(m.getId());
+            response.add(r);
+        }
+
+        return response;
+    }
+
+    @Override
+    public MembershipResponse getByUserId() {
+        Integer userId = util.getLoginUserId();
+
+        MembershipResponse response = new MembershipResponse();
+        Optional<UsersMembership> usersMembership = usersMembershipRepository.findByUserId(userId, MembershipPaymentStatus.ACTIVE);
+        if (usersMembership.isPresent()){
+            Membership m = usersMembership.get().getMembership();
+            response.setId(m.getId());
+            response.setType(m.getType());
+            response.setPrice(m.getPrice());
+            response.setName(m.getName());
+            response.setDuration(m.getDuration());
+            response.setPaymentStatus(usersMembership.get().getMembershipPaymentStatus());
+            response.setStatus(m.getStatus());
+            response.setStartDate(usersMembership.get().getStartDate());
+            response.setEndDate(usersMembership.get().getExpiredDate());
+
+            return response;
+        }
+        return null;
+    }
+
+    @Override
+    public void addPayment(Integer userId, Integer membershipId) {
+        Membership membership = membershipRepository.findById(membershipId).orElseThrow(() -> new RuntimeException("Membership does not exist"));
+        Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("User does not exist"));
+
+        UsersMembership usersMembership = new UsersMembership();
+        usersMembership.setMembership(membership);
+        usersMembership.setUser(user);
+        usersMembership.setPrice(membership.getPrice());
+        usersMembership.setStartDate(LocalDateTime.now());
+        LocalDateTime endTime = LocalDateTime.now().plusDays(membership.getDuration());
+        usersMembership.setExpiredDate(endTime);
+        usersMembership.setMembershipPaymentStatus(MembershipPaymentStatus.ACTIVE);
+        usersMembership.setStatus(Status.ACTIVE);
+
+        usersMembershipRepository.save(usersMembership);
     }
 }

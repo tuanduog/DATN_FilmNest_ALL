@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.dto.response;
 
+import com.booking.booking_ticket.utils.MembershipPaymentStatus;
 import com.booking.booking_ticket.utils.MembershipType;
 import com.booking.booking_ticket.utils.Status;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,12 @@ public class MembershipResponse {
     Integer duration;
 
     Status status;
+
+    MembershipPaymentStatus paymentStatus;
+
+    LocalDateTime startDate;
+
+    LocalDateTime endDate;
 
     MembershipBenefitResponse[] benefits;
 

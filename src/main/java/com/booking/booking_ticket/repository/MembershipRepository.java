@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -31,4 +32,11 @@ public interface MembershipRepository extends JpaRepository<Membership, Integer>
         AND (:status IS NULL OR m.status = :status)
     """)
     Page<MembershipResponse> getList(Pageable pageable, String keyword, Status status);
+
+    @Query("""
+        SELECT m
+        FROM Membership m
+            WHERE m.status = :status
+    """)
+    List<Membership> findAllMembership(Status status);
 }

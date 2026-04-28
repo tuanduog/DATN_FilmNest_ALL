@@ -6,6 +6,10 @@ import com.booking.booking_ticket.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+
 import java.util.Optional;
 
 @Component
@@ -90,5 +94,21 @@ public class Util {
         if(voucher.isPresent()){
             throw new RuntimeException("Voucher already exists");
         }
+    }
+
+    public Integer getLoginUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+            return ((Number) jwt.getClaim("user_id")).intValue();
+        }
+        return null;
+    }
+
+    public Users getLoginUser() {
+        Integer id = getLoginUserId();
+        if (id != null) {
+            return usersRepository.findById(id).orElse(null);
+        }
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package com.booking.booking_ticket.entity;
 
+import com.booking.booking_ticket.utils.MembershipPaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,9 +22,14 @@ public class UsersMembership extends BaseEntity{
     @JoinColumn(name = "membership_id")
     private Membership membership;
 
+    private Double price;
+
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
 
     @Column(name = "end_date", nullable = false)
     private LocalDateTime expiredDate;
+
+    @Column(name = "membership_payment_status", nullable = false)
+    private MembershipPaymentStatus membershipPaymentStatus;
 }
