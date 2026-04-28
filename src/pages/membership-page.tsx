@@ -328,23 +328,6 @@ export default function MembershipPage() {
                 meta: { width: '20%' }
             },
             {
-                id: 'discount',
-                header: intl.formatMessage({ id: 'discount' }),
-                accessorKey: 'discount',
-                dataType: 'text',
-                enableGrouping: false,
-                meta: { width: '20%' },
-                cell: ({ row }) => {
-                    const { discount } = row.original;
-
-                    return (
-                        <Typography>
-                            {discount}%
-                        </Typography>
-                    );
-                }
-            },
-            {
                 id: 'duration',
                 header: intl.formatMessage({ id: 'duration' }),
                 accessorKey: 'duration',

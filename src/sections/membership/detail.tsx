@@ -15,7 +15,16 @@ import { useParams } from 'react-router';
 import { getById } from 'api/membership';
 import { HttpStatusCode } from 'axios';
 import { useIntl } from 'react-intl';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
+import { getList as getListCombo } from 'api/combo';
+import { getList as getListVoucher } from 'api/voucher';
+import { Combo } from 'types/combo';
+import { Voucher } from 'types/voucher';
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import { MembershipBenefit } from 'types/membership';
 
 export default function MembershipDetail() {
     const { id } = useParams<{ id: string }>();
@@ -43,9 +52,40 @@ export default function MembershipDetail() {
             } catch (err: any) {
                 setAlert({ open: true, message: err.message, severity: 'error' });
             }
-        }
+        };
         fetchMembership();
     }, [id]);
+
+    const [combos, setCombos] = useState<Combo[]>([]);
+    const [vouchers, setVouchers] = useState<Voucher[]>([]);
+
+    useEffect(() => {
+        const fetchBenefits = async () => {
+            try {
+                const resCombo = await getListCombo({ page: 0, size: 100, keyword: '', sort: '', status: 'ACTIVE' });
+                if (resCombo?.data?.content) setCombos(resCombo.data.content);
+
+                const resVoucher = await getListVoucher({ page: 0, size: 100, keyword: '', sort: '', status: 'ACTIVE' });
+                if (resVoucher?.data?.content) setVouchers(resVoucher.data.content);
+            } catch (error) {
+                console.error('Failed to fetch benefits', error);
+            }
+        };
+        fetchBenefits();
+    }, []);
+
+    const getBenefitName = (benefit: any) => {
+        const type = benefit.type?.toUpperCase();
+        if (type === 'VOUCHER') {
+            return benefit.voucher ? `Voucher: ${benefit.voucher.code}` : 'Voucher (Không tìm thấy)';
+        }
+        if (type === 'COMBO') {
+            return benefit.combo ? `Combo: ${benefit.combo.name}` : 'Combo (Không tìm thấy)';
+        }
+        if (type === 'DIRECT') {
+            return `Quyền lợi trực tiếp: ${benefit.description}`;
+        }
+    };
 
     return (
         <Box>
@@ -69,7 +109,7 @@ export default function MembershipDetail() {
                         )}
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="name" sx={{ mb: 1 }}>
                                 Tên gói thành viên
                             </InputLabel>
 
@@ -77,7 +117,7 @@ export default function MembershipDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="type" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="type" sx={{ mb: 1 }}>
                                 Loại gói thành viên
                             </InputLabel>
 
@@ -85,7 +125,7 @@ export default function MembershipDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="price" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="price" sx={{ mb: 1 }}>
                                 Giá tiền (VND)
                             </InputLabel>
 
@@ -93,28 +133,30 @@ export default function MembershipDetail() {
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="discount" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Tỷ lệ giảm giá (%)
-                            </InputLabel>
-
-                            <Typography>{membership?.discount}</Typography>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel htmlFor="duration" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                            <InputLabel htmlFor="duration" sx={{ mb: 1 }}>
                                 Thời hạn (ngày)
                             </InputLabel>
 
                             <Typography>{membership?.duration}</Typography>
                         </Grid>
-
-                        <Grid size={12}>
-                            <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Mô tả
-                            </InputLabel>
-
-                            <Typography>{membership?.description}</Typography>
-                        </Grid>
+                        {membership?.benefits && membership.benefits.length > 0 && (
+                            <Grid size={12}>
+                                <Divider sx={{ my: 2 }} />
+                                <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+                                    Các quyền lợi của gói thành viên
+                                </Typography>
+                                <List disablePadding>
+                                    {membership.benefits.map((benefit: MembershipBenefit, index: number) => (
+                                        <ListItem key={index} sx={{ py: 1, px: 0, borderBottom: '1px dashed', borderColor: 'divider' }}>
+                                            <ListItemText
+                                                primary={getBenefitName(benefit)}
+                                                secondary={`Số lượng: ${benefit.quantity}`}
+                                            />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Grid>
+                        )}
                     </Grid>
                 </Box>
 

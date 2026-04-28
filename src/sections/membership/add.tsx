@@ -40,11 +40,10 @@ export default function AddMembership() {
         name: '',
         type: '',
         price: 0,
-        discount: 0,
         duration: 0,
-        description: '',
         status: '',
-        image: null
+        image: null,
+        benefits: []
     };
 
     const [membership, setMembership] = useState<Membership>(initialValues);

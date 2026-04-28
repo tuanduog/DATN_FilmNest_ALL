@@ -5,8 +5,14 @@ export interface Membership {
     name: string;
     price: number;
     type: string;
-    discount: number;
     duration?: number;
-    description?: string;
     status: string;
+    benefits: MembershipBenefit[];
+}
+
+export interface MembershipBenefit {
+    type: string;
+    description: string;
+    benefitRefId: number;
+    quantity: number;
 }

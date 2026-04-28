@@ -13,15 +13,20 @@ import {
     Select,
     MenuItem,
     FormHelperText,
-    Grid
+    Grid,
+    Divider
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Membership } from 'types/membership';
 import { CloseCircle } from 'iconsax-reactjs';
 import AnimateButton from 'components/@extended/AnimateButton';
 import ImageDropZone from 'components/ImageDropZone';
+import { getList as getListCombo } from 'api/combo';
+import { getList as getListVoucher } from 'api/voucher';
+import { Combo } from 'types/combo';
+import { Voucher } from 'types/voucher';
 
 interface MembershipFormProps {
     handleNext: () => void;
@@ -33,14 +38,29 @@ const validationSchema = Yup.object({
     name: Yup.string().required('Tên gói thành viên là bắt buộc'),
     type: Yup.string().required('Loại gói thành viên là bắt buộc'),
     price: Yup.number().required('Giá tiền là bắt buộc').min(1, 'Giá tiền phải lớn hơn 0'),
-    discount: Yup.number().required('Tỷ lệ giảm giá là bắt buộc').min(1, 'Tỷ lệ giảm giá phải lớn hơn 0').max(100, 'Tỷ lệ giảm giá phải nhỏ hơn hoặc bằng 100'),
-    duration: Yup.number().required('Thời hạn là bắt buộc').min(1, 'Thời hạn phải lớn hơn 0'),
-    description: Yup.string().required('Mô tả là bắt buộc')
+    duration: Yup.number().required('Thời hạn là bắt buộc').min(1, 'Thời hạn phải lớn hơn 0')
 });
 
 export default function MembershipForm({ handleNext, setMembership, membership }: MembershipFormProps) {
     const [image, setImage] = useState<File | null>(membership.image!);
     const [preview, setPreview] = useState<string | null>('');
+    const [combos, setCombos] = useState<Combo[]>([]);
+    const [vouchers, setVouchers] = useState<Voucher[]>([]);
+
+    useEffect(() => {
+        const fetchBenefits = async () => {
+            try {
+                const resCombo = await getListCombo({ page: 0, size: 100, keyword: '', sort: '', status: 'ACTIVE' });
+                if (resCombo?.data?.content) setCombos(resCombo.data.content);
+
+                const resVoucher = await getListVoucher({ page: 0, size: 100, keyword: '', sort: '', status: 'ACTIVE' });
+                if (resVoucher?.data?.content) setVouchers(resVoucher.data.content);
+            } catch (error) {
+                console.error('Failed to fetch benefits', error);
+            }
+        };
+        fetchBenefits();
+    }, []);
 
     const [alert, setAlert] = useState({
         open: false,
@@ -79,7 +99,7 @@ export default function MembershipForm({ handleNext, setMembership, membership }
                         <Grid container spacing={2}>
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
-                                    <InputLabel sx={{ mb: 1 }}>Hình ảnh combo</InputLabel>
+                                    <InputLabel sx={{ mb: 1 }}>Hình ảnh gói</InputLabel>
                                     {!preview ? (
                                         <ImageDropZone
                                             value={preview ?? ''}
@@ -199,26 +219,6 @@ export default function MembershipForm({ handleNext, setMembership, membership }
                             </Grid>
 
                             <Grid size={12}>
-                                <InputLabel htmlFor="discount" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tỷ lệ giảm giá (%)
-                                </InputLabel>
-
-                                <TextField
-                                    id="discount"
-                                    name="discount"
-                                    placeholder="Nhập tỷ lệ giảm giá (%)"
-                                    size="small"
-                                    type='number'
-                                    fullWidth
-                                    value={formik.values.discount}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    error={formik.touched.discount && Boolean(formik.errors.discount)}
-                                    helperText={formik.touched.discount && formik.errors.discount}
-                                />
-                            </Grid>
-
-                            <Grid size={12}>
                                 <InputLabel htmlFor="duration" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
                                     Thời hạn (tháng)
                                 </InputLabel>
@@ -239,24 +239,116 @@ export default function MembershipForm({ handleNext, setMembership, membership }
                             </Grid>
 
                             <Grid size={12}>
-                                <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Mô tả
-                                </InputLabel>
+                                <Divider sx={{ my: 2 }} />
+                                <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+                                    Các quyền lợi của gói thành viên
+                                </Typography>
 
-                                <TextField
-                                    id="description"
-                                    name="description"
-                                    placeholder="Nhập mô tả"
-                                    size="small"
-                                    rows={4}
-                                    multiline
-                                    fullWidth
-                                    value={formik.values.description}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    error={formik.touched.description && Boolean(formik.errors.description)}
-                                    helperText={formik.touched.description && formik.errors.description}
-                                />
+                                {(formik.values.benefits || []).map((benefit, index) => (
+                                    <Grid container spacing={2} key={index} sx={{ mb: 2, alignItems: 'center' }}>
+                                        <Grid size={{ xs: 12, md: 3 }}>
+                                            <FormControl fullWidth size="small">
+                                                <Select
+                                                    value={benefit.type || ''}
+                                                    displayEmpty
+                                                    onChange={(e) => {
+                                                        const newBenefits = [...(formik.values.benefits || [])];
+                                                        newBenefits[index].type = e.target.value as string;
+                                                        newBenefits[index].benefitRefId = 0;
+                                                        formik.setFieldValue('benefits', newBenefits);
+                                                    }}
+                                                >
+                                                    <MenuItem value="" disabled sx={{ display: 'none' }}>Chọn loại quyền lợi</MenuItem>
+                                                    <MenuItem value="VOUCHER">Voucher</MenuItem>
+                                                    <MenuItem value="COMBO">Combo</MenuItem>
+                                                    <MenuItem value="DIRECT">Trực tiếp</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        {(benefit.type === 'VOUCHER' || benefit.type === 'COMBO') && (
+                                            <Grid size={{ xs: 12, md: 6 }}>
+                                                {benefit.type === 'VOUCHER' ? (
+                                                    <FormControl fullWidth size="small">
+                                                        <Select
+                                                            value={benefit.benefitRefId || ''}
+                                                            displayEmpty
+                                                            onChange={(e) => {
+                                                                const newBenefits = [...(formik.values.benefits || [])];
+                                                                newBenefits[index].benefitRefId = Number(e.target.value);
+                                                                formik.setFieldValue('benefits', newBenefits);
+                                                            }}
+                                                        >
+                                                            <MenuItem value="" disabled sx={{ display: 'none' }}>Chọn Voucher</MenuItem>
+                                                            {vouchers.map(v => <MenuItem key={v.id} value={v.id}>{v.code}</MenuItem>)}
+                                                        </Select>
+                                                    </FormControl>
+                                                ) : (
+                                                    <FormControl fullWidth size="small">
+                                                        <Select
+                                                            value={benefit.benefitRefId || ''}
+                                                            displayEmpty
+                                                            onChange={(e) => {
+                                                                const newBenefits = [...(formik.values.benefits || [])];
+                                                                newBenefits[index].benefitRefId = Number(e.target.value);
+                                                                formik.setFieldValue('benefits', newBenefits);
+                                                            }}
+                                                        >
+                                                            <MenuItem value="" disabled sx={{ display: 'none' }}>Chọn Combo</MenuItem>
+                                                            {combos.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+                                                        </Select>
+                                                    </FormControl>
+                                                )}
+                                            </Grid>
+                                        )}
+                                        {benefit.type !== 'VOUCHER' && benefit.type !== 'COMBO' && (
+                                            <Grid size={{ xs: 12, md: 6 }}>
+                                                <TextField
+                                                    placeholder="Mô tả quyền lợi"
+                                                    size="small"
+                                                    fullWidth
+                                                    value={benefit.description || ''}
+                                                    onChange={(e) => {
+                                                        const newBenefits = [...(formik.values.benefits || [])];
+                                                        newBenefits[index].description = e.target.value;
+                                                        formik.setFieldValue('benefits', newBenefits);
+                                                    }}
+                                                />
+                                            </Grid>
+                                        )}
+                                        <Grid size={{ xs: 12, md: 2 }}>
+                                            <TextField
+                                                type="number"
+                                                placeholder="Số lượng"
+                                                size="small"
+                                                fullWidth
+                                                value={benefit.quantity || ''}
+                                                onChange={(e) => {
+                                                    const newBenefits = [...(formik.values.benefits || [])];
+                                                    newBenefits[index].quantity = Number(e.target.value);
+                                                    formik.setFieldValue('benefits', newBenefits);
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid size={{ xs: 12, md: 1 }} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                            <IconButton color="error" onClick={() => {
+                                                const newBenefits = formik.values.benefits?.filter((_, i) => i !== index);
+                                                formik.setFieldValue('benefits', newBenefits);
+                                            }}>
+                                                <CloseCircle />
+                                            </IconButton>
+                                        </Grid>
+                                    </Grid>
+                                ))}
+
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => {
+                                        const newBenefits = [...(formik.values.benefits || []), { type: '', description: '', quantity: 1, benefitRefId: 0 }];
+                                        formik.setFieldValue('benefits', newBenefits);
+                                    }}
+                                >
+                                    Thêm quyền lợi
+                                </Button>
                             </Grid>
                         </Grid>
                     </Box>

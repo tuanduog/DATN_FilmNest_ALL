@@ -11,7 +11,15 @@ import { Alert, Box, Divider, Grid, Paper, Snackbar, Stack, Typography } from '@
 import { create } from 'api/membership';
 import { useIntl } from 'react-intl';
 import useAuth from 'hooks/useAuth';
-import { Membership } from 'types/membership';
+import { Membership, MembershipBenefit } from 'types/membership';
+import { getList as getListCombo } from 'api/combo';
+import { getList as getListVoucher } from 'api/voucher';
+import { Combo } from 'types/combo';
+import { Voucher } from 'types/voucher';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import { useEffect } from 'react';
 import AnimateButton from 'components/@extended/AnimateButton';
 import { uploadImage } from 'api/file';
 
@@ -30,6 +38,36 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
         message: '',
         severity: 'success' as 'success' | 'error' | 'info' | 'warning'
     });
+
+    const [combos, setCombos] = useState<Combo[]>([]);
+    const [vouchers, setVouchers] = useState<Voucher[]>([]);
+
+    useEffect(() => {
+        const fetchBenefits = async () => {
+            try {
+                const resCombo = await getListCombo({ page: 0, size: 100, keyword: '', sort: '', status: 'ACTIVE' });
+                if (resCombo?.data?.content) setCombos(resCombo.data.content);
+
+                const resVoucher = await getListVoucher({ page: 0, size: 100, keyword: '', sort: '', status: 'ACTIVE' });
+                if (resVoucher?.data?.content) setVouchers(resVoucher.data.content);
+            } catch (error) {
+                console.error('Failed to fetch benefits', error);
+            }
+        };
+        fetchBenefits();
+    }, []);
+
+    const getBenefitName = (benefit: MembershipBenefit) => {
+        if (benefit.type === 'voucher') {
+            const v = vouchers.find(x => x.id === benefit.benefitRefId);
+            return v ? `Voucher: ${v.code}` : 'Voucher (Không tìm thấy)';
+        }
+        if (benefit.type === 'combo') {
+            const c = combos.find(x => x.id === benefit.benefitRefId);
+            return c ? `Combo: ${c.name}` : 'Combo (Không tìm thấy)';
+        }
+        return benefit.description || 'Trực tiếp';
+    };
 
     const handleSubmit = async () => {
         let imageUrl = '';
@@ -66,9 +104,8 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
             name: membership.name,
             type: membership.type,
             price: membership.price,
-            discount: membership.discount,
             duration: membership.duration,
-            description: membership.description,
+            benefits: membership.benefits
         };
 
         try {
@@ -142,26 +179,29 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Giảm giá (%)</InputLabel>
-                                <Typography>
-                                    {membership.discount}%
-                                </Typography>
-                            </Stack>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Stack sx={{ gap: 1 }}>
                                 <InputLabel sx={{ fontWeight: 'bold' }}>Thời hạn (tháng)</InputLabel>
                                 <Typography>{membership.duration}</Typography>
                             </Stack>
                         </Grid>
 
-                        <Grid size={{ xs: 12, sm: 12 }}>
-                            <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mô tả</InputLabel>
-                                <Typography sx={{ whiteSpace: 'pre-wrap' }}>{membership.description}</Typography>
-                            </Stack>
-                        </Grid>
+                        {membership.benefits && membership.benefits.length > 0 && (
+                            <Grid size={12}>
+                                <Divider sx={{ my: 2 }} />
+                                <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                                    Các quyền lợi của gói thành viên
+                                </Typography>
+                                <List disablePadding>
+                                    {membership.benefits.map((benefit: MembershipBenefit, index: number) => (
+                                        <ListItem key={index} sx={{ py: 1, px: 0, borderBottom: '1px dashed', borderColor: 'divider' }}>
+                                            <ListItemText
+                                                primary={getBenefitName(benefit)}
+                                                secondary={`Số lượng: ${benefit.quantity}`}
+                                            />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Grid>
+                        )}
                     </Grid>
                 </Box>
 
