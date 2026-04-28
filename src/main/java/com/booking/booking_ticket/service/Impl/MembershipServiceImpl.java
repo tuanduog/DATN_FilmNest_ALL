@@ -1,16 +1,29 @@
 package com.booking.booking_ticket.service.Impl;
 
+import com.booking.booking_ticket.dto.request.MembershipBenefitRequest;
 import com.booking.booking_ticket.dto.request.MembershipRequest;
+import com.booking.booking_ticket.dto.response.MembershipBenefitResponse;
 import com.booking.booking_ticket.dto.response.MembershipResponse;
+import com.booking.booking_ticket.entity.Combo;
 import com.booking.booking_ticket.entity.Membership;
+import com.booking.booking_ticket.entity.MembershipBenefit;
+import com.booking.booking_ticket.entity.Voucher;
+import com.booking.booking_ticket.repository.ComboRepository;
+import com.booking.booking_ticket.repository.MembershipBenefitRepository;
 import com.booking.booking_ticket.repository.MembershipRepository;
+import com.booking.booking_ticket.repository.VoucherRepository;
 import com.booking.booking_ticket.service.MembershipService;
+import com.booking.booking_ticket.utils.BenefitType;
 import com.booking.booking_ticket.utils.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +31,15 @@ public class MembershipServiceImpl implements MembershipService {
 
     @Autowired
     private MembershipRepository membershipRepository;
+
+    @Autowired
+    private MembershipBenefitRepository membershipBenefitRepository;
+
+    @Autowired
+    private ComboRepository comboRepository;
+
+    @Autowired
+    private VoucherRepository voucherRepository;
 
     @Override
     public Page<MembershipResponse> getList(Pageable pageable, String keyword, Status status){
@@ -31,6 +53,7 @@ public class MembershipServiceImpl implements MembershipService {
     }
 
     @Override
+    @Transactional
     public void addMembership(MembershipRequest request){
         Optional<Membership> checkValid = membershipRepository.findByName(request.getName());
         if (checkValid.isPresent()){
@@ -38,21 +61,33 @@ public class MembershipServiceImpl implements MembershipService {
         }
         Membership membership = new Membership();
 
-//        membership.setImage(request.getImage());
-//        membership.setName(request.getName());
-//        membership.setType(request.getType());
-//        membership.setPrice(request.getPrice());
-//        membership.setDiscount(request.getDiscount());
-//        membership.setDuration(request.getDuration());
-//        membership.setDescription(request.getDescription());
-//        membership.setStatus(Status.ACTIVE);
+        membership.setImage(request.getImage());
+        membership.setName(request.getName());
+        membership.setType(request.getType());
+        membership.setPrice(request.getPrice());
+        membership.setDuration(request.getDuration());
+        membership.setStatus(Status.ACTIVE);
+        Membership savedMembership = membershipRepository.save(membership);
 
-        membershipRepository.save(membership);
+        List<MembershipBenefitRequest> benefitRequest = Arrays.stream(request.getBenefits()).toList();
+        List<MembershipBenefit> listBenefit = new ArrayList<>();
+        for (MembershipBenefitRequest r : benefitRequest){
+            MembershipBenefit benefit = new MembershipBenefit();
+            benefit.setType(r.getType());
+            benefit.setDescription(r.getDescription());
+            benefit.setQuantity(r.getQuantity());
+            benefit.setBenefitRefId(r.getBenefitRefId());
+            benefit.setStatus(Status.ACTIVE);
+            benefit.setMembership(savedMembership);
+            listBenefit.add(benefit);
+        }
+
+        membershipBenefitRepository.saveAll(listBenefit);
     }
 
     @Override
     public void updateMembership(Integer id, MembershipRequest request){
-        Membership membership = membershipRepository.getOne(id);
+        Membership membership = membershipRepository.findById(id).orElseThrow(() -> new RuntimeException("Membership does not exist"));
 
         if (request.getImage() != null){
             membership.setImage(request.getImage());
@@ -70,37 +105,64 @@ public class MembershipServiceImpl implements MembershipService {
             membership.setPrice(request.getPrice());
         }
 
-//        if (request.getDiscount() != null){
-//            membership.setDiscount(request.getDiscount());
-//        }
-//
-//        if (request.getDuration() != null){
-//            membership.setDuration(request.getDuration());
-//        }
-//
-//        if (request.getDescription() != null){
-//            membership.setDescription(request.getDescription());
-//        }
-
+        if (request.getDuration() != null){
+            membership.setDuration(request.getDuration());
+        }
         membershipRepository.save(membership);
+
+        List<MembershipBenefitRequest> benefitRequest = Arrays.stream(request.getBenefits()).toList();
+        List<MembershipBenefit> listBenefit = new ArrayList<>();
+        for (MembershipBenefitRequest r : benefitRequest){
+            Optional<MembershipBenefit> benefit = membershipBenefitRepository.findById(r.getId());
+            if (benefit.isPresent()){
+                benefit.get().setType(r.getType());
+                benefit.get().setDescription(r.getDescription());
+                benefit.get().setQuantity(r.getQuantity());
+                benefit.get().setBenefitRefId(r.getBenefitRefId());
+                listBenefit.add(benefit.get());
+            }
+        }
+        membershipBenefitRepository.saveAll(listBenefit);
     }
 
     @Override
     public MembershipResponse getById(Integer id){
-        Membership membership = membershipRepository.getById(id);
+        Membership membership = membershipRepository.findById(id).orElseThrow(() -> new RuntimeException("Membership does not exist"));
 
         MembershipResponse response = new MembershipResponse();
-        if (membership != null){
-            response.setId(membership.getId());
-            response.setImage(membership.getImage());
-            response.setName(membership.getName());
-            response.setType(membership.getType());
-            response.setPrice(membership.getPrice());
-//            response.setDiscount(membership.getDiscount());
-//            response.setDuration(membership.getDuration());
-//            response.setDescription(membership.getDescription());
-            response.setStatus(membership.getStatus());
-        } else return null;
+        response.setId(membership.getId());
+        response.setImage(membership.getImage());
+        response.setName(membership.getName());
+        response.setType(membership.getType());
+        response.setPrice(membership.getPrice());
+        response.setDuration(membership.getDuration());
+        response.setStatus(membership.getStatus());
+
+        List<MembershipBenefit> benefits = membershipBenefitRepository.findByMembership_Id(id);
+        List<MembershipBenefitResponse> benefitResponse = new ArrayList<>();
+        for (MembershipBenefit benefit : benefits){
+            MembershipBenefitResponse responseBenefit = new MembershipBenefitResponse();
+            responseBenefit.setId(benefit.getId());
+            responseBenefit.setQuantity(benefit.getQuantity());
+            responseBenefit.setType(benefit.getType());
+            if (benefit.getType().equals(BenefitType.COMBO)){
+                Optional<Combo> combo = comboRepository.findById(benefit.getBenefitRefId());
+                if (combo.isPresent()){
+                    responseBenefit.setCombo(combo.get());
+                }
+            }
+            if (benefit.getType().equals(BenefitType.VOUCHER)){
+                Optional<Voucher> voucher = voucherRepository.findById(benefit.getBenefitRefId());
+                if (voucher.isPresent()){
+                    responseBenefit.setVoucher(voucher.get());
+                }
+            }
+            if (benefit.getType().equals(BenefitType.DIRECT)){
+                responseBenefit.setDescription(benefit.getDescription());
+            }
+            benefitResponse.add(responseBenefit);
+        }
+        response.setBenefits(benefitResponse.toArray(new MembershipBenefitResponse[0]));
 
         return response;
     }

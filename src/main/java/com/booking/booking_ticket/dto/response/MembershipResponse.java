@@ -29,6 +29,8 @@ public class MembershipResponse {
 
     Status status;
 
+    MembershipBenefitResponse[] benefits;
+
     public MembershipResponse(int id, String name, MembershipType type, Double price, Integer duration, Status status) {
         this.id = id;
         this.name = name;

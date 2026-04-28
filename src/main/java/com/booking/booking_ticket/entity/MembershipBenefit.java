@@ -25,8 +25,8 @@ public class MembershipBenefit extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     String description;
 
-    @Column(name = "voucher_id")
-    Integer voucherId;
+    @Column(name = "benefit_ref_id")
+    Integer benefitRefId;
 
     Integer quantity;
 }
