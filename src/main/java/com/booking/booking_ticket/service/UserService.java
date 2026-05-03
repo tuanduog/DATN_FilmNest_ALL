@@ -1,7 +1,10 @@
 package com.booking.booking_ticket.service;
 
+import com.booking.booking_ticket.dto.request.ChangePasswordRequest;
 import com.booking.booking_ticket.dto.request.UserRequest;
+import com.booking.booking_ticket.dto.request.UserUpdateRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
+import com.booking.booking_ticket.dto.response.UserBenefitResponse;
 import com.booking.booking_ticket.dto.response.UserResponse;
 import com.booking.booking_ticket.entity.Users;
 import com.booking.booking_ticket.utils.Status;
@@ -12,11 +15,11 @@ import java.util.List;
 
 public interface UserService {
 
-    public Users getByUsername (String userName);
+    public UserResponse getUserProfile();
 
-    public Users updateProfile (Users new_User);
+    public void updateUserProfile(UserUpdateRequest request);
 
-    public List<Users> getAllUser();
+    public void changePassword(ChangePasswordRequest request);
 
     public Page<UserResponse> getList(Pageable pageable, String keyword, Status status);
 
@@ -29,4 +32,6 @@ public interface UserService {
     public void deleteUser(Integer id);
 
     public ResponseData<?> checkExistUser(String username);
+
+    public UserBenefitResponse getBenefitsForUser();
 }

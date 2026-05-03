@@ -4,6 +4,7 @@ import com.booking.booking_ticket.dto.request.VoucherRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.service.VoucherService;
 import com.booking.booking_ticket.utils.Status;
+import com.booking.booking_ticket.utils.VoucherType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +23,11 @@ public class VoucherController {
     private final VoucherService voucherService;
 
     @GetMapping("/v1")
-    public ResponseData<?> getList(@PageableDefault() Pageable pageable, @RequestParam(required = false) String keyword, @RequestParam(required = false) Status status){
-        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", voucherService.getList(pageable, keyword, status));
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable,
+                                   @RequestParam(required = false) String keyword,
+                                   @RequestParam(required = false) VoucherType type,
+                                   @RequestParam(required = false) Status status){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", voucherService.getList(pageable, keyword, type, status));
     }
 
     @GetMapping("/v1/{id}")
@@ -47,5 +51,10 @@ public class VoucherController {
     public ResponseData<?> deleteRoom(@PathVariable Integer id){
         voucherService.deleteVoucher(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Delete voucher successful");
+    }
+
+    @GetMapping("/v1/public")
+    public ResponseData<?> getPublicVoucher(){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get public voucher successful", voucherService.getPublicVouchers());
     }
 }

@@ -1,9 +1,7 @@
 package com.booking.booking_ticket.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.booking.booking_ticket.utils.BookingComboType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -23,6 +21,9 @@ public class BookingCombo extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "combo_id")
     Combo combo;
+
+    @Enumerated(EnumType.STRING)
+    BookingComboType type;
 
     Integer quantity;
 

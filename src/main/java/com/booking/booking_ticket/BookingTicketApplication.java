@@ -2,10 +2,10 @@ package com.booking.booking_ticket;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.beans.Encoder;
-
+@EnableScheduling
 @SpringBootApplication
 public class BookingTicketApplication {
 

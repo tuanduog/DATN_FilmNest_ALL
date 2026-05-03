@@ -2,7 +2,9 @@ package com.booking.booking_ticket.controller;
 
 import java.util.List;
 
+import com.booking.booking_ticket.dto.request.ChangePasswordRequest;
 import com.booking.booking_ticket.dto.request.UserRequest;
+import com.booking.booking_ticket.dto.request.UserUpdateRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.service.UserService;
 import com.booking.booking_ticket.utils.Status;
@@ -20,39 +22,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @GetMapping("/get-Userprofile/{userName}")
-    public ResponseEntity<?> getUserByUsername(@PathVariable String userName) {
-        try {
-            Users user = userService.getByUsername(userName);
-            return ResponseEntity.ok(user);
-        } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to getbooking byshowtime: " + e.getMessage());
-        }
-    }
-    
-    @PutMapping("/update-Userprofile")
-    public ResponseEntity<?> updateUserprofile(@RequestBody Users user) {
-        try {
-            Users users = userService.updateProfile(user);
-            return ResponseEntity.ok(users);
-        } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to getbooking byshowtime: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/getAllUser")
-    public ResponseEntity<?> getUsers() {
-        try {
-            List<Users> mem = userService.getAllUser();
-            return ResponseEntity.ok(mem);
-        } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to getusers : " + e.getMessage());
-        }
-    }
 
     @GetMapping("/v1")
     public ResponseData<?> getList(Pageable pageable, String keyword, Status status) {
@@ -85,5 +54,27 @@ public class UserController {
     @GetMapping("/v1/check-exist")
     public ResponseData<?> checkUserExist(@RequestParam String username) {
         return new ResponseData<>(HttpStatus.OK.value(), "Check user successfully", userService.checkExistUser(username));
+    }
+
+    @GetMapping("/v1/benefit")
+    public ResponseData<?> getBenefits() {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get benefit successfully", userService.getBenefitsForUser());
+    }
+
+    @GetMapping("/v1/profile")
+    public ResponseData<?> getUserProfile() {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get user profile successfully", userService.getUserProfile());
+    }
+
+    @PutMapping("/v1/profile")
+    public ResponseData<?> updateUserProfile(@RequestBody UserUpdateRequest request) {
+        userService.updateUserProfile(request);
+        return new ResponseData<>(HttpStatus.OK.value(), "Update user profile successfully");
+    }
+
+    @PutMapping("/v1/change-password")
+    public ResponseData<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        userService.changePassword(request);
+        return new ResponseData<>(HttpStatus.OK.value(), "Change password successfully");
     }
 }

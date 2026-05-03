@@ -1,20 +1,26 @@
 package type;
 
-
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
+import lombok.experimental.FieldDefaults;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreatePaymentLinkRequestBody {
-    private String productName;
-    private String description;
-    private String returnUrl;
-    private int price;
-    private String cancelUrl;
 
+    String productName;
+
+    String description;
+
+    String returnUrl;
+
+    Double price;
+
+    String cancelUrl;
 }

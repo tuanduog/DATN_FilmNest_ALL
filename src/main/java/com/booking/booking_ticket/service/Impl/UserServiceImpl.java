@@ -1,23 +1,25 @@
 package com.booking.booking_ticket.service.Impl;
 
+import com.booking.booking_ticket.dto.request.ChangePasswordRequest;
 import com.booking.booking_ticket.dto.request.UserRequest;
-import com.booking.booking_ticket.dto.response.ResponseData;
-import com.booking.booking_ticket.dto.response.UserResponse;
-import com.booking.booking_ticket.entity.Employee;
-import com.booking.booking_ticket.entity.Users;
-import com.booking.booking_ticket.repository.EmployeeRepository;
-import com.booking.booking_ticket.repository.UsersRepository;
+import com.booking.booking_ticket.dto.request.UserUpdateRequest;
+import com.booking.booking_ticket.dto.response.*;
+import com.booking.booking_ticket.entity.*;
+import com.booking.booking_ticket.repository.*;
 import com.booking.booking_ticket.service.UserService;
-import com.booking.booking_ticket.utils.Role;
-import com.booking.booking_ticket.utils.Status;
-import com.booking.booking_ticket.utils.Util;
+import com.booking.booking_ticket.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,33 +38,84 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private Util util;
 
+    @Autowired
+    private VoucherRepository voucherRepository;
+
+    @Autowired
+    private VoucherUsageRepository voucherUsageRepository;
+
+    @Autowired
+    private UsersMembershipRepository usersMembershipRepository;
+
+    @Autowired
+    private BookingComboRepository bookingComboRepository;
+
+    @Autowired
+    private ComboRepository comboRepository;
+
     @Override
-    public Users getByUsername (String userName){
-        Optional<Users> users = usersRepository.findByUsername(userName);
-        if(users.isPresent()){
-            return users.get();
+    public UserResponse getUserProfile(){
+        Users user = util.getLoginUser();
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setGender(user.getGender());
+        response.setDob(user.getDob());
+        response.setStatus(user.getStatus());
+        response.setRole(user.getRole());
+        response.setPhone(user.getPhone());
+        response.setNationality(user.getNationality());
+        response.setFullname(user.getFullname());
+
+        return response;
+    }
+
+    @Override
+    public void updateUserProfile(UserUpdateRequest request){
+        Users user = util.getLoginUser();
+        util.validateUser(request.getUsername(), request.getEmail(), request.getPhone(), user.getId());
+        if (request.getUsername() != null){
+            user.setUsername(request.getUsername());
         }
-        return null;
+
+        if (request.getEmail() != null){
+            user.setEmail(request.getEmail());
+        }
+
+        if (request.getPhone() != null){
+            user.setPhone(request.getPhone());
+        }
+
+        if (request.getFullname() != null){
+            user.setFullname(request.getFullname());
+        }
+
+        if (request.getDob() != null){
+            user.setDob(request.getDob());
+        }
+
+        if (request.getGender() != null){
+            user.setGender(request.getGender());
+        }
+
+        if (request.getNationality() != null){
+            user.setNationality(request.getNationality());
+        }
+
+        usersRepository.save(user);
     }
 
     @Override
-    public Users updateProfile (Users new_User){
-        return usersRepository.findByUsername(new_User.getUsername()).map(u -> {
-            u.setEmail(new_User.getEmail());
-            if(new_User.getPassword() != null && !new_User.getPassword().isBlank()){
-                u.setPassword(passwordEncoder.encode(new_User.getPassword()));
-            }
-            u.setPhone(new_User.getPhone());
-            u.setDob(new_User.getDob());
-            u.setGender(new_User.getGender());
-            u.setNationality(new_User.getNationality());
-            return usersRepository.save(u);
-        }).orElseThrow(() -> new UsernameNotFoundException("Khong tim thay user!"));
-    }
+    public void changePassword(ChangePasswordRequest request){
+        Users user = util.getLoginUser();
 
-    @Override
-    public List<Users> getAllUser(){
-        return usersRepository.findAll();
+        if (!BCrypt.checkpw(request.getOldPassword(), user.getPassword())){
+            throw new RuntimeException("Old password not match");
+        } else {
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            usersRepository.save(user);
+        }
     }
 
     @Override
@@ -159,5 +212,110 @@ public class UserServiceImpl implements UserService {
             }
         }
         return new ResponseData<>(4, "Chưa có người dùng");
+    }
+
+    @Override
+    public UserBenefitResponse getBenefitsForUser() {
+        UserBenefitResponse response = new UserBenefitResponse();
+        Integer userId = util.getLoginUserId();
+
+        // những public voucher chưa dùng và còn dùng được
+        List<VoucherUsageResponse> voucherResponse = new ArrayList<>();
+        List<Voucher> vouchers = voucherRepository.getPublicVoucher(VoucherType.PUBLIC, Status.ACTIVE);
+        for (Voucher voucher : vouchers){
+            List<Voucher> v = voucherUsageRepository.checkVoucherUsage(userId, voucher.getId());
+            if (v == null || v.isEmpty()) { // chưa dùng thì check xem còn để dùng ko
+                boolean isValidDate;
+
+                if (voucher.getStartDate() != null && voucher.getEndDate() != null) {
+                    isValidDate = voucher.getStartDate().isBefore(LocalDate.now()) && voucher.getEndDate().isAfter(LocalDate.now());
+                } else {
+                    isValidDate = true;
+                }
+
+                boolean checkMaxUsed = checkMaxUsedVoucher(voucher.getId(), voucher.getQuantity());
+
+                if (isValidDate && !checkMaxUsed) {
+                    VoucherUsageResponse voucherUsageResponse = new VoucherUsageResponse();
+                    voucherUsageResponse.setId(voucher.getId());
+                    voucherUsageResponse.setStartDate(voucher.getStartDate());
+                    voucherUsageResponse.setEndDate(voucher.getEndDate());
+                    voucherUsageResponse.setCode(voucher.getCode());
+                    voucherUsageResponse.setDescription(voucher.getDescription());
+                    voucherUsageResponse.setDiscount(voucher.getDiscount());
+                    voucherUsageResponse.setType(voucher.getType());
+                    voucherUsageResponse.setMinOrderValue(voucher.getMinOrderValue());
+
+                    voucherResponse.add(voucherUsageResponse);
+                }
+            }
+        }
+
+        // voucher trong gói + combo free trong gói
+        List<ComboUsageResponse> comboResponse = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+        List<MembershipBenefit> benefits = usersMembershipRepository.findUserBenefit(userId, now, BenefitType.DIRECT);
+        for (MembershipBenefit benefit : benefits){
+            if (benefit.getType().equals(BenefitType.COMBO)){
+                boolean checkComboUsage = bookingComboRepository.checkComboFreeUsage(benefit.getBenefitRefId(), userId, BookingComboType.FREE);
+                if (!checkComboUsage) {
+                    ComboUsageResponse cur = new ComboUsageResponse();
+                    Combo combo = comboRepository.findById(benefit.getBenefitRefId()).orElse(null);
+                    if (combo != null) {
+                        cur.setId(combo.getId());
+                        cur.setImage(combo.getImage());
+                        cur.setPrice(combo.getPrice());
+                        cur.setName(combo.getName());
+                        cur.setDescription(combo.getDescription());
+                        cur.setStatus(combo.getStatus());
+                        cur.setQuantity(benefit.getQuantity());
+                        comboResponse.add(cur);
+                    }
+                }
+            } else if (benefit.getType().equals(BenefitType.VOUCHER)){
+                List<Voucher> used = voucherUsageRepository.checkVoucherUsage(userId, benefit.getBenefitRefId());
+
+                if (used.size() < benefit.getQuantity()) {
+                    Voucher v = voucherRepository.findById(benefit.getBenefitRefId()).orElse(null);
+                    if (v != null) {
+                        boolean isValidDate;
+
+                        if (v.getStartDate() != null && v.getEndDate() != null) {
+                            isValidDate = v.getStartDate().isBefore(LocalDate.now()) &&
+                                    v.getEndDate().isAfter(LocalDate.now());
+                        } else {
+                            isValidDate = true;
+                        }
+
+                        if (isValidDate) {
+                            VoucherUsageResponse voucherUsageResponse = new VoucherUsageResponse();
+                            voucherUsageResponse.setId(v.getId());
+                            voucherUsageResponse.setStartDate(v.getStartDate());
+                            voucherUsageResponse.setEndDate(v.getEndDate());
+                            voucherUsageResponse.setCode(v.getCode());
+                            voucherUsageResponse.setDescription(v.getDescription());
+                            voucherUsageResponse.setDiscount(v.getDiscount());
+                            voucherUsageResponse.setType(v.getType());
+                            voucherUsageResponse.setQuantity(benefit.getQuantity());
+
+                            voucherResponse.add(voucherUsageResponse);
+                        }
+                    }
+                }
+            }
+        }
+
+        response.setVouchers(voucherResponse);
+        response.setCombos(comboResponse);
+        return response;
+    }
+
+    public boolean checkMaxUsedVoucher(Integer voucherId, Integer quantity) {
+        Integer countVoucherUsage = voucherUsageRepository.countVoucherUsage(voucherId);
+        if (countVoucherUsage < quantity) {
+            return false;
+        } else  {
+            return true;
+        }
     }
 }

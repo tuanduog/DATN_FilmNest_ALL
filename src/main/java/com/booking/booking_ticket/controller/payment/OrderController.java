@@ -1,7 +1,5 @@
 package com.booking.booking_ticket.controller.payment;
 
-
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +15,15 @@ import vn.payos.type.PaymentLinkData;
 import java.util.Date;
 import java.util.Map;
 
-
 @Slf4j
 @RestController
-@RequestMapping("/Order")
+@RequestMapping("/api/order")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final PayOS payOS;
 
-    @PostMapping(path = "/create")
+    @PostMapping("/v1/create")
     public ObjectNode createPaymentLink(@RequestBody CreatePaymentLinkRequestBody RequestBody) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode response = objectMapper.createObjectNode();
@@ -35,15 +32,15 @@ public class OrderController {
             final String description = RequestBody.getDescription();
             final String returnUrl = RequestBody.getReturnUrl();
             final String cancelUrl = RequestBody.getCancelUrl();
-            final int price = RequestBody.getPrice();
+            final Double price = RequestBody.getPrice();
 
             // Gen order code
             String currentTimeString = String.valueOf(String.valueOf(new Date().getTime()));
             long orderCode = Long.parseLong(currentTimeString.substring(currentTimeString.length() - 6));
 
-            ItemData item = ItemData.builder().name(productName).price(price).quantity(1).build();
+            ItemData item = ItemData.builder().name(productName).price(price.intValue()).quantity(1).build();
 
-            PaymentData paymentData = PaymentData.builder().orderCode(orderCode).description(description).amount(price)
+            PaymentData paymentData = PaymentData.builder().orderCode(orderCode).description(description).amount(price.intValue())
                     .item(item).returnUrl(returnUrl).cancelUrl(cancelUrl).expiredAt(System.currentTimeMillis()/1000 + 10*60).build();
             
             CheckoutResponseData data = payOS.createPaymentLink(paymentData);
@@ -70,11 +67,10 @@ public class OrderController {
             response.put("message", "fail");
             response.set("data", null);
             return response;
-
         }
     }
 
-    @GetMapping(path = "/{orderId}")
+    @GetMapping("/v1/{orderId}")
     public ObjectNode getOrderById(@PathVariable("orderId") long orderId) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode response = objectMapper.createObjectNode();
@@ -97,7 +93,7 @@ public class OrderController {
     }
 
     @PutMapping(path = "/{orderId}")
-    public ObjectNode cancelOrder(@PathVariable("orderId") int orderId) {
+    public ObjectNode cancelOrder(@PathVariable("orderId") long orderId) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode response = objectMapper.createObjectNode();
         try {
@@ -133,8 +129,4 @@ public class OrderController {
             return response;
         }
     }
-
-
-
-
 }

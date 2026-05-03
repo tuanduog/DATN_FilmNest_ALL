@@ -30,6 +30,7 @@ public class UsersMembership extends BaseEntity{
     @Column(name = "end_date", nullable = false)
     private LocalDateTime expiredDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "membership_payment_status", nullable = false)
     private MembershipPaymentStatus membershipPaymentStatus;
 }

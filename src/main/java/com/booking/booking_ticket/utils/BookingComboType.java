@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Arrays;
 
-public enum VoucherType {
+public enum BookingComboType {
 
-    PERSONAL("personal"), PUBLIC("public");
+    FREE("free"), PAID("paid");
 
     private final String value;
 
-    VoucherType(String value) {
+    BookingComboType(String value) {
         this.value = value;
     }
 
@@ -21,8 +21,8 @@ public enum VoucherType {
     }
 
     @JsonCreator
-    public static VoucherType fromValue(String value) {
-        return Arrays.stream(VoucherType.values())
+    public static BookingComboType fromValue(String value) {
+        return Arrays.stream(BookingComboType.values())
                 .filter(s -> s.value.equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid status " + value));

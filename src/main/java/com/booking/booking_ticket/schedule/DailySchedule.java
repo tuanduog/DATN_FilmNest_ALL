@@ -26,12 +26,12 @@ public class DailySchedule {
 
             if (movie.getShowingStatus().equals(ShowingStatus.NOW_SHOWING)) {
                 LocalDate endDate = movie.getEndDate();
-                if (endDate.isAfter(LocalDate.now())) {
+                if (endDate.isBefore(LocalDate.now())) {
                     movie.setShowingStatus(ShowingStatus.STOP);
                 }
             } else {
                 LocalDate releaseDate = movie.getReleaseDate();
-                if (releaseDate.isAfter(LocalDate.now())) {
+                if (!releaseDate.isAfter(LocalDate.now())) {
                     movie.setShowingStatus(ShowingStatus.NOW_SHOWING);
                 }
             }
