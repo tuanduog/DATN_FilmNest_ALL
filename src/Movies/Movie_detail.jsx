@@ -8,8 +8,10 @@ import { Client } from "@stomp/stompjs";
 import CommentItem from './CommentItem';
 import { useParams } from 'react-router-dom';
 import ShowtimePopup from '../Home/Showtime-popup';
+import { useTranslation } from 'react-i18next';
 
 function Movie_detail() {
+    const { t, i18n } = useTranslation();
     const { id } = useParams();
 
     const [showModal, setShowModal] = useState(false);
@@ -190,8 +192,8 @@ function Movie_detail() {
     if (movieInfo.error) {
         return (
             <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-                <h3 className="text-danger">Không tìm thấy thông tin phim hoặc đã có lỗi xảy ra.</h3>
-                <button className="btn btn-primary mt-3" onClick={() => navigate("/")}>Quay lại trang chủ</button>
+                <h3 className="text-danger">{t('movieNotFound')}</h3>
+                <button className="btn btn-primary mt-3" onClick={() => navigate("/")}>{t('backHome')}</button>
             </div>
         );
     }
@@ -200,7 +202,7 @@ function Movie_detail() {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
                 <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Đang tải...</span>
+                    <span className="visually-hidden">{t('loading')}</span>
                 </div>
             </div>
         );
@@ -224,22 +226,22 @@ function Movie_detail() {
                 <div className="modal-overlay" onClick={() => setShowChoseLocation(false)}>
                     <div className="modal-box" onClick={(e) => e.stopPropagation()}>
                         <span className="close-btn" onClick={() => setShowChoseLocation(false)}><i className="bi bi-x-lg"></i></span>
-                        <h3 className="section-title mb-4">Chọn rạp chiếu</h3>
+                        <h3 className="section-title mb-4">{t('chooseCinemaTitle')}</h3>
                         <div className="row g-3">
                             <div className="col-md-6">
-                                <label className="fw-bold mb-2">Tỉnh / Thành phố</label>
+                                <label className="fw-bold mb-2">{t('province')}</label>
                                 <select className="form-select form-select-custom" value={selectedLocation} onChange={(e) => {
                                     const code = e.target.value;
                                     setSelectedLocation(code);
                                     setTheater(allTheaters.filter(t => t.provinceCode === code));
                                     setselectedTheater("");
                                 }}>
-                                    <option value="">Chọn địa điểm</option>
+                                    <option value="">{t('selectLocation')}</option>
                                     {locations.map((loc, i) => <option key={i} value={loc.code}>{loc.name}</option>)}
                                 </select>
                             </div>
                             <div className="col-md-6">
-                                <label className="fw-bold mb-2">Tên rạp</label>
+                                <label className="fw-bold mb-2">{t('cinemaName')}</label>
                                 <select className="form-select form-select-custom" value={selectedTheater} onChange={(e) => {
                                     const val = e.target.value;
                                     setselectedTheater(val);
@@ -249,7 +251,7 @@ function Movie_detail() {
                                         window.dispatchEvent(new Event('theaterChange'));
                                     }
                                 }}>
-                                    <option value="">Chọn rạp</option>
+                                    <option value="">{t('selectCinema')}</option>
                                     {theater.map((t, i) => <option key={i} value={t.id}>{t.name}</option>)}
                                 </select>
                             </div>
@@ -286,19 +288,19 @@ function Movie_detail() {
 
                         <div className="row g-3 mb-4">
                             <div className="col-md-6">
-                                <div className="meta-item"><i className="bi bi-tag-fill meta-icon"></i><strong>Thể loại:</strong> {movieInfo.genre}</div>
-                                <div className="meta-item"><i className="bi bi-clock-fill meta-icon"></i><strong>Thời lượng:</strong> {movieInfo.duration}</div>
+                                <div className="meta-item"><i className="bi bi-tag-fill meta-icon"></i><strong>{t('genre')}:</strong> {movieInfo.genre}</div>
+                                <div className="meta-item"><i className="bi bi-clock-fill meta-icon"></i><strong>{t('duration')}:</strong> {movieInfo.duration}</div>
                             </div>
                             <div className="col-md-6">
-                                <div className="meta-item"><i className="bi bi-calendar-event-fill meta-icon"></i><strong>Khởi chiếu:</strong> {movieInfo.releaseDate ? new Date(movieInfo.releaseDate).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}</div>
-                                <div className="meta-item"><i className="bi bi-person-badge-fill meta-icon"></i><strong>Đạo diễn:</strong> {movieInfo.director}</div>
+                                <div className="meta-item"><i className="bi bi-calendar-event-fill meta-icon"></i><strong>{t('releaseDate')}:</strong> {movieInfo.releaseDate ? new Date(movieInfo.releaseDate).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'vi-VN') : t('notUpdated')}</div>
+                                <div className="meta-item"><i className="bi bi-person-badge-fill meta-icon"></i><strong>{t('director')}:</strong> {movieInfo.director}</div>
                             </div>
                         </div>
 
                         <div className="d-flex gap-3">
-                            <button className="btn btn-primary btn-book" onClick={handleOpenModal}>ĐẶT VÉ NGAY</button>
+                            <button className="btn btn-primary btn-book" onClick={handleOpenModal}>{t('bookNow')}</button>
                             <button className="btn btn-outline-danger btn-trailer" onClick={() => setShowTrailer(true)}>
-                                <i className="bi bi-play-circle-fill me-2"></i>XEM TRAILER
+                                <i className="bi bi-play-circle-fill me-2"></i>{t('watchTrailer')}
                             </button>
                         </div>
                     </div>
@@ -306,11 +308,11 @@ function Movie_detail() {
 
                 <div className="row mt-5">
                     <div className="col-lg-8">
-                        <h3 className="section-title">Nội dung phim</h3>
+                        <h3 className="section-title">{t('synopsis')}</h3>
                         <p className="description-text mt-3">{movieInfo.description}</p>
 
                         <div className="comment-section">
-                            <h3 className="section-title">Bình luận</h3>
+                            <h3 className="section-title">{t('comments')}</h3>
                             <div className="mt-4">
                                 {Array.isArray(dataCmt) && dataCmt.map((cmt) => (
                                     <CommentItem
@@ -329,13 +331,13 @@ function Movie_detail() {
                                 <textarea
                                     className="form-control border-0 bg-white"
                                     rows="3"
-                                    placeholder="Chia sẻ suy nghĩ của bạn về phim..."
+                                    placeholder={t('commentPlaceholder')}
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                 ></textarea>
                                 <div className="d-flex justify-content-end mt-3">
                                     <button className="btn btn-primary px-4" onClick={() => handleCmt(0, 0)}>
-                                        <i className="bi bi-send-fill me-2"></i>Gửi bình luận
+                                        <i className="bi bi-send-fill me-2"></i>{t('sendComment')}
                                     </button>
                                 </div>
                             </div>
@@ -345,8 +347,8 @@ function Movie_detail() {
                     <div className="col-lg-4">
                         {/* Sidebar content */}
                         <div className="p-4 bg-light rounded-4 sticky-top" style={{ top: '100px' }}>
-                            <h5 className="fw-bold mb-3">Lưu ý</h5>
-                            <p className="small text-muted mb-0">Vui lòng chọn rạp chiếu để xem lịch và đặt vé. Giá vé có thể thay đổi tùy theo loại ghế và suất chiếu.</p>
+                            <h5 className="fw-bold mb-3">{t('sidebarTitle')}</h5>
+                            <p className="small text-muted mb-0">{t('sidebarContent')}</p>
                         </div>
                     </div>
                 </div>

@@ -9,6 +9,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLng } from 'leaflet';
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 // Fix Leaflet marker icon issue in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -20,6 +21,7 @@ L.Icon.Default.mergeOptions({
 
 
 function Theater() {
+  const { t } = useTranslation();
   const [theater, setTheater] = useState(JSON.parse(localStorage.getItem('theater')) || {});
   const navigate = useNavigate();
   const [top5, setTop5] = useState([]);
@@ -75,7 +77,7 @@ function Theater() {
             <h1 className={styles.heroTitle}>{theater.name}</h1>
             <div className={styles.businessHours}>
               <i className="bi bi-clock-fill me-2"></i>
-              Giờ mở cửa: {theater.openingTime || "08:00"} - {theater.closingTime || "23:00"}
+              {t('openingHours')}: {theater.openingTime || "08:00"} - {theater.closingTime || "23:00"}
             </div>
             <div className={styles.heroDivider}></div>
 
@@ -96,7 +98,7 @@ function Theater() {
               <div className={styles.detailsContent}>
                 <h3 className={styles.sectionTitle}>
                   <i className="bi bi-info-circle-fill me-2 text-primary"></i>
-                  Giới thiệu rạp
+                  {t('theaterIntroduction')}
                 </h3>
                 <div className={styles.descriptionText}>
                   {theater.description && <div dangerouslySetInnerHTML={{ __html: theater.description }} />}
@@ -106,7 +108,7 @@ function Theater() {
                 <div className={styles.mapSection}>
                   <h3 className={styles.sectionTitle}>
                     <i className="bi bi-map-fill me-2 text-primary"></i>
-                    Vị trí rạp
+                    {t('theaterLocation')}
                   </h3>
                   <div className={styles.mapContainer}>
                     {theater.latitude && theater.longitude ? (
@@ -125,7 +127,7 @@ function Theater() {
                     ) : (
                       <div className={styles.mapPlaceholder}>
                         <i className="bi bi-geo-alt fs-1 mb-2"></i>
-                        <p>Thông tin tọa độ đang được cập nhật...</p>
+                        <p>{t('coordinateUpdating')}</p>
                       </div>
                     )}
                   </div>
@@ -142,7 +144,7 @@ function Theater() {
                         className={styles.googleMapsBtn}
                       >
                         <i className="bi bi-google me-2"></i>
-                        Xem trên Google Maps
+                        {t('viewOnGoogleMaps')}
                       </a>
                     )}
                   </div>
@@ -153,19 +155,19 @@ function Theater() {
 
                   <div className={styles.featureItem}>
                     <i className="bi bi-aspect-ratio"></i>
-                    <span>Màn hình lớn</span>
+                    <span>{t('largeScreen')}</span>
                   </div>
                   <div className={styles.featureItem}>
                     <i className="bi bi-speaker"></i>
-                    <span>Âm thanh Dolby</span>
+                    <span>{t('dolbySound')}</span>
                   </div>
                   <div className={styles.featureItem}>
                     <i className="bi bi-p-square"></i>
-                    <span>Bãi đỗ xe rộng</span>
+                    <span>{t('largeParking')}</span>
                   </div>
                   <div className={styles.featureItem}>
                     <i className="bi bi-cup-straw"></i>
-                    <span>Bắp nước đa dạng</span>
+                    <span>{t('diverseF&B')}</span>
                   </div>
                 </div>
               </div>
@@ -178,7 +180,7 @@ function Theater() {
               <div className={styles.trendingHeader}>
                 <h3 className={styles.trendingTitle}>
                   <i className="bi bi-fire me-2"></i>
-                  PHIM ĐANG HOT
+                  {t('trendingMovies')}
                 </h3>
                 <div className={styles.smallDivider}></div>
               </div>
@@ -209,7 +211,7 @@ function Theater() {
                 className={styles.viewMoreBtn}
                 onClick={() => navigate('/Ranking')}
               >
-                Xem tất cả bảng xếp hạng
+                {t('viewRanking')}
               </button>
             </div>
           </div>

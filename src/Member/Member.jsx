@@ -3,8 +3,10 @@ import styles from "../Member/Member.module.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 function Member() {
+    const { t } = useTranslation();
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const navigate = useNavigate();
@@ -66,9 +68,9 @@ function Member() {
 
     const handlePayment = async () => {
         try {
-            const res = await axios.post("http://localhost:8099/Order/create", {
-                productName: "Gói " + selectedPlan,
-                description: 'Thanh toán đơn hàng FilmNest',
+            const res = await axios.post("http://localhost:8099/api/order/v1/create", {
+                productName: t('membershipPlan') + " " + selectedPlan,
+                description: 'Thanh toán FilmNest',
                 price: price,
                 returnUrl: "http://localhost:5173/Member",
                 cancelUrl: "http://localhost:5173/Member",
@@ -78,11 +80,11 @@ function Member() {
             if (payUrl) {
                 window.location.href = payUrl;
             } else {
-                toast.error("Không lấy được link thanh toán!");
+                toast.error(t('paymentLinkError') || "Không lấy được link thanh toán!");
             }
         } catch (error) {
             console.error("Tạo đơn thanh toán thất bại:", error);
-            toast.warning("Tạo đơn thanh toán thất bại!");
+            toast.warning(t('paymentCreateFailed') || "Tạo đơn thanh toán thất bại!");
         }
     };
 
@@ -141,7 +143,7 @@ function Member() {
                         {},
                         { withCredentials: true }
                     );
-                    toast.success(`Đăng ký gói ${member.vip} thành công!`);
+                    toast.success(t('subscribeSuccess', { plan: member.vip }) || `Đăng ký gói ${member.vip} thành công!`);
                     localStorage.removeItem('member');
                     // Refresh data
                     fetchMember();
@@ -149,7 +151,7 @@ function Member() {
                     navigate('/Member', { replace: true });
                 } catch (error) {
                     console.error("Cập nhật membership thất bại", error);
-                    toast.error("Có lỗi xảy ra khi cập nhật gói hội viên.");
+                    toast.error(t('updateMemberError') || "Có lỗi xảy ra khi cập nhật gói hội viên.");
                 }
             }
         }
@@ -162,8 +164,8 @@ function Member() {
             <header className={styles.heroSection}>
                 <div className="container">
                     <div className={styles.headerContent}>
-                        <h2 className={styles.title}>TRỞ THÀNH HỘI VIÊN</h2>
-                        <p className={styles.subtitle}>Mở khóa toàn bộ đặc quyền cao cấp và tận hưởng trải nghiệm điện ảnh xứng tầm tại FilmNest.</p>
+                        <h2 className={styles.title}>{t('becomeMember')}</h2>
+                        <p className={styles.subtitle}>{t('memberSubtitle')}</p>
                     </div>
                 </div>
             </header>
@@ -183,12 +185,12 @@ function Member() {
 
                         return (
                             <div key={plan.id || index} className={`${styles.card} ${cardClass} ${isRecommended ? styles.isRecommended : ''}`}>
-                                {isRecommended && <div className={styles.ribbon}>Đề xuất</div>}
-                                <h3 className={styles.name}>{plan.name ? plan.name.toUpperCase() : "GÓI HỘI VIÊN"}</h3>
-                                <div className={styles.packageType}>{plan.type ? plan.type.toUpperCase() : "CƠ BẢN"}</div>
+                                {isRecommended && <div className={styles.ribbon}>{t('recommended')}</div>}
+                                <h3 className={styles.name}>{plan.name ? plan.name.toUpperCase() : t('membershipPlan')}</h3>
+                                <div className={styles.packageType}>{plan.type ? plan.type.toUpperCase() : t('basic')}</div>
                                 <div className={styles.priceContainer}>
                                     <p className={styles.price}>{plan.price ? plan.price.toLocaleString('vi-VN') : 0}<span className={styles.priceCurrency}>đ</span></p>
-                                    <p className={styles.duration}>Sử dụng trong {plan.duration} ngày</p>
+                                    <p className={styles.duration}>{t('validForDays', { days: plan.duration })}</p>
                                 </div>
                                 <ul className={styles.benefitList}>
                                     {plan.benefits && Array.isArray(plan.benefits) && plan.benefits.length > 0 ? (
@@ -213,9 +215,9 @@ function Member() {
                                         })
                                     ) : (
                                         <>
-                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Xem phim không giới hạn</li>
-                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Ưu tiên quầy dịch vụ</li>
-                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> Tích điểm đổi quà</li>
+                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> {t('unlimitedMovies')}</li>
+                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> {t('priorityService')}</li>
+                                            <li><span className={styles.checkIcon}><i className="bi bi-check-lg"></i></span> {t('earnPoints')}</li>
                                         </>
                                     )}
                                 </ul>
@@ -225,11 +227,11 @@ function Member() {
                                         onClick={membership === plan.name ? null : () => handleSelectPlan(plan)}
                                         disabled={membership === plan.name}
                                     >
-                                        {membership === plan.name ? "Đang sử dụng" : "Đăng ký ngay"}
+                                        {membership === plan.name ? t('inUse') : t('subscribeNow')}
                                     </button>
                                     {membership === plan.name && (
                                         <p className={styles.dayLeftText}>
-                                            <i className="bi bi-clock-history"></i> Còn {dayLeft} ngày
+                                            <i className="bi bi-clock-history"></i> {t('daysRemaining', { days: dayLeft })}
                                         </p>
                                     )}
                                 </div>
@@ -247,19 +249,19 @@ function Member() {
                             <i className="bi bi-x-lg"></i>
                         </button>
 
-                        <h4>Xác nhận nâng cấp</h4>
-                        <p>Bạn đang chọn đăng ký gói {selectedPlan}.</p>
+                        <h4>{t('confirmUpgrade')}</h4>
+                        <p>{t('selectingPlan', { plan: selectedPlan })}</p>
 
                         <div className={styles.terms}>
-                            <p className="fw-bold mb-3 text-dark">Điều khoản và Chính sách Hội viên</p>
+                            <p className="fw-bold mb-3 text-dark">{t('termsAndPolicy')}</p>
                             <ul className="list-unstyled">
-                                <li className="mb-2">• Gói dịch vụ có hiệu lực ngay sau khi thanh toán thành công.</li>
-                                <li className="mb-2">• Các ưu đãi giảm giá bắp nước áp dụng trực tiếp tại quầy hoặc ứng dụng.</li>
-                                <li className="mb-2">• Vé tặng (đối với gói VIP) sẽ được gửi vào mục "Quà của tôi" trong tài khoản.</li>
-                                <li className="mb-2">• Dịch vụ không áp dụng hoàn tiền dưới mọi hình thức sau khi đã kích hoạt.</li>
-                                <li className="mb-2">• FilmNest có quyền thay đổi các ưu đãi nhưng sẽ thông báo trước 7 ngày.</li>
+                                <li className="mb-2">• {t('term1')}</li>
+                                <li className="mb-2">• {t('term2')}</li>
+                                <li className="mb-2">• {t('term3')}</li>
+                                <li className="mb-2">• {t('term4')}</li>
+                                <li className="mb-2">• {t('term5')}</li>
                             </ul>
-                            <p className="mt-3 small">Bằng cách nhấn xác nhận, bạn đồng ý với toàn bộ quy định trên của FilmNest Cinema.</p>
+                            <p className="mt-3 small">{t('termsAgree')}</p>
                         </div>
 
                         <label className={styles.agreeContainer}>
@@ -268,17 +270,17 @@ function Member() {
                                 checked={agreed}
                                 onChange={(e) => setAgreed(e.target.checked)}
                             />
-                            Tôi đã đọc và đồng ý với điều khoản dịch vụ
+                            {t('iAgree')}
                         </label>
 
                         <div className={styles.buttonGroup}>
-                            <button onClick={handleClose} className={styles.cancelBtn}>Quay lại</button>
+                            <button onClick={handleClose} className={styles.cancelBtn}>{t('goBack')}</button>
                             <button
                                 onClick={handleConfirm}
                                 disabled={!agreed}
                                 className={styles.confirmBtn}
                             >
-                                Thanh toán ngay
+                                {t('payNow')}
                             </button>
                         </div>
                     </div>

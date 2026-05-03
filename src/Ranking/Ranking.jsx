@@ -3,8 +3,10 @@ import styles from "./Ranking.module.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function Ranking() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [top5, setTop5] = useState([]);
 
@@ -42,10 +44,10 @@ function Ranking() {
           <div className={styles.heroContent}>
             <div className={styles.headerBadge}>
               <i className="bi bi-trophy-fill me-2"></i>
-              Top Charts
+              {t('topCharts')}
             </div>
-            <h1 className={styles.heroTitle}>BẢNG XẾP HẠNG PHIM HOT</h1>
-            <p className={styles.heroSubtitle}>Những bộ phim được cộng đồng FilmNest yêu thích và đánh giá cao nhất</p>
+            <h1 className={styles.heroTitle}>{t('rankingTitle')}</h1>
+            <p className={styles.heroSubtitle}>{t('rankingSubtitle')}</p>
             <div className={styles.heroDivider}></div>
           </div>
         </div>
@@ -74,9 +76,9 @@ function Ranking() {
               <div className={styles.movieInfo}>
                 <h3 className={styles.movieName}>{movie[2]}</h3>
                 <div className={styles.metaInfo}>
-                  <span className={styles.genre}>Xu hướng</span>
+                  <span className={styles.genre}>{t('trending')}</span>
                   <span className={styles.dot}>•</span>
-                  <span className={styles.reviews}>Lượt bình chọn cao</span>
+                  <span className={styles.reviews}>{t('highVotes')}</span>
                 </div>
               </div>
 
@@ -97,7 +99,7 @@ function Ranking() {
 
               <div className={styles.actionSection}>
                 <button className={styles.viewBtn}>
-                  Chi tiết <i className="bi bi-chevron-right ms-1"></i>
+                  {t('details')} <i className="bi bi-chevron-right ms-1"></i>
                 </button>
               </div>
             </div>

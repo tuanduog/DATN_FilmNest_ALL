@@ -2,15 +2,18 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './Movies.module.css';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import axios from 'axios';
 import ShowtimePopup from '../Home/Showtime-popup';
+import { useTranslation } from 'react-i18next';
 
 
 function Movies() {
+    const { t, i18n } = useTranslation();
     const [nowShowing, setNowShowing] = useState(true);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [showingNow, setShowingNow] = useState([]);
     const [commingSoon, setCommingSoon] = useState([]);
@@ -111,9 +114,9 @@ function Movies() {
                         </button>
 
                         <div className={styles.content}>
-                            <h4 className="text-center fw-bold mb-4">Chọn Rạp Của Bạn</h4>
+                            <h4 className="text-center fw-bold mb-4">{t('chooseCinema')}</h4>
                             <div className={styles.formGroup}>
-                                <label>Tỉnh/ Thành phố</label>
+                                <label>{t('province')}</label>
                                 <select
                                     value={selectedLocation}
                                     onChange={e => {
@@ -124,7 +127,7 @@ function Movies() {
                                         setselectedTheater("");
                                     }}
                                 >
-                                    <option value="">Chọn Tỉnh/ Thành phố</option>
+                                    <option value="">{t('selectProvince')}</option>
                                     {Array.isArray(locations) &&
                                         locations.map((loc, idx) => (
                                             <option key={idx} value={loc.code}>{loc.name}</option>
@@ -133,7 +136,7 @@ function Movies() {
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label>Tên rạp</label>
+                                <label>{t('cinemaName')}</label>
                                 <select
                                     value={selectedTheater}
                                     onChange={e => {
@@ -141,17 +144,17 @@ function Movies() {
                                         setselectedTheater(selectedValue);
                                         const selectedObj = theater.find(t => t.id.toString() === selectedValue);
                                         if (selectedObj) {
-                                                localStorage.setItem('theater', JSON.stringify({
-                                                    id: selectedObj.id,
-                                                    name: selectedObj.name,
-                                                    theaterLocation: selectedObj.theaterLocation
-                                                }));
-                                                setShowChoseLocation(false);
-                                                window.dispatchEvent(new Event('theaterChange'));
-                                            }
+                                            localStorage.setItem('theater', JSON.stringify({
+                                                id: selectedObj.id,
+                                                name: selectedObj.name,
+                                                theaterLocation: selectedObj.theaterLocation
+                                            }));
+                                            setShowChoseLocation(false);
+                                            window.dispatchEvent(new Event('theaterChange'));
+                                        }
                                     }}
                                 >
-                                    <option value="">Chọn rạp</option>
+                                    <option value="">{t('selectCinema')}</option>
                                     {Array.isArray(theater) &&
                                         theater.map((theaterItem, idx) => (
                                             <option key={idx} value={theaterItem.id}>{theaterItem.name}</option>
@@ -174,82 +177,85 @@ function Movies() {
             {/* Hero Section */}
             <header className={styles.heroSection}>
                 <div className="container">
-                    <h1 className={styles.heroTitle}>Thế Giới Điện Ảnh</h1>
-                    <p className={styles.heroSubtitle}>KHÁM PHÁ NHỮNG SIÊU PHẨM MỚI NHẤT TẠI FILMNEST</p>
+                    <h1 className={styles.heroTitle}>{t('heroTitle')}</h1>
+                    <p className={styles.heroSubtitle}>{t('heroSubtitle')}</p>
                 </div>
             </header>
 
-            <div className="container">
+            <div className="container-fluid px-3 px-md-5">
                 {/* Tab Navigation */}
                 <div className={styles['tab-wrapper']}>
                     <div
                         className={`${styles.tab} ${nowShowing ? styles.active : ''}`}
                         onClick={() => setNowShowing(true)}
                     >
-                        Phim đang chiếu
+                        {t('nowShowing')}
                     </div>
                     <div
                         className={`${styles.tab} ${!nowShowing ? styles.active : ''}`}
                         onClick={() => setNowShowing(false)}
                     >
-                        Phim sắp chiếu
+                        {t('comingSoon')}
                     </div>
                 </div>
 
                 {/* Movie Grid */}
-                <div className={styles.movieGrid}>
+                <div className="row g-4 justify-content-center mx-auto" style={{ maxWidth: '1440px' }}>
                     {(nowShowing ? showingNow : commingSoon).map((movie) => (
-                        <article className={styles.movieCard} key={movie.movieId || movie.id}>
-                            <div className={styles.imageContainer}>
-                                <img
-                                    src={movie.image}
-                                    className={styles.movieImage}
-                                    alt={movie.movieName || movie.name}
-                                    onClick={() => handleMovieDetails(movie.movieId || movie.id)}
-                                />
-                            </div>
-
-                            <div className={styles.cardBody}>
-                                <h6
-                                    className={styles.movieTitle}
-                                    onClick={() => handleMovieDetails(movie.movieId || movie.id)}
-                                >
-                                    {movie.movieName || movie.name}
-                                </h6>
-
-                                <div className={styles.infoRow}>
-                                    <span className={styles.infoLabel}>Thể loại</span>
-                                    <span className={styles.ellipsis}>{movie.genre}</span>
+                        <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={movie.movieId || movie.id}>
+                            <article className={styles.movieCard}>
+                                <div className={styles.imageContainer}>
+                                    <img
+                                        src={movie.image}
+                                        className={styles.movieImage}
+                                        alt={movie.movieName || movie.name}
+                                        onClick={() => handleMovieDetails(movie.movieId || movie.id)}
+                                    />
                                 </div>
 
-                                {nowShowing ? (
-                                    <div className={styles.infoRow}>
-                                        <span className={styles.infoLabel}>Thời lượng</span>
-                                        <span>{movie.duration} phút</span>
-                                    </div>
-                                ) : (
-                                    <div className={styles.infoRow}>
-                                        <span className={styles.infoLabel}>Khởi chiếu</span>
-                                        <span>
-                                            {new Date(movie.releaseDate).toLocaleDateString('vi-VN', {
-                                                day: '2-digit', month: '2-digit', year: 'numeric'
-                                            })}
-                                        </span>
-                                    </div>
-                                )}
+                                <div className={styles.cardBody}>
+                                    <h6
+                                        className={styles.movieTitle}
+                                        onClick={() => handleMovieDetails(movie.movieId || movie.id)}
+                                        title={movie.movieName || movie.name}
+                                    >
+                                        {movie.movieName || movie.name}
+                                    </h6>
 
-                                <button className={styles.btnBooking} onClick={() => handleOpenModal(movie)}>
-                                    ĐẶT VÉ NGAY
-                                </button>
-                            </div>
-                        </article>
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>{t('genre')}</span>
+                                        <span className={styles.ellipsis}>{movie.genre}</span>
+                                    </div>
+
+                                    {nowShowing ? (
+                                        <div className={styles.infoRow}>
+                                            <span className={styles.infoLabel}>{t('duration')}</span>
+                                            <span>{movie.duration} {t('minutes')}</span>
+                                        </div>
+                                    ) : (
+                                        <div className={styles.infoRow}>
+                                            <span className={styles.infoLabel}>{t('releaseDate')}</span>
+                                            <span>
+                                                {new Date(movie.releaseDate).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'vi-VN', {
+                                                    day: '2-digit', month: '2-digit', year: 'numeric'
+                                                })}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <button className={styles.btnBooking} onClick={() => handleOpenModal(movie)}>
+                                        {t('bookNow')}
+                                    </button>
+                                </div>
+                            </article>
+                        </div>
                     ))}
                 </div>
 
                 {(nowShowing ? showingNow : commingSoon).length === 0 && (
                     <div className="text-center py-5">
                         <i className="bi bi-film text-muted fs-1 mb-3"></i>
-                        <h5 className="text-muted">Hiện chưa có phim nào trong danh mục này.</h5>
+                        <h5 className="text-muted">{t('noMoviesInCategory')}</h5>
                     </div>
                 )}
             </div>

@@ -95,17 +95,19 @@ function Header() {
     }, []);
 
     const fetchMember = async () => {
+        if (!user) return;
         try {
-            const res = await axios.get(`http://localhost:8099/auth/get-Membership/${user.data.userId}`,
+            const res = await axios.get(`http://localhost:8099/api/membership/v1/user`,
                 { withCredentials: true }
-            )
-            if (res.data.membership != "no membership") {
-                setMembership(true);
+            );
+            if (res.data && res.data.data) {
+                setMembership(res.data.data.name || true);
             } else {
                 setMembership(false);
             }
         } catch (error) {
             console.error("Khong lay duoc membership", error);
+            setMembership(false);
         }
     }
 
@@ -150,7 +152,7 @@ function Header() {
 
     useEffect(() => {
         window.addEventListener('authChange', handleAuth);
-        
+
         const handleTheaterChange = () => {
             const theaterSaved = JSON.parse(localStorage.getItem("theater") || '{}');
             if (theaterSaved.id) {
@@ -227,7 +229,7 @@ function Header() {
                                             setTheater(filtered);
                                         }}
                                     >
-                                        <option value="">Chọn Tỉnh/ Thành phố</option>
+                                        <option value="">{t('selectProvince')}</option>
                                         {Array.isArray(locations) &&
                                             locations.map((loc, idx) => (
                                                 <option key={idx} value={loc.code}>
@@ -238,7 +240,7 @@ function Header() {
                                 </div>
 
                                 <div className="formGroup">
-                                    <label>Tên rạp</label>
+                                    <label>{t('cinemaName')}</label>
                                     <select style={{ fontSize: '14px' }}
                                         value={selectedTheater}
                                         onChange={e => {
@@ -257,7 +259,7 @@ function Header() {
                                             }
 
                                         }}>
-                                        <option value="">Chọn rạp</option>
+                                        <option value="">{t('selectCinema')}</option>
                                         {Array.isArray(theater) &&
                                             theater.map((theaterItem, idx) => (
                                                 <option key={idx} value={theaterItem.id}>
@@ -304,7 +306,7 @@ function Header() {
 
                             {membership ? <span className='px-2 rounded border border-warning text-warning me-2 fw-bold'
                                 style={{ backgroundColor: 'rgba(255, 193, 7, 0.1)', fontSize: '12px' }}>
-                                VIP
+                                {typeof membership === 'string' ? membership.toUpperCase() : 'VIP'}
                             </span> : <></>}
                             <div className="dropdown">
                                 <span className="mb-0 me-2 fs-6 top-link" style={{ cursor: 'pointer' }} data-bs-toggle="dropdown">
@@ -348,7 +350,7 @@ function Header() {
                                 <div className="d-flex align-items-center overflow-hidden">
                                     <i className="bi bi-geo-alt-fill text-danger me-2" style={{ fontSize: '16px' }}></i>
                                     <span className="text-dark fw-bold text-truncate" style={{ fontSize: '14px', lineHeight: 'normal' }}>
-                                        {allTheaters.find(t => t.id.toString() === selectedTheater.toString())?.name || "Đang tải..."}
+                                        {allTheaters.find(t => t.id.toString() === selectedTheater.toString())?.name || t('loading')}
                                     </span>
                                 </div>
                                 <i className="bi bi-caret-down-fill ms-2 text-muted" style={{ fontSize: '12px' }}></i>
@@ -359,11 +361,11 @@ function Header() {
                                 <div className='me-2 shadow-sm rounded'>
                                     <select
                                         className="form-select"
-                                        style={{ 
-                                            width: '160px', 
-                                            height: '38px', 
-                                            border: '1px solid #333 !important', 
-                                            fontSize: '14px', 
+                                        style={{
+                                            width: '160px',
+                                            height: '38px',
+                                            border: '1px solid #333 !important',
+                                            fontSize: '14px',
                                             cursor: 'pointer',
                                             fontWeight: 'bold'
                                         }}
@@ -376,7 +378,7 @@ function Header() {
                                             setTheater(filtered);
                                         }}
                                     >
-                                        <option value="">Chọn địa điểm</option>
+                                        <option value="">{t('selectLocation')}</option>
                                         {Array.isArray(locations) &&
                                             locations.map((loc, idx) => (
                                                 <option key={idx} value={loc.code}>
@@ -390,11 +392,11 @@ function Header() {
                                     <div className='shadow-sm rounded'>
                                         <select
                                             className="form-select"
-                                            style={{ 
-                                                width: '180px', 
-                                                height: '38px', 
-                                                border: '1px solid #333 !important', 
-                                                fontSize: '14px', 
+                                            style={{
+                                                width: '180px',
+                                                height: '38px',
+                                                border: '1px solid #333 !important',
+                                                fontSize: '14px',
                                                 cursor: 'pointer',
                                                 fontWeight: 'bold'
                                             }}
@@ -414,7 +416,7 @@ function Header() {
                                                 }
                                             }}
                                         >
-                                            <option value="">Chọn rạp</option>
+                                            <option value="">{t('selectCinema')}</option>
                                             {Array.isArray(theater) &&
                                                 theater.map((theaterItem, idx) => (
                                                     <option key={idx} value={theaterItem.id}>
@@ -429,19 +431,29 @@ function Header() {
                     </div>
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div className="navbar-nav" style={{ gap: '10px' }}>
-                            <span className={`nav-link active ${isActive('/')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/')}>TRANG CHỦ</span>
-                            <span className={`nav-link active ${isActive('/Movies')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/Movies')}>PHIM</span>
-                            <span className={`nav-link active ${isActive('/Theater')}`} style={{ cursor: 'pointer' }} onClick={handleLoc}>RẠP</span>
-                            <span className={`nav-link active ${isActive('/Ranking')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/Ranking')}>XẾP HẠNG PHIM</span>
-                            <span className={`nav-link active ${isActive('/Member')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/Member')}>HỘI VIÊN</span>
-                            <span className={`nav-link active ${isActive('/Booking_history')}`} style={{ cursor: 'pointer' }} onClick={handleHistory}>LỊCH SỬ ĐẶT VÉ</span>
+                            <span className={`nav-link active ${isActive('/')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/')}>{t('home')}</span>
+                            <span className={`nav-link active ${isActive('/Movies')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/Movies')}>{t('movies')}</span>
+                            <span className={`nav-link active ${isActive('/Theater')}`} style={{ cursor: 'pointer' }} onClick={handleLoc}>{t('cinema')}</span>
+                            <span className={`nav-link active ${isActive('/Ranking')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/Ranking')}>{t('movieRanking')}</span>
+                            <span className={`nav-link active ${isActive('/Member')}`} style={{ cursor: 'pointer' }} onClick={handleNavigate('/Member')}>{t('membership')}</span>
+                            <span className={`nav-link active ${isActive('/Booking_history')}`} style={{ cursor: 'pointer' }} onClick={handleHistory}>{t('bookingHistory')}</span>
                         </div>
                     </div>
 
-                    <form className="d-flex justify-content-end" role="search" onSubmit={handleFilter}>
-                        <input className="form-control me-2" type="search" placeholder="Tìm phim..." aria-label="Search" value={name}
-                            onChange={(e) => setName(e.target.value)} />
-                        <button className="btn btn-primary" type="submit">Tìm</button>
+                    <form className="d-flex justify-content-end ms-auto" role="search" onSubmit={handleFilter}>
+                        <div className="input-group" style={{ width: '260px' }}>
+                            <input
+                                className="form-control"
+                                type="search"
+                                placeholder={t('searchPlaceholder')}
+                                aria-label="Search"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <button className="btn btn-primary" type="submit">
+                                <i className="bi bi-search"></i>
+                            </button>
+                        </div>
                     </form>
                 </div>
             </nav>

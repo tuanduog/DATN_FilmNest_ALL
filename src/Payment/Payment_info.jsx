@@ -11,7 +11,6 @@ function PaymentInfo() {
   const bookingInfo = useMemo(() => JSON.parse(localStorage.getItem('bookingInfo')) || {}, []);
   const savedTheater = useMemo(() => JSON.parse(localStorage.getItem('theater')) || {}, []);
 
-  const [membership, setMembership] = useState({});
   const [combos, setCombos] = useState([]);
   const [comboCounts, setComboCounts] = useState({}); // Use ID as key
 
@@ -22,19 +21,14 @@ function PaymentInfo() {
   const { total = 0, selectedSeats = [], seatTypes = [] } = location.state || {};
 
   const [totalPrice, setTotalPrice] = useState(total);
-  const [voucher, setVoucher] = useState("");
-  const [voucherStatus, setVoucherStatus] = useState({ show: false, ok: false, text: "" });
-  const [discount, setDiscount] = useState(false);
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [giftComboCounts, setGiftComboCounts] = useState({});
+  const [benefits, setBenefits] = useState({ vouchers: [], combos: [] });
 
   const [timeLeft, setTimeLeft] = useState(() => {
     const storedTime = localStorage.getItem('timeLeft');
     return storedTime ? parseInt(storedTime, 10) : 600;
   });
-
-  const seatsWithType = useMemo(() => selectedSeats.map((seat, index) => ({
-    seat,
-    type: seatTypes[index] || "normal"
-  })), [selectedSeats, seatTypes]);
 
   const handleIncrement = (id) => {
     setComboCounts(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
@@ -45,35 +39,16 @@ function PaymentInfo() {
   };
 
   useEffect(() => {
-    let comboDiscountRate = 1;
-    if (membership.membership === "vip tháng") comboDiscountRate = 0.85;
-    if (membership.membership === "vip năm") comboDiscountRate = 0.8;
-
     const comboTotal = combos.reduce((acc, combo) => {
       const count = comboCounts[combo.id] || 0;
       return acc + (combo.price * count);
-    }, 0) * comboDiscountRate;
+    }, 0);
 
     setTotalPrice(total + comboTotal);
-  }, [comboCounts, membership, total, combos]);
-
-  const handleVoucher = () => {
-    if (voucher === 'DHDT01') {
-      if (totalPrice < 200000) {
-        setVoucherStatus({ show: true, ok: false, text: "Voucher chỉ áp dụng cho đơn hàng từ 200.000 VNĐ" });
-        setDiscount(false);
-      } else {
-        setVoucherStatus({ show: true, ok: true, text: "Áp dụng voucher thành công! Giảm 15%" });
-        setDiscount(true);
-      }
-    } else {
-      setVoucherStatus({ show: true, ok: false, text: "Mã voucher không hợp lệ" });
-      setDiscount(false);
-    }
-  };
+  }, [comboCounts, total, combos]);
 
   const handlePayment = async () => {
-    const finalPrice = discount ? totalPrice * 0.85 : totalPrice;
+    const finalPrice = Math.round(finalAmount);
     localStorage.setItem('price', finalPrice);
 
     try {
@@ -81,9 +56,9 @@ function PaymentInfo() {
         'xxxxxxxx-xxxx-xxxx'.replace(/[x]/g, () => Math.floor(Math.random() * 16).toString(16));
       localStorage.setItem('paymentId', paymentId);
 
-      const res = await axios.post("http://localhost:8099/Order/create", {
-        productName: 'Đơn hàng: ' + paymentId,
-        description: 'Thanh toán vé xem phim FilmNest',
+      const res = await axios.post("http://localhost:8099/api/order/v1/create", {
+        productName: "Thanh toan ve xem phim",
+        description: `TT${paymentId.slice(0, 10)}`, // Max 25 chars for PayOS description
         price: finalPrice,
         returnUrl: "http://localhost:5173/Booking_history",
         cancelUrl: "http://localhost:5173",
@@ -107,7 +82,8 @@ function PaymentInfo() {
         const res = await axios.get("http://localhost:8099/api/combo/v1", {
           params: { page: 0, size: 100, status: 'ACTIVE' }
         });
-        setCombos(res.data.data.content);
+        const data = res.data.data;
+        setCombos(Array.isArray(data) ? data : (data.content || []));
       } catch (error) {
         console.error("Lỗi khi lấy danh sách combo", error);
       }
@@ -116,12 +92,17 @@ function PaymentInfo() {
   }, []);
 
   useEffect(() => {
-    const selectedCombosStr = combos
+    const purchased = combos
       .filter(combo => comboCounts[combo.id] > 0)
-      .map(combo => `${combo.name} x${comboCounts[combo.id]}`)
-      .join(', ');
+      .map(combo => `${combo.name} x${comboCounts[combo.id]}`);
+
+    const free = benefits.combos
+      ?.filter(combo => giftComboCounts[combo.id] > 0)
+      .map(combo => `${combo.name} x${giftComboCounts[combo.id]} (FREE)`) || [];
+
+    const selectedCombosStr = [...purchased, ...free].join(', ');
     localStorage.setItem('selectedCombos', selectedCombosStr);
-  }, [comboCounts, combos]);
+  }, [comboCounts, combos, giftComboCounts, benefits.combos]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -135,16 +116,47 @@ function PaymentInfo() {
   }, [timeLeft, navigate]);
 
   useEffect(() => {
-    const fetchMember = async () => {
+    const fetchBenefit = async () => {
       try {
-        const res = await axios.get(`http://localhost:8099/auth/get-Membership/${userInfo.userId}`, { withCredentials: true });
-        setMembership(res.data);
+        const res = await axios.get(`http://localhost:8099/api/user/v1/benefit`, {
+          withCredentials: true
+        });
+        setBenefits(res.data.data || { vouchers: [], combos: [] });
       } catch (error) {
-        console.error("Không lấy được membership", error);
+        console.error('Error fetching benefits:', error);
       }
-    };
-    if (userInfo.userId) fetchMember();
-  }, [userInfo.userId]);
+    }
+    fetchBenefit();
+  }, []);
+
+  const handleSelectVoucher = (v) => {
+    if (v.minOrderValue && totalPrice < v.minOrderValue) {
+      toast.warning(`Đơn hàng tối thiểu ${v.minOrderValue.toLocaleString()}đ để áp dụng mã này!`);
+      return;
+    }
+    if (appliedVoucher?.code === v.code) {
+      setAppliedVoucher(null);
+    } else {
+      setAppliedVoucher(v);
+      toast.success(`Đã áp dụng mã ${v.code}!`);
+    }
+  };
+
+  const handleIncrementGift = (combo) => {
+    setGiftComboCounts(prev => {
+      const current = prev[combo.id] || 0;
+      if (current < combo.quantity) return { ...prev, [combo.id]: current + 1 };
+      return prev;
+    });
+  };
+
+  const handleDecrementGift = (combo) => {
+    setGiftComboCounts(prev => {
+      const current = prev[combo.id] || 0;
+      if (current > 0) return { ...prev, [combo.id]: current - 1 };
+      return prev;
+    });
+  };
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -161,7 +173,14 @@ function PaymentInfo() {
     );
   }
 
-  const finalAmount = discount ? totalPrice * 0.85 : totalPrice;
+  const discountAmount = useMemo(() => {
+    if (!appliedVoucher) return 0;
+    if (appliedVoucher.minOrderValue && totalPrice < appliedVoucher.minOrderValue) return 0;
+    const discountPercent = appliedVoucher.discount || 0;
+    return (totalPrice * discountPercent) / 100;
+  }, [appliedVoucher, totalPrice]);
+
+  const finalAmount = totalPrice - discountAmount;
   const comboTotalCalculated = combos.reduce((acc, combo) => acc + (combo.price * (comboCounts[combo.id] || 0)), 0);
 
   return (
@@ -196,11 +215,6 @@ function PaymentInfo() {
               <h2 className={styles.sectionTitle}>
                 <img src="https://img.icons8.com/ios/24/ff4d4f/popcorn.png" alt="" style={{ width: 24 }} />
                 COMBO ƯU ĐÃI
-                {membership.membership && (
-                  <span className={styles.membershipBadge}>
-                    Hội viên {membership.membership} - Giảm {membership.membership === "vip tháng" ? "15%" : "20%"} combo
-                  </span>
-                )}
               </h2>
 
               <div className={styles.comboGrid}>
@@ -225,42 +239,114 @@ function PaymentInfo() {
               </div>
             </section>
 
-            {/* Voucher Section */}
+            {/* Benefits & Vouchers Section */}
             <section className={styles.sectionBox}>
-              <h2 className={styles.sectionTitle}><FaTag /> MÃ GIẢM GIÁ</h2>
-              <div className={styles.voucherInputGroup}>
-                <input
-                  type="text"
-                  placeholder="Nhập mã voucher (ví dụ: DHDT01)"
-                  className={styles.voucherInput}
-                  value={voucher}
-                  onChange={(e) => setVoucher(e.target.value)}
-                />
-                <button className={styles.voucherApplyBtn} onClick={handleVoucher}>ÁP DỤNG</button>
-              </div>
-              {voucherStatus.show && (
-                <p style={{ color: voucherStatus.ok ? '#52c41a' : '#ff4d4f', fontSize: '0.9rem', marginTop: -10, marginBottom: 15 }}>
-                  <FaInfoCircle /> {voucherStatus.text}
-                </p>
+              <h2 className={styles.sectionTitle}><FaTag /> ƯU ĐÃI & QUÀ TẶNG CỦA BẠN</h2>
+
+              {/* Gift Combos */}
+              {benefits.combos && benefits.combos.length > 0 && (
+                <div className="mb-4">
+                  <h6 className="fw-bold mb-3 text-success">
+                    <img src="https://img.icons8.com/ios/20/52c41a/gift.png" alt="" style={{ width: 20, marginRight: 8, verticalAlign: 'text-bottom' }} />
+                    Combo Được Tặng
+                  </h6>
+                  <div className="table-responsive">
+                    <table className="table table-sm table-borderless align-middle" style={{ fontSize: '0.9rem' }}>
+                      <thead className="table-light">
+                        <tr>
+                          <th style={{ width: '60px' }}></th>
+                          <th>Combo</th>
+                          <th>Số lượng</th>
+                          <th style={{ width: '50px', textAlign: 'center' }}>Chọn</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {benefits.combos.map((combo) => {
+                          const count = giftComboCounts[combo.id] || 0;
+                          return (
+                            <tr key={combo.id} style={{ opacity: count > 0 ? 1 : 0.8 }}>
+                              <td>
+                                <img src={combo.image} alt={combo.name} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} />
+                              </td>
+                              <td>
+                                <div className="fw-bold text-success">{combo.name}</div>
+                                <div className="text-muted" style={{ fontSize: '0.8rem' }}>{combo.description}</div>
+                              </td>
+                              <td>x{combo.quantity}</td>
+                              <td className="text-center">
+                                <div className={styles.quantityControl} style={{ justifyContent: 'center' }}>
+                                  <button className={styles.quantityBtn} onClick={() => handleDecrementGift(combo)}><FaMinus /></button>
+                                  <span className={styles.quantityValue}>{count}</span>
+                                  <button className={styles.quantityBtn} onClick={() => handleIncrementGift(combo)}><FaPlus /></button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
 
-              <div className="table-responsive">
-                <table className="table table-sm table-borderless align-middle" style={{ fontSize: '0.9rem' }}>
-                  <thead className="table-light">
-                    <tr>
-                      <th>Mã voucher</th>
-                      <th>Ưu đãi</th>
-                      <th>Hạn dùng</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="fw-bold text-primary">DHDT01</td>
-                      <td>Giảm 15% cho đơn từ 200K</td>
-                      <td className="text-muted">31/12/2025</td>
-                    </tr>
-                  </tbody>
-                </table>
+              {/* Vouchers Table */}
+              <div>
+                <h6 className="fw-bold mb-3 text-primary">
+                  <FaTag style={{ marginRight: 8 }} />
+                  Mã Giảm Giá Của Bạn
+                </h6>
+                <div className="table-responsive">
+                  <table className="table table-sm table-borderless align-middle" style={{ fontSize: '0.9rem' }}>
+                    <thead className="table-light">
+                      <tr>
+                        <th>Mã voucher</th>
+                        <th>Ưu đãi</th>
+                        <th>Hạn dùng</th>
+                        <th style={{ width: '50px', textAlign: 'center' }}>Chọn</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {benefits.vouchers?.map((v, idx) => {
+                        const isEligible = totalPrice >= (v.minOrderValue || 0);
+                        return (
+                          <tr key={idx} style={{ opacity: isEligible ? 1 : 0.6 }}>
+                            <td className="fw-bold text-primary">
+                              {v.code}
+                              {v.quantity > 0 && (
+                                <span className="badge bg-info-subtle text-info ms-2" style={{ fontSize: '0.7rem', fontWeight: 'normal' }}>
+                                  Còn {v.quantity} lượt
+                                </span>
+                              )}
+                              {!isEligible && <div className="text-danger" style={{ fontSize: '0.75rem' }}>Đơn tối thiểu {v.minOrderValue?.toLocaleString()}đ</div>}
+                            </td>
+                            <td>{v.description || `Giảm ${v.discount}%`}</td>
+                            <td className="text-muted">{v.endDate ? new Date(v.endDate).toLocaleDateString('vi-VN') : 'Không thời hạn'}</td>
+                            <td className="text-center">
+                              <input
+                                type="radio"
+                                name="voucherSelection"
+                                checked={appliedVoucher?.code === v.code}
+                                disabled={!isEligible}
+                                onChange={() => handleSelectVoucher(v)}
+                                style={{ cursor: isEligible ? 'pointer' : 'not-allowed', transform: 'scale(1.2)' }}
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {(!benefits.vouchers || benefits.vouchers.length === 0) && (
+                        <tr>
+                          <td colSpan="4" className="text-center text-muted">Bạn chưa có mã giảm giá nào.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                {appliedVoucher && (
+                  <div className="text-end mt-2">
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => setAppliedVoucher(null)}>Bỏ chọn voucher</button>
+                  </div>
+                )}
               </div>
             </section>
           </main>
@@ -306,17 +392,24 @@ function PaymentInfo() {
                 <span className={styles.summaryValue}>{total.toLocaleString()}đ</span>
               </div>
 
-              {comboTotalCalculated > 0 && (
-                <div className={styles.summaryItem}>
-                  <span className={styles.summaryLabel}>Combo {membership.membership && <span className="text-danger">(-{membership.membership === "vip tháng" ? "15%" : "20%"})</span>}</span>
-                  <span className={styles.summaryValue}>{(totalPrice - total).toLocaleString()}đ</span>
+              {(comboTotalCalculated > 0 || Object.values(giftComboCounts).some(c => c > 0)) && (
+                <div className={styles.summaryItem} style={{ alignItems: 'flex-start' }}>
+                  <div className={styles.summaryLabel} style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>Combo</span>
+                    {benefits.combos?.filter(c => giftComboCounts[c.id] > 0).map((combo, idx) => (
+                      <span key={`free-${idx}`} style={{ fontSize: '0.85em', color: '#52c41a', marginTop: 4 }}>
+                        + {combo.name} x{giftComboCounts[combo.id]} (FREE)
+                      </span>
+                    ))}
+                  </div>
+                  <span className={styles.summaryValue} style={{ marginTop: 2 }}>{(totalPrice - total).toLocaleString()}đ</span>
                 </div>
               )}
 
-              {discount && (
+              {appliedVoucher && (
                 <div className={styles.summaryItem}>
-                  <span className={styles.summaryLabel}>Voucher giảm giá (15%)</span>
-                  <span className={styles.summaryValue} style={{ color: '#52c41a' }}>-{(totalPrice * 0.15).toLocaleString()}đ</span>
+                  <span className={styles.summaryLabel}>Voucher giảm giá ({appliedVoucher.discount}%)</span>
+                  <span className={styles.summaryValue} style={{ color: '#52c41a' }}>-{discountAmount.toLocaleString()}đ</span>
                 </div>
               )}
 

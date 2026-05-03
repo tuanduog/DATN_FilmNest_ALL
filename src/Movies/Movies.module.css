@@ -34,7 +34,7 @@
   margin: 0 auto 50px auto;
   padding: 6px;
   border-radius: 50px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .tab {
@@ -44,7 +44,7 @@
   font-weight: 700;
   color: #64748b;
   border-radius: 50px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -73,14 +73,13 @@
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .movieCard:hover {
-  transform: translateY(-12px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .imageContainer {
@@ -94,10 +93,11 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
+  cursor: pointer;
 }
 
 .movieCard:hover .movieImage {
-  transform: scale(1.1);
+  opacity: 0.9;
 }
 
 .cardBody {
@@ -181,8 +181,15 @@
 }
 
 @keyframes modalIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .closeBtn {

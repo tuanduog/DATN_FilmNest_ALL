@@ -9,8 +9,10 @@ import "slick-carousel/slick/slick-theme.css";
 import axios from 'axios';
 import { useEffect } from 'react';
 import ShowtimePopup from './Showtime-popup';
+import { useTranslation } from 'react-i18next';
 
 function Homepage() {
+    const { t } = useTranslation();
     const [nowShowing, setNowShowing] = useState(true);
     const navigate = useNavigate();
 
@@ -26,6 +28,7 @@ function Homepage() {
     const [theater, setTheater] = useState([]);
     const [allTheaters, setAllTheaters] = useState([]);
     const [locations, setLocation] = useState([]);
+    const [publicVouchers, setPublicVouchers] = useState([]);
 
     const handleOpenModal = (movie) => {
         if (localStorage.getItem('theater') === null) {
@@ -145,6 +148,23 @@ function Homepage() {
         fetchMovies();
     }, []);
 
+    useEffect(() => {
+        const fetchPublicVouchers = async () => {
+            try {
+                const res = await axios.get("http://localhost:8099/api/voucher/v1/public");
+                const data = res.data.data;
+
+                console.log('Public Vouchers:', data);
+                if (Array.isArray(data)) {
+                    setPublicVouchers(data);
+                }
+            } catch (error) {
+                console.error('Error fetching public vouchers:', error);
+            }
+        };
+        fetchPublicVouchers();
+    }, []);
+
     return (
         <div className={styles.pageWrapper}>
             {/* Modal Chọn Rạp */}
@@ -156,9 +176,9 @@ function Homepage() {
                         </button>
 
                         <div className={styles.content}>
-                            <h4 className="fw-bold mb-4 text-center">Chọn Khu Vực & Rạp</h4>
+                            <h4 className="fw-bold mb-4 text-center">{t('chooseRegionAndCinema')}</h4>
                             <div className={styles.formGroup}>
-                                <label>Tỉnh/Thành phố</label>
+                                <label>{t('province')}</label>
                                 <select
                                     value={selectedLocation}
                                     onChange={e => {
@@ -169,7 +189,7 @@ function Homepage() {
                                         setselectedTheater("");
                                     }}
                                 >
-                                    <option value="">Chọn Tỉnh/ Thành phố</option>
+                                    <option value="">{t('selectProvince')}</option>
                                     {Array.isArray(locations) &&
                                         locations.map((loc, idx) => (
                                             <option key={idx} value={loc.code}>{loc.name}</option>
@@ -178,7 +198,7 @@ function Homepage() {
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label>Tên rạp</label>
+                                <label>{t('cinemaName')}</label>
                                 <select
                                     value={selectedTheater}
                                     onChange={e => {
@@ -196,7 +216,7 @@ function Homepage() {
                                         }
                                     }}
                                 >
-                                    <option value="">Chọn rạp</option>
+                                    <option value="">{t('selectCinema')}</option>
                                     {Array.isArray(theater) &&
                                         theater.map((theaterItem, idx) => (
                                             <option key={idx} value={theaterItem.id}>{theaterItem.name}</option>
@@ -215,6 +235,15 @@ function Homepage() {
                 onClose={() => setShowShowtime(false)}
                 savedTheater={savedTheater}
             />
+
+            {/* Voucher Marquee */}
+            {publicVouchers.length > 0 && (
+                <div style={{ backgroundColor: '#fff3cd', borderBottom: '1px solid #ffe69c', padding: '8px 0' }}>
+                    <marquee behavior="scroll" direction="left" className="text-danger fw-bold mb-0" style={{ fontSize: '16px' }}>
+                        {t('voucherNotice', { count: publicVouchers.length })}
+                    </marquee>
+                </div>
+            )}
 
             {/* Banner Section */}
             <section className={styles.bannerContainer}>
@@ -238,13 +267,13 @@ function Homepage() {
                         className={`${styles.tab} ${nowShowing ? styles.active : ''}`}
                         onClick={() => setNowShowing(true)}
                     >
-                        Phim đang chiếu
+                        {t('nowShowing')}
                     </div>
                     <div
                         className={`${styles.tab} ${!nowShowing ? styles.active : ''}`}
                         onClick={() => setNowShowing(false)}
                     >
-                        Phim sắp chiếu
+                        {t('comingSoon')}
                     </div>
                 </div>
 
@@ -268,18 +297,18 @@ function Homepage() {
                                     </h6>
 
                                     <div className={styles.infoRow}>
-                                        <span className={styles.infoLabel}>Thể loại</span>
+                                        <span className={styles.infoLabel}>{t('genre')}</span>
                                         <span className={styles.ellipsis}>{movie.genre}</span>
                                     </div>
 
                                     {nowShowing ? (
                                         <div className={styles.infoRow}>
-                                            <span className={styles.infoLabel}>Thời lượng</span>
-                                            <span>{movie.duration} phút</span>
+                                            <span className={styles.infoLabel}>{t('duration')}</span>
+                                            <span>{movie.duration} {t('minutes')}</span>
                                         </div>
                                     ) : (
                                         <div className={styles.infoRow}>
-                                            <span className={styles.infoLabel}>Khởi chiếu</span>
+                                            <span className={styles.infoLabel}>{t('releaseDate')}</span>
                                             <span>
                                                 {new Date(movie.releaseDate).toLocaleDateString("vi-VN", {
                                                     day: '2-digit', month: '2-digit', year: 'numeric'
@@ -289,7 +318,7 @@ function Homepage() {
                                     )}
 
                                     <button className={styles.btnBook} onClick={() => handleOpenModal(movie)}>
-                                        ĐẶT VÉ NGAY
+                                        {t('bookNow')}
                                     </button>
                                 </div>
                             </article>
@@ -300,7 +329,7 @@ function Homepage() {
                 {(nowShowing ? showingNow : commingSoon).length === 0 && (
                     <div className="text-center py-5">
                         <i className="bi bi-film text-muted fs-1 mb-3"></i>
-                        <h5 className="text-muted">Hiện chưa có phim nào được cập nhật.</h5>
+                        <h5 className="text-muted">{t('noMoviesAvailable')}</h5>
                     </div>
                 )}
             </div>
