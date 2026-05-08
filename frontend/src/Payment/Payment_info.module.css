@@ -1,0 +1,350 @@
+.paymentPage {
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  padding: 40px 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 30px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Common Box Style */
+.sectionBox {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 2px solid #f0f2f5;
+  padding-bottom: 15px;
+}
+
+.sectionTitle i {
+  color: #ff4d4f;
+}
+
+/* User Info */
+.userInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoLabel {
+  font-size: 0.85rem;
+  color: #8c8c8c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.infoValue {
+  font-weight: 600;
+  color: #262626;
+}
+
+/* Combo Section */
+.comboGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.comboCard {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #f0f2f5;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.comboCard:hover {
+  border-color: #ff4d4f;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.comboImage {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.comboDetails {
+  flex: 1;
+}
+
+.comboName {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.comboDesc {
+  font-size: 0.9rem;
+  color: #595959;
+  line-height: 1.4;
+}
+
+.comboSavings {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #52c41a;
+  background: #f6ffed;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #b7eb8f;
+}
+
+.comboActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pricePerCombo {
+  font-weight: 700;
+  color: #ff4d4f;
+}
+
+/* Quantity Control */
+.quantityControl {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #d9d9d9;
+  overflow: hidden;
+}
+
+.quantityBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #595959;
+  transition: all 0.2s;
+}
+
+.quantityBtn:hover {
+  background: #f5f5f5;
+  color: #ff4d4f;
+}
+
+.quantityValue {
+  width: 40px;
+  text-align: center;
+  font-weight: 600;
+  border-left: 1px solid #d9d9d9;
+  border-right: 1px solid #d9d9d9;
+}
+
+/* Voucher Section */
+.voucherInputGroup {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.voucherInput {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #d9d9d9;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.voucherInput:focus {
+  border-color: #ff4d4f;
+}
+
+.voucherApplyBtn {
+  padding: 0 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.voucherApplyBtn:hover {
+  transform: scale(1.02);
+}
+
+/* Order Summary Sidebar */
+.sidebar {
+  position: sticky;
+  top: 40px;
+}
+
+.summaryTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+.summaryLabel {
+  color: #8c8c8c;
+}
+
+.summaryValue {
+  font-weight: 600;
+  color: #262626;
+  text-align: right;
+}
+
+.summaryDivider {
+  height: 1px;
+  background: #f0f2f5;
+  margin: 20px 0;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.totalLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.totalAmount {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ff4d4f;
+}
+
+/* Timer */
+.timerBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: #fff1f0;
+  border: 1px solid #ffa39e;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  color: #cf1322;
+  font-weight: 700;
+}
+
+.timerIcon {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Checkout Button */
+.checkoutBtn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #f759ab 100%);
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 10px 20px rgba(255, 77, 79, 0.3);
+}
+
+.checkoutBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(255, 77, 79, 0.4);
+}
+
+.checkoutBtn:disabled {
+  background: #d9d9d9;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Membership Badge */
+.membershipBadge {
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: #fff7e6;
+  color: #d46b08;
+  border: 1px solid #ffd591;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.membershipDiscount {
+  color: #cf1322;
+  font-weight: 700;
+}

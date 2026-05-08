@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,700');
+
+.authContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  /* changed back from 100vh since Header and Footer were added back */
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f6f5f7;
+  padding: 40px 20px;
+}
+
+.authContainer * {
+  box-sizing: border-box;
+}
+
+.container {
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  padding: 40px 30px;
+  position: relative;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 30px;
+}
+
+.tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 15px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #a0a0a0;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.tab:focus {
+  outline: none;
+}
+
+.tab:hover {
+  color: #333;
+}
+
+.activeTab {
+  color: #0d6efd;
+}
+
+.activeTab::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #0d6efd;
+}
+
+.formContent form {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.socialContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.social {
+  border: 1px solid #DDDDDD;
+  border-radius: 50%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 8px;
+  height: 40px;
+  width: 40px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.social:hover {
+  background-color: #f1f1f1;
+  border-color: #ccc;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #777;
+  text-align: center;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.inputGroup {
+  margin-bottom: 15px;
+}
+
+.inputGroup input {
+  width: 100%;
+  background-color: #f7f7f7;
+  border: 1px solid transparent;
+  padding: 13px 18px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+.inputGroup input:focus {
+  background-color: #fff;
+  border-color: #0d6efd;
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.2);
+}
+
+.forgotPassword {
+  color: #666;
+  font-size: 13px;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.forgotPassword:hover {
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+.btnSubmit {
+  border-radius: 25px;
+  border: none;
+  background: #0d6efd;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 15px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.btnSubmit:hover {
+  background: #0b5ed7;
+  box-shadow: 0 8px 15px rgba(13, 110, 253, 0.3);
+}
+
+.btnSubmit:active {
+  transform: scale(0.98);
+}

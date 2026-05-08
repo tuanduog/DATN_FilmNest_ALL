@@ -1,0 +1,435 @@
+:root {
+  --primary-color: #0d6efd;
+  --vip-color: #f59e0b;
+  --couple-color: #ec4899;
+  --selected-color: #10b981;
+  --selecting-color: #6366f1;
+  --sold-color: #e2e8f0;
+  --bg-light: #f8fafc;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(0, 0, 0, 0.05);
+}
+
+.booking-page {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  min-height: 100vh;
+  color: #1e293b;
+  padding-bottom: 50px;
+}
+
+.ticket-booking-container {
+  display: flex;
+  gap: 30px;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Seating Section */
+.seating-layout {
+  flex: 1;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 60px 40px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.screen-container {
+  perspective: 1000px;
+  margin-bottom: 80px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.screen {
+  height: 8px;
+  background: linear-gradient(to right,
+      transparent,
+      var(--primary-color),
+      #38bdf8,
+      var(--primary-color),
+      transparent);
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 50% / 100% 100% 0 0;
+  box-shadow:
+    0 4px 15px rgba(13, 110, 253, 0.4),
+    0 10px 30px rgba(13, 110, 253, 0.2),
+    0 15px 50px rgba(13, 110, 253, 0.1);
+  transform: rotateX(-20deg);
+  position: relative;
+}
+
+.screen::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 10%;
+  right: 10%;
+  height: 50px;
+  background: linear-gradient(to bottom,
+      rgba(13, 110, 253, 0.15),
+      transparent);
+  clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
+  filter: blur(10px);
+}
+
+.screen-text {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 6px;
+  margin-top: 35px;
+  opacity: 0.8;
+}
+
+/* Seat Grid */
+.seat-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.seat-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.row-label {
+  width: 30px;
+  font-weight: 700;
+  color: #64748b;
+  font-size: 16px;
+}
+
+.seat {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid #cbd5e1;
+  background: #ffffff;
+  color: #64748b;
+}
+
+
+.seat:hover:not(.sold) {
+  transform: translateY(-2px) scale(1.1);
+  border-color: var(--primary-color);
+  background: var(--primary-color) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+
+.seat.normal {
+  border-color: #cbd5e1;
+}
+
+
+.seat.vip {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.05);
+  color: var(--vip-color);
+}
+
+.seat.couple {
+  width: 94px;
+  border-color: rgba(236, 72, 153, 0.5);
+  background: rgba(236, 72, 153, 0.05);
+  color: var(--couple-color);
+}
+
+
+.seat.selected {
+  background: var(--selected-color) !important;
+  border-color: var(--selected-color) !important;
+  color: white !important;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+.seat.selecting {
+  background: var(--selecting-color) !important;
+  border-color: var(--selecting-color) !important;
+  color: white !important;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.seat.sold {
+  background: var(--sold-color) !important;
+  border-color: transparent !important;
+  color: #94a3b8;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Legend */
+.legend-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 50px;
+  padding-top: 30px;
+  border-top: 1px solid var(--glass-border);
+  width: 100%;
+}
+
+.legend-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.legend-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #475569;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #1e293b;
+  background: white;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.legend-seat {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.legend-seat i {
+  font-size: 12px;
+}
+
+.legend-seat.normal {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+}
+
+.legend-seat.vip {
+  background: rgba(245, 158, 11, 0.05);
+  border: 2px solid rgba(245, 158, 11, 0.5);
+  color: var(--vip-color);
+}
+
+.legend-seat.couple {
+  background: rgba(236, 72, 153, 0.05);
+  border: 2px solid rgba(236, 72, 153, 0.5);
+  color: var(--couple-color);
+}
+
+.legend-seat.empty {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+}
+
+.legend-seat.selected {
+  background: var(--selected-color);
+  border: 2px solid var(--selected-color);
+}
+
+.legend-seat.selecting {
+  background: var(--selecting-color);
+  border: 2px solid var(--selecting-color);
+  animation: pulse 1.5s infinite;
+}
+
+.legend-seat.sold {
+  background: var(--sold-color);
+  border: 2px solid var(--sold-color);
+  opacity: 0.6;
+}
+
+
+/* Ticket Summary Sidebar */
+.ticket-summary {
+  width: 320px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 30px;
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.movie-mini-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.summary-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #1e293b;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info-label {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.info-value {
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.selected-seats-badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.seat-badge {
+  background: var(--primary-color);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.total-section {
+  background: rgba(13, 110, 253, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 25px;
+}
+
+.total-label {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.total-amount {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.total-currency {
+  font-size: 16px;
+  color: var(--primary-color);
+}
+
+.timer-floating {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 12px 24px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.timer-icon {
+  color: var(--primary-color);
+  font-size: 20px;
+}
+
+.timer-value {
+  font-weight: 800;
+  font-family: monospace;
+  font-size: 18px;
+}
+
+.btn-checkout {
+  width: 100%;
+  background: linear-gradient(45deg, #0d6efd, #00d2ff);
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-checkout:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.4);
+}
+
+.btn-checkout:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

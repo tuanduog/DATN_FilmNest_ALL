@@ -1,0 +1,121 @@
+* {
+  box-sizing: border-box;
+}
+
+
+.topblack {
+  height: 40px;
+  width: 100%;
+  background-color: black;
+}
+
+.nav-link {
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.nav-link:hover {
+  color: #0d6efd !important;
+  /* đổi màu chữ khi hover */
+}
+
+.active-nav {
+  color: #0d6efd !important;
+  font-weight: 600;
+}
+
+.top-link {
+  transition: color 0.2s;
+}
+
+.top-link:hover {
+  color: #0d6efd !important;
+}
+
+.navbar {
+  min-height: 70px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  overflow: visible;
+  padding: 0;
+}
+
+.navbar-logo {
+  height: 70px;
+  width: auto;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  /* removes white background visually */
+  margin-top: -10px;
+  margin-bottom: -10px;
+  cursor: pointer;
+}
+
+.navbar-brand:hover {
+  cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup {
+  margin-top: -150px;
+  background: white;
+  padding: 20px 30px;
+  border-radius: 4px;
+  width: 700px;
+  position: relative;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.content {
+  margin-top: 15px;
+}
+
+.formRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.formGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.formGroup select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
