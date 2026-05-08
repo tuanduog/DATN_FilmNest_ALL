@@ -1,0 +1,333 @@
+import {
+    Box,
+    InputLabel,
+    TextField,
+    Typography,
+    Paper,
+    Snackbar,
+    Alert,
+    Button,
+    IconButton,
+    Stack,
+    Grid
+} from '@mui/material';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useState } from 'react';
+import { Movie } from 'types/movie';
+import { CloseCircle } from 'iconsax-reactjs';
+import AnimateButton from 'components/@extended/AnimateButton';
+import ImageDropZone from 'components/ImageDropZone';
+
+interface MovieFormProps {
+    handleNext: () => void;
+    setMovie: (movie: Movie) => void;
+    movie: Movie;
+}
+
+const validationSchema = Yup.object({
+    name: Yup.string().required('Tên phim là bắt buộc'),
+    description: Yup.string().required('Mô tả là bắt buộc'),
+    director: Yup.string().required('Đạo diễn là bắt buộc'),
+    actor: Yup.string().required('Diễn viên là bắt buộc'),
+    genre: Yup.string().required('Thể loại là bắt buộc'),
+    releaseDate: Yup.string().required('Ngày công chiếu là bắt buộc'),
+    endDate: Yup.string().required('Ngày kết thúc là bắt buộc'),
+    duration: Yup.number().required('Thời lượng là bắt buộc').min(1, 'Thời lượng phải lớn hơn 0'),
+    trailerUrl: Yup.string().required('URL trailer là bắt buộc'),
+});
+
+export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProps) {
+    const [image, setImage] = useState<File | string | null>(movie.image!);
+    const [preview, setPreview] = useState<string | null>('');
+
+    const [alert, setAlert] = useState({
+        open: false,
+        message: '',
+        severity: 'success' as 'success' | 'error' | 'info' | 'warning'
+    });
+
+    const formik = useFormik<Movie>({
+        initialValues: movie,
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            setMovie({ ...values, image: image });
+            handleNext();
+        }
+    });
+
+    const handleGetFileUrl = (e: any) => {
+        const selectedFile = e.target.files[0];
+        setImage(selectedFile);
+        return URL.createObjectURL(selectedFile);
+    };
+
+    const handleDeleteImage = async () => {
+        setImage(null);
+    };
+
+    return (
+        <Box>
+            <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
+                <form onSubmit={formik.handleSubmit} noValidate>
+                    <Box mb={4}>
+                        <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
+                            Thông tin phim
+                        </Typography>
+
+                        <Grid container spacing={2}>
+                            <Grid size={12}>
+                                <Box sx={{ width: '100%', mb: 2 }}>
+                                    <InputLabel sx={{ mb: 1 }}>Hình ảnh phim</InputLabel>
+                                    {!preview ? (
+                                        <ImageDropZone
+                                            value={preview ?? ''}
+                                            onGetFile={(files) => handleGetFileUrl(files)}
+                                            onChange={(url) => {
+                                                setPreview(url);
+                                            }}
+                                            width="150px"
+                                            height="150px"
+                                        />
+                                    ) : (
+                                        <Box sx={{ position: 'relative', width: '150px' }}>
+                                            <Box>
+                                                <img
+                                                    alt="image"
+                                                    src={preview}
+                                                    style={{ width: '150px', height: '150px', display: 'block', borderRadius: '5px', objectFit: 'cover' }}
+                                                />
+                                            </Box>
+
+                                            <IconButton
+                                                onClick={handleDeleteImage}
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 4,
+                                                    right: 4,
+                                                    zIndex: 10,
+                                                    '&:hover': { backgroundColor: 'transparent' }
+                                                }}
+                                                size="small"
+                                            >
+                                                <CloseCircle
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        fontWeight: 'bold',
+                                                        color: 'white',
+                                                        backgroundColor: 'black',
+                                                        borderRadius: '50%'
+                                                    }}
+                                                />
+                                            </IconButton>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Tên phim
+                                </InputLabel>
+
+                                <TextField
+                                    id="name"
+                                    name="name"
+                                    placeholder="Nhập tên phim"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.name}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.name && Boolean(formik.errors.name)}
+                                    helperText={formik.touched.name && formik.errors.name}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="genre" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Thể loại
+                                </InputLabel>
+
+                                <TextField
+                                    id="genre"
+                                    name="genre"
+                                    placeholder="Nhập thể loại"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.genre}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.genre && Boolean(formik.errors.genre)}
+                                    helperText={formik.touched.genre && formik.errors.genre}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="duration" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Thời lượng (phút)
+                                </InputLabel>
+
+                                <TextField
+                                    id="duration"
+                                    name="duration"
+                                    type="number"
+                                    placeholder="Nhập thời lượng"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.duration}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.duration && Boolean(formik.errors.duration)}
+                                    helperText={formik.touched.duration && formik.errors.duration}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="director" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Đạo diễn
+                                </InputLabel>
+
+                                <TextField
+                                    id="director"
+                                    name="director"
+                                    type="text"
+                                    placeholder="Nhập đạo diễn"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.director}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.director && Boolean(formik.errors.director)}
+                                    helperText={formik.touched.director && formik.errors.director}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="actor" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Diễn viên
+                                </InputLabel>
+
+                                <TextField
+                                    id="actor"
+                                    name="actor"
+                                    type="text"
+                                    placeholder="Nhập diễn viên"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.actor}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.actor && Boolean(formik.errors.actor)}
+                                    helperText={formik.touched.actor && formik.errors.actor}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="releaseDate" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Ngày khởi chiếu
+                                </InputLabel>
+
+                                <TextField
+                                    id="releaseDate"
+                                    name="releaseDate"
+                                    type="date"
+                                    placeholder="Nhập ngày phát hành"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.releaseDate}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.releaseDate && Boolean(formik.errors.releaseDate)}
+                                    helperText={formik.touched.releaseDate && formik.errors.releaseDate}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="endDate" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Ngày kết thúc chiếu
+                                </InputLabel>
+
+                                <TextField
+                                    id="endDate"
+                                    name="endDate"
+                                    type="date"
+                                    placeholder="Nhập ngày kết thúc chiếu"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.endDate}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.endDate && Boolean(formik.errors.endDate)}
+                                    helperText={formik.touched.endDate && formik.errors.endDate}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <InputLabel htmlFor="trailerUrl" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Link trailer
+                                </InputLabel>
+
+                                <TextField
+                                    id="trailerUrl"
+                                    name="trailerUrl"
+                                    placeholder="Nhập link trailer"
+                                    size="small"
+                                    fullWidth
+                                    value={formik.values.trailerUrl}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.trailerUrl && Boolean(formik.errors.trailerUrl)}
+                                    helperText={formik.touched.trailerUrl && formik.errors.trailerUrl}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 12 }}>
+                                <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
+                                    Mô tả
+                                </InputLabel>
+
+                                <TextField
+                                    id="description"
+                                    name="description"
+                                    placeholder="Nhập mô tả combo"
+                                    size="small"
+                                    multiline
+                                    rows={4}
+                                    fullWidth
+                                    value={formik.values.description}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    error={formik.touched.description && Boolean(formik.errors.description)}
+                                    helperText={formik.touched.description && formik.errors.description}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Box>
+
+                    <Grid size={12} sx={{ p: 0, m: 0 }}>
+                        <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
+                            <AnimateButton>
+                                <Button variant="contained" type="submit" sx={{ my: 3, ml: 1 }}>
+                                    Tiếp tục
+                                </Button>
+                            </AnimateButton>
+                        </Stack>
+                    </Grid>
+                </form>
+            </Paper>
+
+            <Snackbar
+                open={alert.open}
+                autoHideDuration={3000}
+                onClose={() => setAlert({ ...alert, open: false })}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert onClose={() => setAlert({ ...alert, open: false })} severity={alert.severity} variant="filled" sx={{ width: '100%' }}>
+                    {alert.message}
+                </Alert>
+            </Snackbar>
+        </Box>
+    );
+}
