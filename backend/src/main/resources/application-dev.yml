@@ -1,0 +1,39 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: ${POSTGRESQL_URL:jdbc:postgresql://localhost:5432/filmnest}
+    username: ${POSTGRESQL_USER:film_nest}
+    password: ${POSTGRESQL_PASSWORD:abc123!@#}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+openapi:
+  service:
+    api-docs: api-service
+    serverUrl: http://localhost:${server.port}
+    serverName: Server Dev
+    title: API Document
+    version: 1.0.0
+server:
+  port: 8099
+jwt:
+  signerKey : "jimCkrbwN6xbegs1wNqLlyqsAk2vsGqSJ2d9oOCvXIE57Qa34TlgM3Xe48Q8IxPp"
+
+logging:
+  level:
+    org.springframework.web.socket: DEBUG
+    org.springframework.web.socket.messaging: DEBUG
+    org.springframework.messaging: DEBUG
+    org.springframework.web.servlet: DEBUG
