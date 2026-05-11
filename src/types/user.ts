@@ -7,6 +7,6 @@ export interface User {
     gender: string;
     dob: string;
     nationality: string;
-    role: string;
+    role?: string;
     status?: string;
 }   

@@ -54,7 +54,7 @@ export default function AddConfirmForm({ handleBack, employee }: ConfirmProps) {
 
             if (response.status === HttpStatusCode.Ok) {
                 navigate('/admin/employee', {
-                    state: { alert: { open: true, severity: 'success', message: 'Thêm nhân viên thành công' } }
+                    state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'add-employee-success' }) } }
                 });
             } else if (response.status === HttpStatusCode.BadRequest) {
                 setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
@@ -75,62 +75,62 @@ export default function AddConfirmForm({ handleBack, employee }: ConfirmProps) {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Xác nhận thông tin nhân viên
+                        {intl.formatMessage({ id: 'confirm-employee-info' })}
                     </Typography>
 
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Tên tài khoản</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'username' })}</InputLabel>
                                 <Typography>{employee.username}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mã nhân viên</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'code' })}</InputLabel>
                                 <Typography>{employee.code}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Họ và tên</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'fullname' })}</InputLabel>
                                 <Typography>{employee.fullname}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Email</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'email' })}</InputLabel>
                                 <Typography>{employee.email}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Số điện thoại</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'phone' })}</InputLabel>
                                 <Typography>{employee.phone}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Giới tính</InputLabel>
-                                <Typography>{employee.gender === 'MALE' ? 'Nam' : employee.gender === 'FEMALE' ? 'Nữ' : 'Khác'}</Typography>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'gender' })}</InputLabel>
+                                <Typography>{employee.gender === 'MALE' ? intl.formatMessage({ id: 'male' }) : employee.gender === 'FEMALE' ? intl.formatMessage({ id: 'female' }) : intl.formatMessage({ id: 'other' })}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Ngày sinh</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'dob' })}</InputLabel>
                                 <Typography>{formatDate(employee.dob)}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Quốc tịch</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'nationality' })}</InputLabel>
                                 <Stack direction="row" alignItems="center" spacing={1}>
                                     {employee.nationality && countries.find((c) => c.code === employee.nationality) && (
                                         <img
@@ -150,22 +150,22 @@ export default function AddConfirmForm({ handleBack, employee }: ConfirmProps) {
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mức lương</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'salary' })}</InputLabel>
                                 <Typography>{employee.salary.toLocaleString()} VNĐ</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Ngày bắt đầu làm việc</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'hire-at' })}</InputLabel>
                                 <Typography>{formatDate(employee.hireAt)}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Vai trò</InputLabel>
-                                <Typography>{employee.role === 'USER' ? 'Người dùng' : employee.role === 'MANAGER' ? 'Quản lý' : 'Nhân viên'}</Typography>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'role' })}</InputLabel>
+                                <Typography>{employee.role === 'USER' ? intl.formatMessage({ id: 'user-role' }) : employee.role === 'MANAGER' ? intl.formatMessage({ id: 'manager' }) : intl.formatMessage({ id: 'staff' })}</Typography>
                             </Stack>
                         </Grid>
                     </Grid>
@@ -175,12 +175,12 @@ export default function AddConfirmForm({ handleBack, employee }: ConfirmProps) {
 
                 <Grid display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
                     <Button variant="contained" sx={{ my: 3 }} color="secondary" onClick={handleBack}>
-                        Quay lại
+                        {intl.formatMessage({ id: 'back' })}
                     </Button>
 
                     <AnimateButton>
                         <Button variant="contained" type="button" sx={{ my: 3 }} color="primary" onClick={handleSubmit}>
-                            Xác nhận
+                            {intl.formatMessage({ id: 'confirm' })}
                         </Button>
                     </AnimateButton>
                 </Grid>

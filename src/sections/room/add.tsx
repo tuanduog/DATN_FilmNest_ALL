@@ -9,8 +9,9 @@ import RoomSeatConfig from './seat';
 import RoomConfirmForm from './add-confirm-form';
 
 import { Room } from 'types/room';
+import { FormattedMessage } from 'react-intl';
 
-const steps = ['Thông tin phòng chiếu', 'Thiết lập ghế', 'Xác nhận'];
+const stepKeys = ['room-info', 'seat-config', 'confirm'];
 
 function getStepContent(
     step: number,
@@ -79,13 +80,13 @@ export default function AddRoom() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Thêm phòng chiếu</Typography>
+                <Typography variant="h3"><FormattedMessage id="add-room" /></Typography>
             </Box>
 
             <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
-                {steps.map((label) => (
-                    <Step key={label}>
-                        <StepLabel>{label}</StepLabel>
+                {stepKeys.map((key) => (
+                    <Step key={key}>
+                        <StepLabel><FormattedMessage id={key} /></StepLabel>
                     </Step>
                 ))}
             </Stepper>

@@ -81,12 +81,14 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             }
           });
         } else {
+          setSession(null);
           dispatch({
             type: LOGOUT
           });
         }
       } catch (err) {
         console.error(err);
+        setSession(null);
         dispatch({
           type: LOGOUT
         });
@@ -97,6 +99,7 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
   }, []);
 
   const login = async (authInfo: AuthInfo) => {
+    setSession(null);
     const data = await loginApi(authInfo);
 
     // loginApi catches and returns errors, so handle if it's an error

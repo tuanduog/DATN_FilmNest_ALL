@@ -7,6 +7,7 @@ import { Box, Typography } from '@mui/material';
 import { Theater } from 'types/theater';
 import TheaterForm from './theater-form';
 import AddConfirmForm from './add-confirm-form';
+import { useIntl } from 'react-intl';
 
 function getStepContent(
     step: number,
@@ -32,6 +33,7 @@ function getStepContent(
 // ==============================|| ADD THEATER ||============================== //
 
 export default function AddTheater() {
+    const intl = useIntl();
     const [activeStep, setActiveStep] = useState(0);
 
     const initialValues: Theater = {
@@ -61,7 +63,7 @@ export default function AddTheater() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Thêm rạp chiếu</Typography>
+                <Typography variant="h3">{intl.formatMessage({ id: 'add-theater' })}</Typography>
             </Box>
 
             {activeStep === 0 ? (

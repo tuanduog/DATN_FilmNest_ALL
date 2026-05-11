@@ -18,9 +18,11 @@ import { getById } from 'api/voucher';
 import { HttpStatusCode } from 'axios';
 import formatDate from 'utils/formatDateTime';
 import { Voucher } from 'types/voucher';
+import { useIntl } from 'react-intl';
 
 export default function VoucherDetail() {
     const { id } = useParams<{ id: string }>();
+    const intl = useIntl();
     const navigate = useNavigate();
     const [voucher, setVoucher] = useState<Voucher | null>(null);
     const [loading, setLoading] = useState(true);
@@ -62,8 +64,10 @@ export default function VoucherDetail() {
     if (!voucher) {
         return (
             <Box p={3}>
-                <Alert severity="error">Không tìm thấy thông tin khuyến mãi</Alert>
-                <Button onClick={() => navigate('/admin/voucher')} sx={{ mt: 2 }}>Quay lại danh sách</Button>
+                <Alert severity="error">{intl.formatMessage({ id: 'voucher-not-found' })}</Alert>
+                <Button onClick={() => navigate('/admin/voucher')} sx={{ mt: 2 }}>
+                    {intl.formatMessage({ id: 'back-to-list' })}
+                </Button>
             </Box>
         );
     }
@@ -73,54 +77,54 @@ export default function VoucherDetail() {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 20 }, mr: { xs: 0, lg: 20 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Chi tiết khuyến mãi
+                        {intl.formatMessage({ id: 'detail-voucher' })}
                     </Typography>
 
                     <Grid container spacing={3}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mã khuyến mãi</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'voucher-code' })}</InputLabel>
                                 <Typography variant="body1">{voucher.code}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Loại khuyến mãi</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'voucher-type' })}</InputLabel>
                                 <Typography variant="body1">
-                                    {voucher.type === 'PUBLIC' ? 'Chung (Công khai)' : 'Cá nhân (Gói hội viên)'}
+                                    {voucher.type === 'PUBLIC' ? intl.formatMessage({ id: 'public-voucher' }) : intl.formatMessage({ id: 'personal-voucher' })}
                                 </Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mô tả</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'description' })}</InputLabel>
                                 <Typography variant="body1">{voucher.description}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Ngày bắt đầu</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'start-date' })}</InputLabel>
                                 <Typography variant="body1">
-                                    {voucher.startDate ? formatDate(voucher.startDate) : 'Không giới hạn'}
+                                    {voucher.startDate ? formatDate(voucher.startDate) : intl.formatMessage({ id: 'unlimited' })}
                                 </Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Ngày kết thúc</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'end-date' })}</InputLabel>
                                 <Typography variant="body1">
-                                    {voucher.endDate ? formatDate(voucher.endDate) : 'Không giới hạn'}
+                                    {voucher.endDate ? formatDate(voucher.endDate) : intl.formatMessage({ id: 'unlimited' })}
                                 </Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: voucher.type === 'PUBLIC' ? 6 : 12 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mức giảm giá (%)</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'discount-value' })} (%)</InputLabel>
                                 <Typography variant="body1">{voucher.discount}%</Typography>
                             </Stack>
                         </Grid>
@@ -129,16 +133,16 @@ export default function VoucherDetail() {
                             <>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Stack spacing={1}>
-                                        <InputLabel sx={{ fontWeight: 'bold' }}>Số lượng</InputLabel>
+                                        <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'quantity' })}</InputLabel>
                                         <Typography variant="body1">{voucher.quantity}</Typography>
                                     </Stack>
                                 </Grid>
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Stack spacing={1}>
-                                        <InputLabel sx={{ fontWeight: 'bold' }}>Đơn tối thiểu</InputLabel>
+                                        <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'min-order-value' })}</InputLabel>
                                         <Typography variant="body1">
-                                            {voucher.minOrderValue ? `${voucher.minOrderValue.toLocaleString()} VNĐ` : '0 VNĐ'}
+                                            {voucher.minOrderValue ? `${voucher.minOrderValue.toLocaleString()} VNĐ` : `0 VNĐ`}
                                         </Typography>
                                     </Stack>
                                 </Grid>
@@ -147,9 +151,9 @@ export default function VoucherDetail() {
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Trạng thái</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'status' })}</InputLabel>
                                 <Typography variant="body1" color={voucher.status === 'ACTIVE' ? 'success.main' : 'error.main'}>
-                                    {voucher.status === 'ACTIVE' ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+                                    {voucher.status === 'ACTIVE' ? intl.formatMessage({ id: 'active' }) : intl.formatMessage({ id: 'inactive' })}
                                 </Typography>
                             </Stack>
                         </Grid>
@@ -160,11 +164,11 @@ export default function VoucherDetail() {
 
                 <Stack direction="row" justifyContent="space-between" spacing={2}>
                     <Button variant="outlined" color="secondary" onClick={() => navigate('/admin/voucher')}>
-                        Quay lại
+                        {intl.formatMessage({ id: 'back' })}
                     </Button>
                     <AnimateButton>
                         <Button variant="contained" color="primary" onClick={() => navigate(`/admin/voucher/edit/${id}`)}>
-                            Chỉnh sửa
+                            {intl.formatMessage({ id: 'edit' })}
                         </Button>
                     </AnimateButton>
                 </Stack>

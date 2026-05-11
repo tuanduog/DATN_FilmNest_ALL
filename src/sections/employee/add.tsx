@@ -7,6 +7,7 @@ import { Box, Typography } from '@mui/material';
 import { Employee } from 'types/employee';
 import EmployeeForm from './employee-form';
 import AddConfirmForm from './add-confirm-form';
+import { useIntl } from 'react-intl';
 
 function getStepContent(
     step: number,
@@ -32,6 +33,7 @@ function getStepContent(
 // ==============================|| ADD EMPLOYEE ||============================== //
 
 export default function AddEmployee() {
+    const intl = useIntl();
     const [activeStep, setActiveStep] = useState(0);
 
     const initialValues: Employee = {
@@ -65,7 +67,7 @@ export default function AddEmployee() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Thêm nhân viên</Typography>
+                <Typography variant="h3">{intl.formatMessage({ id: 'add-employee' })}</Typography>
             </Box>
 
             {activeStep == 0 ? (

@@ -52,13 +52,13 @@ export default function ShowtimeDetail() {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Thông tin suất chiếu
+                        {intl.formatMessage({ id: 'showtime-info' })}
                     </Typography>
 
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="movieName" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Tên phim
+                                {intl.formatMessage({ id: 'movie-name' })}
                             </InputLabel>
 
                             <Typography>{showtime?.movieName}</Typography>
@@ -66,7 +66,7 @@ export default function ShowtimeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="roomName" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Phòng chiếu
+                                {intl.formatMessage({ id: 'room' })}
                             </InputLabel>
 
                             <Typography>{showtime?.roomName}</Typography>
@@ -74,7 +74,7 @@ export default function ShowtimeDetail() {
 
                         <Grid size={12}>
                             <InputLabel htmlFor="theaterName" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Rạp chiếu
+                                {intl.formatMessage({ id: 'theater' })}
                             </InputLabel>
 
                             <Typography>{showtime?.theaterName}</Typography>
@@ -82,7 +82,7 @@ export default function ShowtimeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="showDate" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Ngày chiếu
+                                {intl.formatMessage({ id: 'show-date' })}
                             </InputLabel>
 
                             <Typography>{showtime?.showDate}</Typography>
@@ -90,7 +90,7 @@ export default function ShowtimeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="startTime" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Giờ chiếu
+                                {intl.formatMessage({ id: 'show-time' })}
                             </InputLabel>
 
                             <Typography>{showtime?.startTime}</Typography>
@@ -98,7 +98,7 @@ export default function ShowtimeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="surcharge" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Phụ thu theo khung giờ (VND)
+                                {intl.formatMessage({ id: 'surcharge-vnd' })}
                             </InputLabel>
 
                             <Typography>{showtime?.surcharge}</Typography>
@@ -112,7 +112,7 @@ export default function ShowtimeDetail() {
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
                             <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/showtime/edit/${id}`)}>
-                                Cập nhật
+                                {intl.formatMessage({ id: 'update' })}
                             </Button>
                         </AnimateButton>
                     </Stack>

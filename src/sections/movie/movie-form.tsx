@@ -14,6 +14,7 @@ import {
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useState } from 'react';
+import { useIntl } from 'react-intl';
 import { Movie } from 'types/movie';
 import { CloseCircle } from 'iconsax-reactjs';
 import AnimateButton from 'components/@extended/AnimateButton';
@@ -25,19 +26,20 @@ interface MovieFormProps {
     movie: Movie;
 }
 
-const validationSchema = Yup.object({
-    name: Yup.string().required('Tên phim là bắt buộc'),
-    description: Yup.string().required('Mô tả là bắt buộc'),
-    director: Yup.string().required('Đạo diễn là bắt buộc'),
-    actor: Yup.string().required('Diễn viên là bắt buộc'),
-    genre: Yup.string().required('Thể loại là bắt buộc'),
-    releaseDate: Yup.string().required('Ngày công chiếu là bắt buộc'),
-    endDate: Yup.string().required('Ngày kết thúc là bắt buộc'),
-    duration: Yup.number().required('Thời lượng là bắt buộc').min(1, 'Thời lượng phải lớn hơn 0'),
-    trailerUrl: Yup.string().required('URL trailer là bắt buộc'),
+const validationSchema = (intl: any) => Yup.object({
+    name: Yup.string().required(intl.formatMessage({ id: 'movie-name-required' })),
+    description: Yup.string().required(intl.formatMessage({ id: 'description-required' })),
+    director: Yup.string().required(intl.formatMessage({ id: 'director-required' })),
+    actor: Yup.string().required(intl.formatMessage({ id: 'actor-required' })),
+    genre: Yup.string().required(intl.formatMessage({ id: 'genre-required' })),
+    releaseDate: Yup.string().required(intl.formatMessage({ id: 'release-date-required' })),
+    endDate: Yup.string().required(intl.formatMessage({ id: 'end-date-required' })),
+    duration: Yup.number().required(intl.formatMessage({ id: 'duration-required' })).min(1, intl.formatMessage({ id: 'duration-min' })),
+    trailerUrl: Yup.string().required(intl.formatMessage({ id: 'trailer-url-required' })),
 });
 
 export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProps) {
+    const intl = useIntl();
     const [image, setImage] = useState<File | string | null>(movie.image!);
     const [preview, setPreview] = useState<string | null>('');
 
@@ -49,7 +51,7 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
     const formik = useFormik<Movie>({
         initialValues: movie,
-        validationSchema: validationSchema,
+        validationSchema: validationSchema(intl),
         onSubmit: async (values) => {
             setMovie({ ...values, image: image });
             handleNext();
@@ -72,13 +74,13 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                            Thông tin phim
+                            {intl.formatMessage({ id: 'movie-info' })}
                         </Typography>
 
                         <Grid container spacing={2}>
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
-                                    <InputLabel sx={{ mb: 1 }}>Hình ảnh phim</InputLabel>
+                                    <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'movie-image' })}</InputLabel>
                                     {!preview ? (
                                         <ImageDropZone
                                             value={preview ?? ''}
@@ -128,13 +130,13 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tên phim
+                                    {intl.formatMessage({ id: 'movie-name' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="name"
                                     name="name"
-                                    placeholder="Nhập tên phim"
+                                    placeholder={intl.formatMessage({ id: 'movie-name-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.name}
@@ -147,13 +149,13 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="genre" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Thể loại
+                                    {intl.formatMessage({ id: 'genre' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="genre"
                                     name="genre"
-                                    placeholder="Nhập thể loại"
+                                    placeholder={intl.formatMessage({ id: 'genre-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.genre}
@@ -166,14 +168,14 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="duration" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Thời lượng (phút)
+                                    {intl.formatMessage({ id: 'duration-minutes' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="duration"
                                     name="duration"
                                     type="number"
-                                    placeholder="Nhập thời lượng"
+                                    placeholder={intl.formatMessage({ id: 'duration-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.duration}
@@ -186,14 +188,14 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="director" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Đạo diễn
+                                    {intl.formatMessage({ id: 'director' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="director"
                                     name="director"
                                     type="text"
-                                    placeholder="Nhập đạo diễn"
+                                    placeholder={intl.formatMessage({ id: 'director-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.director}
@@ -206,14 +208,14 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="actor" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Diễn viên
+                                    {intl.formatMessage({ id: 'actor' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="actor"
                                     name="actor"
                                     type="text"
-                                    placeholder="Nhập diễn viên"
+                                    placeholder={intl.formatMessage({ id: 'actor-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.actor}
@@ -226,14 +228,14 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="releaseDate" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Ngày khởi chiếu
+                                    {intl.formatMessage({ id: 'release-date' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="releaseDate"
                                     name="releaseDate"
                                     type="date"
-                                    placeholder="Nhập ngày phát hành"
+                                    placeholder={intl.formatMessage({ id: 'release-date-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.releaseDate}
@@ -246,14 +248,14 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="endDate" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Ngày kết thúc chiếu
+                                    {intl.formatMessage({ id: 'end-date' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="endDate"
                                     name="endDate"
                                     type="date"
-                                    placeholder="Nhập ngày kết thúc chiếu"
+                                    placeholder={intl.formatMessage({ id: 'end-date-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.endDate}
@@ -266,13 +268,13 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="trailerUrl" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Link trailer
+                                    {intl.formatMessage({ id: 'trailer-link' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="trailerUrl"
                                     name="trailerUrl"
-                                    placeholder="Nhập link trailer"
+                                    placeholder={intl.formatMessage({ id: 'trailer-link-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.trailerUrl}
@@ -285,13 +287,13 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
                             <Grid size={{ xs: 12, md: 12 }}>
                                 <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Mô tả
+                                    {intl.formatMessage({ id: 'description' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="description"
                                     name="description"
-                                    placeholder="Nhập mô tả combo"
+                                    placeholder={intl.formatMessage({ id: 'description-placeholder' })}
                                     size="small"
                                     multiline
                                     rows={4}
@@ -310,7 +312,7 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
                         <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                             <AnimateButton>
                                 <Button variant="contained" type="submit" sx={{ my: 3, ml: 1 }}>
-                                    Tiếp tục
+                                    {intl.formatMessage({ id: 'continue' })}
                                 </Button>
                             </AnimateButton>
                         </Stack>

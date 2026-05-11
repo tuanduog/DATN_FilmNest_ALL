@@ -245,7 +245,7 @@ const MovieDialog: React.FC<MovieDialogProps> = ({ open, id, onClose, onConfirm 
             },
             {
                 id: 'image',
-                header: 'Hình ảnh',
+                header: intl.formatMessage({ id: 'image' }),
                 accessorKey: 'image',
                 cell: (cell) => {
                     const src = cell.row.original.image;
@@ -263,7 +263,7 @@ const MovieDialog: React.FC<MovieDialogProps> = ({ open, id, onClose, onConfirm 
             },
             {
                 id: 'name',
-                header: 'Tên phim',
+                header: intl.formatMessage({ id: 'movie-name' }),
                 accessorKey: 'name',
                 dataType: 'text',
                 enableGrouping: false,
@@ -271,16 +271,16 @@ const MovieDialog: React.FC<MovieDialogProps> = ({ open, id, onClose, onConfirm 
             },
             {
                 id: 'duration',
-                header: 'Thời lượng',
+                header: intl.formatMessage({ id: 'duration' }),
                 accessorKey: 'duration',
                 dataType: 'text',
                 enableGrouping: false,
-                cell: (cell) => `${cell.row.original.duration} phút`,
+                cell: (cell) => `${cell.row.original.duration} ${intl.formatMessage({ id: 'minutes' })}`,
                 meta: { width: '15%' }
             },
             {
                 id: 'genre',
-                header: 'Thể loại',
+                header: intl.formatMessage({ id: 'genre' }),
                 accessorKey: 'genre',
                 dataType: 'text',
                 enableGrouping: false,
@@ -476,7 +476,7 @@ const MovieDialog: React.FC<MovieDialogProps> = ({ open, id, onClose, onConfirm 
             fullWidth
         >
             <DialogTitle sx={{ fontWeight: 'bold' }}>
-                Danh sách phim
+                {intl.formatMessage({ id: 'movie-list' })}
                 <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
                     <CloseCircle />
                 </IconButton>
@@ -507,7 +507,7 @@ const MovieDialog: React.FC<MovieDialogProps> = ({ open, id, onClose, onConfirm 
                                     px: 2
                                 }}
                             >
-                                {alert?.message || 'Không có thông báo'}
+                                {alert?.message || intl.formatMessage({ id: 'no-data' })}
                             </Alert>
                         </Snackbar>
 
@@ -579,7 +579,7 @@ const MovieDialog: React.FC<MovieDialogProps> = ({ open, id, onClose, onConfirm 
                                             ) : (
                                                 <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                                                     <TableCell colSpan={table.getAllColumns().length}>
-                                                        <EmptyTable msg="Không có dữ liệu" />
+                                                        <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
                                                     </TableCell>
                                                 </TableRow>
                                             )}
@@ -645,7 +645,7 @@ const MovieDialog: React.FC<MovieDialogProps> = ({ open, id, onClose, onConfirm 
                     size="large"
                     onClick={handleConfirm}
                 >
-                    Xác nhận
+                    {intl.formatMessage({ id: 'confirm' })}
                 </Button>
             </Box>
         </Dialog>

@@ -25,6 +25,7 @@ import { Room } from 'types/room';
 import { Seat } from 'types/seat';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 // Internal UI type — 'DELETED' chỉ dùng để hiển thị lối đi
 export type SeatDisplayType = 'STANDARD' | 'VIP' | 'SWEETBOX' | 'DELETED';
@@ -36,6 +37,7 @@ export interface SeatInfo {
     type: SeatDisplayType;
     label: string;
     price: number;
+    isHidden?: boolean;
 }
 
 interface RoomSeatConfigProps {
@@ -45,20 +47,8 @@ interface RoomSeatConfigProps {
     room: Room;
 }
 
-const seatLayoutSchema = Yup.object({
-    totalRow: Yup.number()
-        .typeError('Số hàng phải là số')
-        .required('Số hàng là bắt buộc')
-        .min(1, 'Số hàng phải lớn hơn 0')
-        .max(26, 'Số hàng tối đa là 26'),
-    totalColumn: Yup.number()
-        .typeError('Số cột phải là số')
-        .required('Số cột là bắt buộc')
-        .min(1, 'Số cột phải lớn hơn 0')
-        .max(50, 'Số cột tối đa là 50')
-});
-
 export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }: RoomSeatConfigProps) {
+    const intl = useIntl();
     const [seats, setSeats] = useState<SeatInfo[][]>([]);
     const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
     const [prices, setPrices] = useState({
@@ -72,7 +62,18 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
             totalRow: room.totalRow > 0 ? room.totalRow : ('' as any),
             totalColumn: room.totalColumn > 0 ? room.totalColumn : ('' as any)
         },
-        validationSchema: seatLayoutSchema,
+        validationSchema: Yup.object({
+            totalRow: Yup.number()
+                .typeError(intl.formatMessage({ id: 'number-required' }))
+                .required(intl.formatMessage({ id: 'row-required' }))
+                .min(1, intl.formatMessage({ id: 'row-min' }))
+                .max(26, intl.formatMessage({ id: 'row-max' })),
+            totalColumn: Yup.number()
+                .typeError(intl.formatMessage({ id: 'number-required' }))
+                .required(intl.formatMessage({ id: 'column-required' }))
+                .min(1, intl.formatMessage({ id: 'column-min' }))
+                .max(50, intl.formatMessage({ id: 'column-max' }))
+        }),
         onSubmit: (values) => {
             generateSeats(Number(values.totalRow), Number(values.totalColumn));
         }
@@ -98,7 +99,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                         }));
                     rows.push(rowArr);
                 }
-                setSeats(rows);
+                setSeats(recalculateLabels(rows));
 
                 // Also restore base prices from first found seats of each type
                 const standard = flat.find((s) => (s.type || '').toUpperCase() === 'STANDARD' && (s.seatStatus || '').toUpperCase() === 'ACTIVE');
@@ -120,7 +121,11 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
 
     // Auto-calculate capacity = số ghế không bị xóa
     const autoCapacity = useMemo(
-        () => seats.flat().filter((s) => s.type !== 'DELETED').length,
+        () => seats.flat().reduce((acc, s) => {
+            if (s.type === 'DELETED' || s.isHidden) return acc;
+            if (s.type === 'SWEETBOX') return acc + 2;
+            return acc + 1;
+        }, 0),
         [seats]
     );
 
@@ -138,11 +143,23 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
         return currentSeats.map((row, rIndex) => {
             const rowLabel = generateAlphabetLabel(rIndex);
             let seatNumber = 1;
+            let skipNext = false;
             return row.map((seat) => {
-                if (seat.type === 'DELETED') return { ...seat, label: '' };
+                if (skipNext) {
+                    skipNext = false;
+                    return { ...seat, type: seat.type === 'SWEETBOX' ? 'STANDARD' : seat.type, label: '', isHidden: true };
+                }
+
+                if (seat.type === 'DELETED') {
+                    return { ...seat, label: '', isHidden: false };
+                }
+
                 const newLabel = `${rowLabel}${seatNumber}`;
                 seatNumber++;
-                return { ...seat, label: newLabel };
+                if (seat.type === 'SWEETBOX') {
+                    skipNext = true;
+                }
+                return { ...seat, label: newLabel, isHidden: false };
             });
         });
     };
@@ -215,17 +232,20 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
     };
 
     const countByType = (type: SeatDisplayType) =>
-        seats.flat().filter((s) => s.type === type).length;
+        seats.flat().filter((s) => s.type === type && !s.isHidden).length;
 
     const handleConfirmSeats = () => {
-        const payload: Seat[] = seats.flat().map((seat) => ({
-            row: seat.row,
-            col: seat.col,
-            label: seat.label,
-            type: seat.type === 'DELETED' ? 'STANDARD' : seat.type,
-            price: seat.price,
-            seatStatus: seat.type === 'DELETED' ? 'DELETED' : 'ACTIVE'
-        }));
+        const payload: Seat[] = seats.flat().map((seat) => {
+            const isEffectivelyDeleted = seat.type === 'DELETED' || seat.isHidden;
+            return {
+                row: seat.row,
+                col: seat.col,
+                label: seat.label,
+                type: (isEffectivelyDeleted ? 'STANDARD' : seat.type) as "STANDARD" | "VIP" | "SWEETBOX",
+                price: seat.price,
+                seatStatus: isEffectivelyDeleted ? 'DELETED' : 'ACTIVE'
+            };
+        });
         console.log("payload", payload)
         setRoom({
             ...room,
@@ -245,10 +265,10 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
             {/* Layout config form */}
             <Paper sx={{ p: 3, borderRadius: 2 }}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
-                    Thiết lập sơ đồ ghế ngồi
+                    <FormattedMessage id="seat-layout-setup" />
                 </Typography>
                 <Typography variant="body2" color="textSecondary" mb={3}>
-                    Nhập số hàng và số cột để tạo sơ đồ ghế. Số lượng chỗ ngồi sẽ được tự động tính dựa trên sơ đồ.
+                    <FormattedMessage id="seat-layout-description" />
                 </Typography>
 
                 <form onSubmit={formik.handleSubmit} noValidate>
@@ -256,8 +276,8 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                         {/* Số hàng */}
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <InputLabel htmlFor="totalRow" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Số hàng{' '}
-                                <Typography component="span" variant="caption" color="textSecondary">(tối đa 26)</Typography>
+                                <FormattedMessage id="row-number" />{' '}
+                                <Typography component="span" variant="caption" color="textSecondary"><FormattedMessage id="max-26" /></Typography>
                             </InputLabel>
                             <TextField
                                 id="totalRow"
@@ -278,8 +298,8 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                         {/* Số cột */}
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <InputLabel htmlFor="totalColumn" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                Số cột{' '}
-                                <Typography component="span" variant="caption" color="textSecondary">(tối đa 50)</Typography>
+                                <FormattedMessage id="column-number" />{' '}
+                                <Typography component="span" variant="caption" color="textSecondary"><FormattedMessage id="max-50" /></Typography>
                             </InputLabel>
                             <TextField
                                 id="totalColumn"
@@ -300,8 +320,8 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                         {/* Số chỗ ngồi (auto) */}
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <InputLabel sx={{ mb: 1 }}>
-                                Số chỗ ngồi{' '}
-                                <Typography component="span" variant="caption" color="textSecondary">(tự động)</Typography>
+                                <FormattedMessage id="seat-count" />{' '}
+                                <Typography component="span" variant="caption" color="textSecondary"><FormattedMessage id="auto" /></Typography>
                             </InputLabel>
                             <TextField
                                 size="small"
@@ -319,7 +339,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                                 type="submit"
                                 startIcon={<RefreshIcon />}
                             >
-                                {seats.length > 0 ? 'Tạo lại sơ đồ' : 'Tạo sơ đồ ghế'}
+                                {seats.length > 0 ? <FormattedMessage id="recreate-layout" /> : <FormattedMessage id="create-layout" />}
                             </Button>
                         </Grid>
                     </Grid>
@@ -330,11 +350,11 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                         <Divider sx={{ my: 2 }} />
                         {/* Legend */}
                         <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
-                            <Chip size="small" label="Thường" sx={{ bgcolor: '#e3f2fd', border: '1px solid #2196f3', color: '#0d47a1', fontWeight: 600 }} icon={<EventSeatIcon style={{ color: '#2196f3', fontSize: 14 }} />} />
+                            <Chip size="small" label={intl.formatMessage({ id: 'standard' })} sx={{ bgcolor: '#e3f2fd', border: '1px solid #2196f3', color: '#0d47a1', fontWeight: 600 }} icon={<EventSeatIcon style={{ color: '#2196f3', fontSize: 14 }} />} />
                             <Chip size="small" label="VIP" sx={{ bgcolor: '#fff3e0', border: '1px solid #ff9800', color: '#e65100', fontWeight: 600 }} icon={<StarIcon style={{ color: '#ff9800', fontSize: 14 }} />} />
                             <Chip size="small" label="Sweetbox" sx={{ bgcolor: '#fce4ec', border: '1px solid #e91e63', color: '#880e4f', fontWeight: 600 }} icon={<FavoriteIcon style={{ color: '#e91e63', fontSize: 14 }} />} />
-                            <Chip size="small" label="Đã xóa" sx={{ bgcolor: 'transparent', border: '1px dashed #bdbdbd', color: '#9e9e9e', fontWeight: 600 }} />
-                            <Chip size="small" label="Đang chọn" sx={{ bgcolor: 'rgba(76,175,80,0.1)', border: '2px solid #4caf50', color: '#2e7d32', fontWeight: 600 }} />
+                            <Chip size="small" label={intl.formatMessage({ id: 'deleted' })} sx={{ bgcolor: 'transparent', border: '1px dashed #bdbdbd', color: '#9e9e9e', fontWeight: 600 }} />
+                            <Chip size="small" label={intl.formatMessage({ id: 'selected' })} sx={{ bgcolor: 'rgba(76,175,80,0.1)', border: '2px solid #4caf50', color: '#2e7d32', fontWeight: 600 }} />
 
 
                         </Stack>
@@ -363,7 +383,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                                     boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
                                     borderTop: '4px solid #90a4ae'
                                 }}>
-                                    <Typography variant="button" color="textSecondary" sx={{ letterSpacing: 4, fontWeight: 'bold' }}>MÀN HÌNH</Typography>
+                                    <Typography variant="button" color="textSecondary" sx={{ letterSpacing: 4, fontWeight: 'bold' }}><FormattedMessage id="screen" /></Typography>
                                 </Box>
 
                                 {/* Seat rows */}
@@ -375,13 +395,14 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                                             </Typography>
 
                                             {row.map((seat, cIndex) => {
+                                                if (seat.isHidden) return null;
                                                 const isSelected = selectedSeats.includes(seat.id);
                                                 return (
                                                     <Box
                                                         key={seat.id}
                                                         onClick={() => handleSeatClick(rIndex, cIndex)}
                                                         sx={{
-                                                            width: seat.type === 'SWEETBOX' ? 80 : 38,
+                                                            width: seat.type === 'SWEETBOX' ? 88 : 38,
                                                             height: 38,
                                                             bgcolor: getSeatColor(seat.type),
                                                             border: isSelected ? '2px solid #4caf50' : getSeatBorder(seat.type),
@@ -428,26 +449,26 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                             alignSelf: 'flex-start'
                         }}>
                             <Typography variant="subtitle2" sx={{ textAlign: 'center', width: '100%', color: 'primary.main', fontWeight: 'bold' }}>
-                                {selectedSeats.length > 0 ? `Đã chọn ${selectedSeats.length} ghế` : 'Chọn ghế để áp dụng'}
+                                {selectedSeats.length > 0 ? intl.formatMessage({ id: 'selected-seats' }, { count: selectedSeats.length }) : <FormattedMessage id="select-seat-to-apply" />}
                             </Typography>
 
                             <Stack spacing={1} sx={{ width: '100%', mb: 1 }}>
                                 <TextField
-                                    label="Giá ghế Thường"
+                                    label={intl.formatMessage({ id: 'standard-price' })}
                                     type="number"
                                     size="small"
                                     value={prices.STANDARD}
                                     onChange={(e) => setPrices({ ...prices, STANDARD: Number(e.target.value) })}
                                 />
                                 <TextField
-                                    label="Giá ghế VIP"
+                                    label={intl.formatMessage({ id: 'vip-price' })}
                                     type="number"
                                     size="small"
                                     value={prices.VIP}
                                     onChange={(e) => setPrices({ ...prices, VIP: Number(e.target.value) })}
                                 />
                                 <TextField
-                                    label="Giá ghế Sweetbox"
+                                    label={intl.formatMessage({ id: 'sweetbox-price' })}
                                     type="number"
                                     size="small"
                                     value={prices.SWEETBOX}
@@ -456,7 +477,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                             </Stack>
 
                             <Button variant="outlined" color="primary" onClick={() => handleApplyType('STANDARD')} disabled={selectedSeats.length === 0} startIcon={<EventSeatIcon />} fullWidth>
-                                Thường
+                                <FormattedMessage id="standard" />
                             </Button>
                             <Button variant="outlined" color="warning" onClick={() => handleApplyType('VIP')} disabled={selectedSeats.length === 0} startIcon={<StarIcon />} fullWidth>
                                 VIP
@@ -472,7 +493,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                                 Sweetbox
                             </Button>
                             <Button variant="outlined" color="error" onClick={() => handleApplyType('DELETED')} disabled={selectedSeats.length === 0} startIcon={<DeleteIcon />} fullWidth>
-                                Xóa ghế
+                                <FormattedMessage id="delete-seat" />
                             </Button>
 
 
@@ -480,21 +501,21 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
 
                             {selectedSeats.length > 0 && (
                                 <Button variant="text" size="small" onClick={() => setSelectedSeats([])} fullWidth>
-                                    Bỏ chọn tất cả
+                                    <FormattedMessage id="deselect-all" />
                                 </Button>
                             )}
 
                             {/* Stats */}
                             <Box sx={{ borderTop: '1px solid #e0e0e0', pt: 1.5, width: '100%' }}>
-                                <Typography variant="caption" display="block" color="textSecondary" fontWeight={600} mb={0.5}>Thống kê:</Typography>
-                                <Typography variant="caption" display="block" sx={{ color: '#0d47a1' }}>Thường: {countByType('STANDARD')}</Typography>
+                                <Typography variant="caption" display="block" color="textSecondary" fontWeight={600} mb={0.5}><FormattedMessage id="statistics" /></Typography>
+                                <Typography variant="caption" display="block" sx={{ color: '#0d47a1' }}><FormattedMessage id="standard" />: {countByType('STANDARD')}</Typography>
                                 <Typography variant="caption" display="block" sx={{ color: '#e65100' }}>VIP: {countByType('VIP')}</Typography>
                                 <Typography variant="caption" display="block" sx={{ color: '#880e4f' }}>Sweetbox: {countByType('SWEETBOX')}</Typography>
-                                <Typography variant="caption" display="block" sx={{ color: '#9e9e9e' }}>Đã xóa: {countByType('DELETED')}</Typography>
+                                <Typography variant="caption" display="block" sx={{ color: '#9e9e9e' }}><FormattedMessage id="deleted" />: {countByType('DELETED')}</Typography>
 
 
                                 <Divider sx={{ my: 0.5 }} />
-                                <Typography variant="caption" display="block" fontWeight={700}>Tổng chỗ ngồi: {autoCapacity}</Typography>
+                                <Typography variant="caption" display="block" fontWeight={700}><FormattedMessage id="room-total-seats" />: {autoCapacity}</Typography>
                             </Box>
                         </Paper>
                     </Stack>
@@ -504,7 +525,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
             {/* Navigation */}
             <Stack direction="row" justifyContent="space-between" sx={{ pb: 2 }}>
                 <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack}>
-                    Quay lại
+                    <FormattedMessage id="back" />
                 </Button>
                 <AnimateButton>
                     <Button
@@ -513,7 +534,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                         onClick={handleConfirmSeats}
                         disabled={!canProceed}
                     >
-                        Tiếp tục
+                        <FormattedMessage id="continue" />
                     </Button>
                 </AnimateButton>
             </Stack>

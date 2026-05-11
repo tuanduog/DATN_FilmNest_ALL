@@ -7,6 +7,7 @@ import { Box, Typography } from '@mui/material';
 import { Movie } from 'types/movie';
 import MovieForm from './movie-form';
 import AddConfirmForm from './add-confirm-form';
+import { useIntl } from 'react-intl';
 
 function getStepContent(
     step: number,
@@ -30,6 +31,7 @@ function getStepContent(
 }
 
 export default function AddMovie() {
+    const intl = useIntl();
     const [activeStep, setActiveStep] = useState(0);
 
     const initialValues: Movie = {
@@ -61,7 +63,7 @@ export default function AddMovie() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Thêm phim</Typography>
+                <Typography variant="h3">{intl.formatMessage({ id: 'add-movie' })}</Typography>
             </Box>
 
             {activeStep == 0 ? (

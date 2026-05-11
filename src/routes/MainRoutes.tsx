@@ -8,7 +8,6 @@ import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
 import AdminDashboard from 'pages/dashboard/admin';
 import ManagerDashboard from 'pages/dashboard/manager';
-import StaffDashboard from 'pages/dashboard/staff';
 import ComboPage from 'pages/combo-page';
 import AddCombo from 'sections/combo/add';
 import ComboDetail from 'sections/combo/detail';
@@ -49,6 +48,7 @@ import AddVoucher from 'sections/voucher/add';
 import EditVoucher from 'sections/voucher/edit';
 import VoucherPage from 'pages/voucher-page';
 import VoucherDetail from 'sections/voucher/detail';
+import ProfilePage from 'sections/profile/profile';
 
 
 // pages routing
@@ -79,10 +79,6 @@ const MainRoutes = {
         {
           path: 'manager/dashboard',
           element: <ManagerDashboard />
-        },
-        {
-          path: 'staff/dashboard',
-          element: <StaffDashboard />
         },
         {
           path: 'admin/combo',
@@ -243,6 +239,10 @@ const MainRoutes = {
         {
           path: 'admin/voucher/detail/:id',
           element: <VoucherDetail />
+        },
+        {
+          path: 'admin/profile',
+          element: <ProfilePage />
         }
       ]
     },

@@ -7,6 +7,7 @@ import { Box, Typography } from '@mui/material';
 import { Showtime } from 'types/showtime';
 import ShowtimeForm from './showtime-form';
 import AddConfirmForm from './add-confirm-form';
+import { useIntl } from 'react-intl';
 
 function getStepContent(
     step: number,
@@ -30,6 +31,7 @@ function getStepContent(
 }
 
 export default function AddShowtime() {
+    const intl = useIntl();
     const [activeStep, setActiveStep] = useState(0);
 
     const initialValues: Showtime = {
@@ -55,7 +57,7 @@ export default function AddShowtime() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Thêm suất chiếu</Typography>
+                <Typography variant="h3">{intl.formatMessage({ id: 'add-showtime' })}</Typography>
             </Box>
 
             {activeStep == 0 ? (

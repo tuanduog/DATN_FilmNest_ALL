@@ -32,22 +32,22 @@ import { Theater } from 'types/theater';
 
 const phoneRegExp = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
 
-const validationSchema = Yup.object({
-    username: Yup.string().required('Tên tài khoản là bắt buộc'),
-    fullname: Yup.string().required('Họ và tên là bắt buộc'),
-    code: Yup.string().required('Mã nhân viên là bắt buộc'),
-    email: Yup.string().required('Email là bắt buộc').email('Email không hợp lệ'),
-    phone: Yup.string().required('Số điện thoại là bắt buộc').matches(phoneRegExp, 'Số điện thoại không hợp lệ'),
-    gender: Yup.string().required('Giới tính là bắt buộc'),
-    dob: Yup.string().required('Ngày sinh là bắt buộc'),
-    nationality: Yup.string().required('Quốc tịch là bắt buộc'),
-    role: Yup.string().required('Vai trò là bắt buộc'),
-    salary: Yup.number().typeError('Lương phải là một số').nullable(),
-    hireAt: Yup.string().required('Ngày bắt đầu làm việc là bắt buộc'),
-    theaterId: Yup.number().required('Rạp chiếu phụ trách là bắt buộc').min(1, 'Rạp chiếu phụ trách là bắt buộc'),
+const validationSchema = (intl: any) => Yup.object({
+    username: Yup.string().required(intl.formatMessage({ id: 'username-required' })),
+    fullname: Yup.string().required(intl.formatMessage({ id: 'fullname-required' })),
+    code: Yup.string().required(intl.formatMessage({ id: 'code-required' })),
+    email: Yup.string().required(intl.formatMessage({ id: 'email-required' })).email(intl.formatMessage({ id: 'email-invalid' })),
+    phone: Yup.string().required(intl.formatMessage({ id: 'phone-required' })).matches(phoneRegExp, intl.formatMessage({ id: 'phone-invalid' })),
+    gender: Yup.string().required(intl.formatMessage({ id: 'gender-required' })),
+    dob: Yup.string().required(intl.formatMessage({ id: 'dob-required' })),
+    nationality: Yup.string().required(intl.formatMessage({ id: 'nationality-required' })),
+    role: Yup.string().required(intl.formatMessage({ id: 'role-required' })),
+    salary: Yup.number().typeError(intl.formatMessage({ id: 'salary-type-error' })).nullable(),
+    hireAt: Yup.string().required(intl.formatMessage({ id: 'hire-at-required' })),
+    theaterId: Yup.number().required(intl.formatMessage({ id: 'theater-required' })).min(1, intl.formatMessage({ id: 'theater-required' })),
     managerId: Yup.number().nullable().when('role', {
         is: 'STAFF',
-        then: (schema) => schema.required('Người quản lý trực tiếp là bắt buộc').min(1, 'Người quản lý trực tiếp là bắt buộc'),
+        then: (schema) => schema.required(intl.formatMessage({ id: 'manager-required' })).min(1, intl.formatMessage({ id: 'manager-required' })),
         otherwise: (schema) => schema.nullable()
     })
 });
@@ -128,14 +128,14 @@ export default function EditEmployee() {
     const formik = useFormik<Employee>({
         initialValues: employee,
         enableReinitialize: true,
-        validationSchema: validationSchema,
+        validationSchema: validationSchema(intl),
         onSubmit: async (values) => {
             try {
                 const response = await update(Number(id), values);
 
                 if (response.status === HttpStatusCode.Ok) {
                     navigate('/admin/employee', {
-                        state: { alert: { open: true, severity: 'success', message: 'Cập nhật nhân viên thành công' } }
+                        state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'update-employee-success' }) } }
                     });
                 } else if (response.status === HttpStatusCode.BadRequest) {
                     setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
@@ -159,19 +159,19 @@ export default function EditEmployee() {
                     )}
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                            Thông tin nhân viên
+                            {intl.formatMessage({ id: 'employee-info' })}
                         </Typography>
 
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tên tài khoản
+                                    {intl.formatMessage({ id: 'username' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="username"
                                     name="username"
-                                    placeholder="Nhập tên tài khoản"
+                                    placeholder={intl.formatMessage({ id: 'username-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.username}
@@ -184,13 +184,13 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="code" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Mã nhân viên
+                                    {intl.formatMessage({ id: 'code' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="code"
                                     name="code"
-                                    placeholder="Nhập mã nhân viên"
+                                    placeholder={intl.formatMessage({ id: 'code-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.code}
@@ -203,13 +203,13 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="fullname" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Họ và tên
+                                    {intl.formatMessage({ id: 'fullname' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="fullname"
                                     name="fullname"
-                                    placeholder="Nhập họ và tên"
+                                    placeholder={intl.formatMessage({ id: 'fullname-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.fullname}
@@ -222,13 +222,13 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="email" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Email
+                                    {intl.formatMessage({ id: 'email' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="email"
                                     name="email"
-                                    placeholder="Nhập email"
+                                    placeholder={intl.formatMessage({ id: 'email-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.email}
@@ -241,13 +241,13 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="phone" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Số điện thoại
+                                    {intl.formatMessage({ id: 'phone' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="phone"
                                     name="phone"
-                                    placeholder="Nhập số điện thoại"
+                                    placeholder={intl.formatMessage({ id: 'phone-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.phone}
@@ -260,7 +260,7 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="gender" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Giới tính
+                                    {intl.formatMessage({ id: 'gender' })}
                                 </InputLabel>
 
                                 <FormControl
@@ -277,11 +277,11 @@ export default function EditEmployee() {
                                         onBlur={formik.handleBlur}
                                     >
                                         <MenuItem value="" disabled sx={{ display: 'none' }}>
-                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn giới tính</Box>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}>{intl.formatMessage({ id: 'gender-placeholder' })}</Box>
                                         </MenuItem>
-                                        <MenuItem value="MALE">Nam</MenuItem>
-                                        <MenuItem value="FEMALE">Nữ</MenuItem>
-                                        <MenuItem value="OTHER">Khác</MenuItem>
+                                        <MenuItem value="MALE">{intl.formatMessage({ id: 'male' })}</MenuItem>
+                                        <MenuItem value="FEMALE">{intl.formatMessage({ id: 'female' })}</MenuItem>
+                                        <MenuItem value="OTHER">{intl.formatMessage({ id: 'other' })}</MenuItem>
                                     </Select>
 
                                     <FormHelperText>
@@ -292,14 +292,14 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="dob" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Ngày sinh
+                                    {intl.formatMessage({ id: 'dob' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="dob"
                                     name="dob"
                                     type="date"
-                                    placeholder="Nhập ngày sinh"
+                                    placeholder={intl.formatMessage({ id: 'dob-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.dob}
@@ -312,7 +312,7 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="nationality" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Quốc tịch
+                                    {intl.formatMessage({ id: 'nationality' })}
                                 </InputLabel>
 
                                 <Autocomplete
@@ -340,7 +340,7 @@ export default function EditEmployee() {
                                             <TextField
                                                 {...params}
                                                 name="nationality"
-                                                placeholder="Chọn quốc tịch"
+                                                placeholder={intl.formatMessage({ id: 'nationality-placeholder' })}
                                                 size="small"
                                                 fullWidth
                                                 error={formik.touched.nationality && Boolean(formik.errors.nationality)}
@@ -370,7 +370,7 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="role" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Vai trò
+                                    {intl.formatMessage({ id: 'role' })}
                                 </InputLabel>
 
                                 <FormControl
@@ -388,7 +388,7 @@ export default function EditEmployee() {
                                         onBlur={formik.handleBlur}
                                     >
                                         <MenuItem value="" disabled sx={{ display: 'none' }}>
-                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn vai trò</Box>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}>{intl.formatMessage({ id: 'role-placeholder' })}</Box>
                                         </MenuItem>
                                         <MenuItem value="MANAGER">{intl.formatMessage({ id: 'manager' })}</MenuItem>
                                         <MenuItem value="STAFF">{intl.formatMessage({ id: 'staff' })}</MenuItem>
@@ -402,13 +402,13 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="salary" sx={{ mb: 1 }}>
-                                    Mức lương
+                                    {intl.formatMessage({ id: 'salary' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="salary"
                                     name="salary"
-                                    placeholder="Nhập lương"
+                                    placeholder={intl.formatMessage({ id: 'salary-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.salary}
@@ -421,13 +421,13 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="hireAt" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Ngày bắt đầu làm việc
+                                    {intl.formatMessage({ id: 'hire-at' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="hireAt"
                                     name="hireAt"
-                                    placeholder="Nhập ngày bắt đầu làm việc"
+                                    placeholder={intl.formatMessage({ id: 'hire-at-placeholder' })}
                                     size="small"
                                     type="date"
                                     fullWidth
@@ -441,7 +441,7 @@ export default function EditEmployee() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor='theaterId' required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Rạp chiếu phụ trách
+                                    {intl.formatMessage({ id: 'theater-responsibility' })}
                                 </InputLabel>
 
                                 <Box
@@ -468,7 +468,7 @@ export default function EditEmployee() {
                                     {formik.values.theaterName ? (
                                         <span style={{ color: 'rgba(0, 0, 0, 0.87)' }}>{formik.values.theaterName}</span>
                                     ) : (
-                                        <span style={{ color: 'rgba(0, 0, 0, 0.38)' }}>Chọn rạp chiếu</span>
+                                        <span style={{ color: 'rgba(0, 0, 0, 0.38)' }}>{intl.formatMessage({ id: 'select-theater' })}</span>
                                     )}
                                     <ArrowDropDownIcon sx={{ color: 'rgba(0, 0, 0, 0.54)' }} />
                                 </Box>
@@ -482,7 +482,7 @@ export default function EditEmployee() {
                             {formik.values.role == "STAFF" && (
                                 <Grid size={{ xs: 12, md: 6 }}>
                                     <InputLabel htmlFor='managerId' required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                        Người quản lý trực tiếp
+                                        {intl.formatMessage({ id: 'direct-manager' })}
                                     </InputLabel>
 
                                     <Box
@@ -509,7 +509,7 @@ export default function EditEmployee() {
                                         {formik.values.managerName ? (
                                             <span style={{ color: 'rgba(0, 0, 0, 0.87)' }}>{formik.values.managerName}</span>
                                         ) : (
-                                            <span style={{ color: 'rgba(0, 0, 0, 0.38)' }}>Chọn người quản lý trực tiếp</span>
+                                            <span style={{ color: 'rgba(0, 0, 0, 0.38)' }}>{intl.formatMessage({ id: 'select-manager' })}</span>
                                         )}
                                         <ArrowDropDownIcon sx={{ color: 'rgba(0, 0, 0, 0.54)' }} />
                                     </Box>
@@ -527,7 +527,7 @@ export default function EditEmployee() {
                         <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                             <AnimateButton>
                                 <Button variant="contained" type="submit" sx={{ my: 3, ml: 1 }}>
-                                    Xác nhận
+                                    {intl.formatMessage({ id: 'confirm' })}
                                 </Button>
                             </AnimateButton>
                         </Stack>

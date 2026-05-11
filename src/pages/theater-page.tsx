@@ -127,14 +127,14 @@ function EditAction({
         const response = await deleteById(Number(row.original.id));
 
         if (response.status == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: 'Xóa rạp chiếu thành công', severity: 'success' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'delete-theater-success' }), severity: 'success' });
             setReload(!reload);
         } else if (response.status == HttpStatusCode.Unauthorized) {
             logout();
         } else if (response.status == HttpStatusCode.UnprocessableEntity) {
             setAlert({ open: true, message: response.data, severity: 'error' });
         } else {
-            setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
         }
 
         setOpenDelete(false);
@@ -166,21 +166,23 @@ function EditAction({
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa rạp chiếu này không?</DialogTitle>
+                <DialogTitle id="alert-dialog-title">
+                    {intl.formatMessage({ id: 'delete-theater-confirm' })}
+                </DialogTitle>
 
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa rạp chiếu này, tất cả thông tin đi kèm cũng sẽ bị xóa.
+                        {intl.formatMessage({ id: 'delete-theater-description' })}
                     </DialogContentText>
                 </DialogContent>
 
                 <DialogActions>
                     <Button variant="contained" color="primary" onClick={() => setOpenDelete(false)}>
-                        Huỷ
+                        {intl.formatMessage({ id: 'cancel' })}
                     </Button>
 
                     <Button variant="contained" color="error" onClick={() => handleDelete()} autoFocus>
-                        Xác nhận
+                        {intl.formatMessage({ id: 'confirm' })}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -573,7 +575,7 @@ export default function TheaterPage() {
                             px: 2
                         }}
                     >
-                        {alert?.message || 'Không có thông báo'}
+                        {alert?.message || intl.formatMessage({ id: 'no-notification' })}
                     </Alert>
                 </Snackbar>
 
@@ -595,7 +597,7 @@ export default function TheaterPage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm theo tên rạp chiếu'}
+                            placeholder={intl.formatMessage({ id: 'search-theater-placeholder' })}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {
@@ -673,7 +675,7 @@ export default function TheaterPage() {
                                     ) : (
                                         <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                                             <TableCell colSpan={table.getAllColumns().length}>
-                                                <EmptyTable msg="Không có dữ liệu" />
+                                                <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
                                             </TableCell>
                                         </TableRow>
                                     )}

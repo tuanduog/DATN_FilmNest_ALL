@@ -22,6 +22,7 @@ import TheaterDialog from './theater-dialog';
 import { Theater } from 'types/theater';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Room } from 'types/room';
+import { useIntl, FormattedMessage } from 'react-intl';
 
 interface RoomFormProps {
     handleNext: () => void;
@@ -29,20 +30,20 @@ interface RoomFormProps {
     room: Room;
 }
 
-const validationSchema = Yup.object({
-    name: Yup.string().required('Tên phòng là bắt buộc'),
-    type: Yup.string().required('Loại phòng là bắt buộc'),
-    theaterId: Yup.number().required('Rạp chiếu là bắt buộc')
-});
-
-
 export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
+    const intl = useIntl();
     const [alert, setAlert] = useState({
         open: false,
         message: '',
         severity: 'success' as 'success' | 'error' | 'info' | 'warning'
     });
     const [openTheaterDialog, setOpenTheaterDialog] = useState<boolean>(false);
+
+    const validationSchema = Yup.object({
+        name: Yup.string().required(intl.formatMessage({ id: 'room-name-required' })),
+        type: Yup.string().required(intl.formatMessage({ id: 'room-type-required' })),
+        theaterId: Yup.number().required(intl.formatMessage({ id: 'theater-required' }))
+    });
 
     const formik = useFormik<Room>({
         initialValues: room,
@@ -64,19 +65,19 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                            Thông tin phòng chiếu
+                            <FormattedMessage id="room-info" />
                         </Typography>
 
                         <Grid container spacing={2}>
                             {/* Tên phòng chiếu */}
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tên phòng chiếu
+                                    <FormattedMessage id="room-name" />
                                 </InputLabel>
                                 <TextField
                                     id="name"
                                     name="name"
-                                    placeholder="Nhập tên phòng chiếu"
+                                    placeholder={intl.formatMessage({ id: 'room-name-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.name}
@@ -90,7 +91,7 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                             {/* Loại phòng chiếu */}
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="type" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Loại phòng chiếu
+                                    <FormattedMessage id="room-type" />
                                 </InputLabel>
                                 <FormControl fullWidth size="small" error={formik.touched.type && Boolean(formik.errors.type)}>
                                     <Select
@@ -102,11 +103,11 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                                         onBlur={formik.handleBlur}
                                     >
                                         <MenuItem value="" disabled sx={{ display: 'none' }}>
-                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn loại phòng</Box>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}><FormattedMessage id="select-room-type" /></Box>
                                         </MenuItem>
-                                        <MenuItem value="STANDARD">Tiêu chuẩn (2D)</MenuItem>
-                                        <MenuItem value="IMAX">IMAX</MenuItem>
-                                        <MenuItem value="THREE_D">3D</MenuItem>
+                                        <MenuItem value="STANDARD"><FormattedMessage id="standard-2d" /></MenuItem>
+                                        <MenuItem value="IMAX"><FormattedMessage id="IMAX" /></MenuItem>
+                                        <MenuItem value="THREE_D"><FormattedMessage id="3D" /></MenuItem>
                                     </Select>
                                     <FormHelperText>{formik.touched.type && formik.errors.type}</FormHelperText>
                                 </FormControl>
@@ -114,7 +115,7 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                             {/* Rạp chiếu */}
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="theaterId" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Thuộc rạp chiếu
+                                    <FormattedMessage id="belong-to-theater" />
                                 </InputLabel>
                                 <Box
                                     onClick={() => setOpenTheaterDialog(true)}
@@ -137,7 +138,7 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                                     {formik.values.theaterName ? (
                                         <span style={{ color: 'rgba(0, 0, 0, 0.87)' }}>{formik.values.theaterName}</span>
                                     ) : (
-                                        <span style={{ color: 'rgba(0, 0, 0, 0.38)' }}>Chọn rạp chiếu</span>
+                                        <span style={{ color: 'rgba(0, 0, 0, 0.38)' }}><FormattedMessage id="select-theater" /></span>
                                     )}
                                     <ArrowDropDownIcon sx={{ color: 'rgba(0, 0, 0, 0.54)' }} />
                                 </Box>
@@ -153,7 +154,7 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
                             <Button variant="contained" type="submit" sx={{ my: 3, ml: 1 }}>
-                                Tiếp tục
+                                <FormattedMessage id="continue" />
                             </Button>
                         </AnimateButton>
                     </Stack>
@@ -183,7 +184,7 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                     variant="filled"
                     sx={{ width: '100%' }}
                 >
-                    {Object.keys(formik.errors).length > 0 ? "Vui lòng kiểm tra lại các trường thông tin!" : alert.message}
+                    {Object.keys(formik.errors).length > 0 ? <FormattedMessage id="check-info-again" /> : alert.message}
                 </Alert>
             </Snackbar>
         </Box>

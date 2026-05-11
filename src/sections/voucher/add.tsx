@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 // material-ui
 import { Box, Typography } from '@mui/material';
+import { useIntl } from 'react-intl';
 
 // project-imports
 import { Voucher } from 'types/voucher';
@@ -35,6 +36,7 @@ function getStepContent(
 // ==============================|| ADD COMBO ||============================== //
 
 export default function AddVoucher() {
+    const intl = useIntl();
     const [activeStep, setActiveStep] = useState(0);
 
     // Extend Combo to hold file for upload locally
@@ -64,7 +66,7 @@ export default function AddVoucher() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Thêm khuyến mãi</Typography>
+                <Typography variant="h3">{intl.formatMessage({ id: 'add-voucher' })}</Typography>
             </Box>
 
             {activeStep == 0 ? (

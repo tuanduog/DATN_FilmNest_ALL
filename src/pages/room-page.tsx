@@ -126,14 +126,14 @@ function EditAction({
         const response = await deleteById(Number(row.original.id));
 
         if (response.status == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: 'Xóa phòng chiếu thành công', severity: 'success' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'delete-room-success' }), severity: 'success' });
             setReload(!reload);
         } else if (response.status == HttpStatusCode.Unauthorized) {
             logout();
         } else if (response.status == HttpStatusCode.UnprocessableEntity) {
             setAlert({ open: true, message: response.data, severity: 'error' });
         } else {
-            setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
         }
 
         setOpenDelete(false);
@@ -165,21 +165,23 @@ function EditAction({
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa phòng này không?</DialogTitle>
+                <DialogTitle id="alert-dialog-title">
+                    {intl.formatMessage({ id: 'delete-room-confirm' })}
+                </DialogTitle>
 
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa phòng này, tất cả thông tin đi kèm cũng sẽ bị xóa.
+                        {intl.formatMessage({ id: 'delete-room-description' })}
                     </DialogContentText>
                 </DialogContent>
 
                 <DialogActions>
                     <Button variant="contained" color="primary" onClick={() => setOpenDelete(false)}>
-                        Huỷ
+                        {intl.formatMessage({ id: 'cancel' })}
                     </Button>
 
                     <Button variant="contained" color="error" onClick={() => handleDelete()} autoFocus>
-                        Xác nhận
+                        {intl.formatMessage({ id: 'confirm' })}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -320,11 +322,15 @@ export default function RoomPage() {
             },
             {
                 id: 'type',
-                header: intl.formatMessage({ id: 'type' }),
+                header: intl.formatMessage({ id: 'room-type' }),
                 accessorKey: 'type',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '35%' },
+                cell: (cell) => {
+                    const { type } = cell.row.original;
+                    return <Typography variant="body2">{type === 'imax' ? intl.formatMessage({ id: 'IMAX' }) : type === 'three_d' ? intl.formatMessage({ id: '3D' }) : intl.formatMessage({ id: 'standard' })}</Typography>;
+                }
             },
             {
                 id: 'capacity',
@@ -570,7 +576,7 @@ export default function RoomPage() {
                             px: 2
                         }}
                     >
-                        {alert?.message || 'Không có thông báo'}
+                        {alert?.message || intl.formatMessage({ id: 'no-notification' })}
                     </Alert>
                 </Snackbar>
 
@@ -592,7 +598,7 @@ export default function RoomPage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm theo tên phòng'}
+                            placeholder={intl.formatMessage({ id: 'search-room-placeholder' })}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {
@@ -670,7 +676,7 @@ export default function RoomPage() {
                                     ) : (
                                         <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                                             <TableCell colSpan={table.getAllColumns().length}>
-                                                <EmptyTable msg="Không có dữ liệu" />
+                                                <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
                                             </TableCell>
                                         </TableRow>
                                     )}

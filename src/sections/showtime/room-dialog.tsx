@@ -246,7 +246,7 @@ const RoomDialog: React.FC<RoomDialogProps> = ({ open, id, theaterId, onClose, o
             },
             {
                 id: 'name',
-                header: 'Tên phòng',
+                header: intl.formatMessage({ id: 'room-name' }),
                 accessorKey: 'name',
                 dataType: 'text',
                 enableGrouping: false,
@@ -254,7 +254,7 @@ const RoomDialog: React.FC<RoomDialogProps> = ({ open, id, theaterId, onClose, o
             },
             {
                 id: 'type',
-                header: 'Loại phòng',
+                header: intl.formatMessage({ id: 'room-type' }),
                 accessorKey: 'type',
                 dataType: 'text',
                 enableGrouping: false,
@@ -262,11 +262,11 @@ const RoomDialog: React.FC<RoomDialogProps> = ({ open, id, theaterId, onClose, o
             },
             {
                 id: 'capacity',
-                header: 'Sức chứa',
+                header: intl.formatMessage({ id: 'capacity' }),
                 accessorKey: 'capacity',
                 dataType: 'text',
                 enableGrouping: false,
-                cell: (cell) => `${cell.row.original.capacity} ghế`,
+                cell: (cell) => `${cell.row.original.capacity} ${intl.formatMessage({ id: 'seats' })}`,
                 meta: { width: '20%' }
             },
             {
@@ -463,7 +463,7 @@ const RoomDialog: React.FC<RoomDialogProps> = ({ open, id, theaterId, onClose, o
             fullWidth
         >
             <DialogTitle sx={{ fontWeight: 'bold' }}>
-                Danh sách phòng chiếu
+                {intl.formatMessage({ id: 'room-list' })}
                 <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
                     <CloseCircle />
                 </IconButton>
@@ -494,7 +494,7 @@ const RoomDialog: React.FC<RoomDialogProps> = ({ open, id, theaterId, onClose, o
                                     px: 2
                                 }}
                             >
-                                {alert?.message || 'Không có thông báo'}
+                                {alert?.message || intl.formatMessage({ id: 'no-data' })}
                             </Alert>
                         </Snackbar>
 
@@ -566,7 +566,7 @@ const RoomDialog: React.FC<RoomDialogProps> = ({ open, id, theaterId, onClose, o
                                             ) : (
                                                 <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                                                     <TableCell colSpan={table.getAllColumns().length}>
-                                                        <EmptyTable msg="Không có dữ liệu" />
+                                                        <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
                                                     </TableCell>
                                                 </TableRow>
                                             )}
@@ -632,7 +632,7 @@ const RoomDialog: React.FC<RoomDialogProps> = ({ open, id, theaterId, onClose, o
                     size="large"
                     onClick={handleConfirm}
                 >
-                    Xác nhận
+                    {intl.formatMessage({ id: 'confirm' })}
                 </Button>
             </Box>
         </Dialog>

@@ -16,6 +16,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { Showtime } from 'types/showtime';
 import AnimateButton from 'components/@extended/AnimateButton';
 import { Movie } from 'types/movie';
@@ -31,15 +32,16 @@ interface ShowtimeFormProps {
     showtime: Showtime;
 }
 
-const validationSchema = Yup.object({
-    movieId: Yup.number().required('Vui lòng chọn phim').min(1, 'Vui lòng chọn phim'),
-    roomId: Yup.number().required('Vui lòng chọn phòng chiếu').min(1, 'Vui lòng chọn phòng chiếu'),
-    showDate: Yup.string().required('Vui lòng chọn ngày chiếu'),
-    startTime: Yup.string().required('Vui lòng chọn giờ chiếu'),
-    surcharge: Yup.number().required('Phụ phí là bắt buộc').min(0, 'Phụ phí không được âm'),
+const validationSchema = (intl: any) => Yup.object({
+    movieId: Yup.number().required(intl.formatMessage({ id: 'select-movie-required' })).min(1, intl.formatMessage({ id: 'select-movie-required' })),
+    roomId: Yup.number().required(intl.formatMessage({ id: 'select-room-required' })).min(1, intl.formatMessage({ id: 'select-room-required' })),
+    showDate: Yup.string().required(intl.formatMessage({ id: 'show-date-required' })),
+    startTime: Yup.string().required(intl.formatMessage({ id: 'show-time-required' })),
+    surcharge: Yup.number().required(intl.formatMessage({ id: 'surcharge-required' })).min(0, intl.formatMessage({ id: 'surcharge-min' })),
 });
 
 export default function ShowtimeForm({ handleNext, setShowtime, showtime }: ShowtimeFormProps) {
+    const intl = useIntl();
     const [selectedTheater, setSelectedTheater] = useState<Theater | null>(showtime.theaterId ? { id: showtime.theaterId, name: showtime.theaterName } as any : null);
     const [selectedMovie, setSelectedMovie] = useState<Movie | null>(showtime.movieId ? { id: showtime.movieId, name: showtime.movieName } as any : null);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(showtime.roomId ? { id: showtime.roomId, name: showtime.roomName } as any : null);
@@ -56,7 +58,7 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
 
     const formik = useFormik<Showtime>({
         initialValues: showtime,
-        validationSchema: validationSchema,
+        validationSchema: validationSchema(intl),
         onSubmit: async (values) => {
             setShowtime({
                 ...values,
@@ -75,16 +77,16 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                            Thông tin suất chiếu
+                            {intl.formatMessage({ id: 'showtime-info' })}
                         </Typography>
 
                         <Grid container spacing={3}>
                             <Grid size={{ xs: 12, md: 12 }}>
-                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>Phim</InputLabel>
+                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>{intl.formatMessage({ id: 'movie' })}</InputLabel>
                                 <TextField
                                     fullWidth
                                     size="small"
-                                    placeholder="Chọn phim"
+                                    placeholder={intl.formatMessage({ id: 'select-movie' })}
                                     value={selectedMovie?.name || ''}
                                     onClick={() => setOpenMovieDialog(true)}
                                     autoComplete="off"
@@ -104,11 +106,11 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>Rạp chiếu</InputLabel>
+                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>{intl.formatMessage({ id: 'theater' })}</InputLabel>
                                 <TextField
                                     fullWidth
                                     size="small"
-                                    placeholder="Chọn rạp"
+                                    placeholder={intl.formatMessage({ id: 'select-theater' })}
                                     value={selectedTheater?.name || ''}
                                     onClick={() => setOpenTheaterDialog(true)}
                                     autoComplete="off"
@@ -126,11 +128,11 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>Phòng chiếu</InputLabel>
+                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>{intl.formatMessage({ id: 'room' })}</InputLabel>
                                 <TextField
                                     fullWidth
                                     size="small"
-                                    placeholder={selectedTheater ? 'Chọn phòng' : 'Vui lòng chọn rạp trước'}
+                                    placeholder={selectedTheater ? intl.formatMessage({ id: 'select-room' }) : intl.formatMessage({ id: 'please-select-theater-first' })}
                                     value={selectedRoom?.name || ''}
                                     onClick={() => selectedTheater && setOpenRoomDialog(true)}
                                     disabled={!selectedTheater}
@@ -151,7 +153,7 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>Ngày chiếu</InputLabel>
+                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>{intl.formatMessage({ id: 'show-date' })}</InputLabel>
                                 <TextField
                                     id="showDate"
                                     name="showDate"
@@ -167,7 +169,7 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>Giờ chiếu</InputLabel>
+                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>{intl.formatMessage({ id: 'show-time' })}</InputLabel>
                                 <TextField
                                     id="startTime"
                                     name="startTime"
@@ -183,12 +185,12 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 12 }}>
-                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>Phụ phí (VND)</InputLabel>
+                                <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>{intl.formatMessage({ id: 'surcharge-vnd' })}</InputLabel>
                                 <TextField
                                     id="surcharge"
                                     name="surcharge"
                                     type="number"
-                                    placeholder="Nhập phụ phí nếu có"
+                                    placeholder={intl.formatMessage({ id: 'surcharge-placeholder' })}
                                     fullWidth
                                     size="small"
                                     value={formik.values.surcharge}
@@ -204,7 +206,7 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
                     <Stack direction="row" justifyContent="flex-end">
                         <AnimateButton>
                             <Button variant="contained" type="submit">
-                                Tiếp tục
+                                {intl.formatMessage({ id: 'continue' })}
                             </Button>
                         </AnimateButton>
                     </Stack>

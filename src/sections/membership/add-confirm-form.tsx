@@ -58,15 +58,15 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
     }, []);
 
     const getBenefitName = (benefit: MembershipBenefit) => {
-        if (benefit.type === 'voucher') {
+        if (benefit.type?.toLowerCase() === 'voucher') {
             const v = vouchers.find(x => x.id === benefit.benefitRefId);
-            return v ? `Voucher: ${v.code}` : 'Voucher (Không tìm thấy)';
+            return v ? `Voucher: ${v.code}` : `Voucher (${intl.formatMessage({ id: 'not-found' })})`;
         }
-        if (benefit.type === 'combo') {
+        if (benefit.type?.toLowerCase() === 'combo') {
             const c = combos.find(x => x.id === benefit.benefitRefId);
-            return c ? `Combo: ${c.name}` : 'Combo (Không tìm thấy)';
+            return c ? `Combo: ${c.name}` : `Combo (${intl.formatMessage({ id: 'not-found' })})`;
         }
-        return benefit.description || 'Trực tiếp';
+        return benefit.description || intl.formatMessage({ id: 'direct' });
     };
 
     const handleSubmit = async () => {
@@ -94,7 +94,7 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
                     return;
                 }
             } catch (err) {
-                setAlert({ open: true, message: 'Lỗi tải ảnh. Gửi form thất bại', severity: 'error' });
+                setAlert({ open: true, message: intl.formatMessage({ id: 'upload-image-error' }), severity: 'error' });
                 return;
             }
         }
@@ -113,7 +113,7 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
 
             if (response.status === HttpStatusCode.Ok) {
                 navigate('/admin/membership', {
-                    state: { alert: { open: true, severity: 'success', message: 'Thêm gói thành viên thành công' } }
+                    state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'add-membership-success' }) } }
                 });
             } else if (response.status === HttpStatusCode.BadRequest) {
                 setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
@@ -134,7 +134,7 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Xác nhận thông tin gói thành viên
+                        {intl.formatMessage({ id: 'confirm-membership-info' })}
                     </Typography>
 
                     <Grid container spacing={2}>
@@ -156,21 +156,21 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Tên gói thành viên</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'membership-name' })}</InputLabel>
                                 <Typography>{membership.name}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Loại gói thành viên</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'membership-type' })}</InputLabel>
                                 <Typography>{membership.type}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Giá tiền (VND)</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'price' })} (VND)</InputLabel>
                                 <Typography>
                                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(membership.price)}
                                 </Typography>
@@ -179,7 +179,7 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Thời hạn (tháng)</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'duration' })} ({intl.formatMessage({ id: 'month' })})</InputLabel>
                                 <Typography>{membership.duration}</Typography>
                             </Stack>
                         </Grid>
@@ -188,14 +188,14 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
                             <Grid size={12}>
                                 <Divider sx={{ my: 2 }} />
                                 <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
-                                    Các quyền lợi của gói thành viên
+                                    {intl.formatMessage({ id: 'membership-benefits' })}
                                 </Typography>
                                 <List disablePadding>
                                     {membership.benefits.map((benefit: MembershipBenefit, index: number) => (
                                         <ListItem key={index} sx={{ py: 1, px: 0, borderBottom: '1px dashed', borderColor: 'divider' }}>
                                             <ListItemText
                                                 primary={getBenefitName(benefit)}
-                                                secondary={`Số lượng: ${benefit.quantity}`}
+                                                secondary={`${intl.formatMessage({ id: 'quantity' })}: ${benefit.quantity}`}
                                             />
                                         </ListItem>
                                     ))}
@@ -209,12 +209,12 @@ export default function AddConfirmForm({ handleBack, membership }: ConfirmProps)
 
                 <Grid display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
                     <Button variant="contained" sx={{ my: 3 }} color="secondary" onClick={handleBack}>
-                        Quay lại
+                        {intl.formatMessage({ id: 'back' })}
                     </Button>
 
                     <AnimateButton>
                         <Button variant="contained" type="button" sx={{ my: 3 }} color="primary" onClick={handleSubmit}>
-                            Xác nhận
+                            {intl.formatMessage({ id: 'confirm' })}
                         </Button>
                     </AnimateButton>
                 </Grid>

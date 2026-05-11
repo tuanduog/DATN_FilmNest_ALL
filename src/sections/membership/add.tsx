@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 // material-ui
 import { Box, Typography } from '@mui/material';
+import { useIntl } from 'react-intl';
 
 // project-imports
 import { Membership } from 'types/membership';
@@ -32,6 +33,7 @@ function getStepContent(
 // ==============================|| ADD MEMBERSHIP ||============================== //
 
 export default function AddMembership() {
+    const intl = useIntl();
     const [activeStep, setActiveStep] = useState(0);
 
     // Extend Membership to hold file for upload locally
@@ -59,7 +61,7 @@ export default function AddMembership() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Thêm gói thành viên</Typography>
+                <Typography variant="h3">{intl.formatMessage({ id: 'add-membership' })}</Typography>
             </Box>
 
             {activeStep == 0 ? (
