@@ -29,4 +29,21 @@ public class CommentDTO {
     Integer userId;
 
     String userName; // tiện gửi ra client
+
+    Integer likeCount;
+
+    Integer dislikeCount;
+
+    String myReaction;
+
+    public CommentDTO(Integer commentId, Integer parentId, String content, Integer level, Instant createdAt, Integer movieId, Integer userId, String userName){
+        this.commentId = commentId;
+        this.parentId = parentId;
+        this.content = content;
+        this.level = level;
+        this.createdAt = createdAt;
+        this.movieId = movieId;
+        this.userId = userId;
+        this.userName = userName;
+    }
 }

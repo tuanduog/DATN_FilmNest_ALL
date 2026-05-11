@@ -1,8 +1,5 @@
 package com.booking.booking_ticket.controller;
 
-import java.util.List;
-
-import com.booking.booking_ticket.dto.request.RoomRequest;
 import com.booking.booking_ticket.dto.request.ShowTimeRequest;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.dto.response.ResponseError;
@@ -13,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.booking.booking_ticket.dto.ShowTimeDTO;
 
 @RestController
 @RequestMapping("/api/showtime")

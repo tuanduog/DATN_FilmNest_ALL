@@ -2,6 +2,7 @@ package com.booking.booking_ticket.repository;
 
 import com.booking.booking_ticket.dto.response.UserResponse;
 import com.booking.booking_ticket.entity.Users;
+import com.booking.booking_ticket.utils.Role;
 import com.booking.booking_ticket.utils.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,7 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
         FROM Users u
         WHERE (LOWER(u.username) LIKE :keyword OR LOWER(u.email) LIKE :keyword)
         AND (:status IS NULL OR u.status = :status)
-        AND u.role <> "ADMINISTRATOR"
+        AND u.role = :role
     """)
-    Page<UserResponse> findAllByKeyword(Pageable pageable, String keyword, Status status);
+    Page<UserResponse> findAllByKeyword(Pageable pageable, String keyword, Status status, Role role);
 }

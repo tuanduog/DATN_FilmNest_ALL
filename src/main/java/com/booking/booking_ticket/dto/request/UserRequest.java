@@ -30,5 +30,5 @@ public class UserRequest implements Serializable {
 
     String nationality;
 
-    Role role;
+    String status;
 }

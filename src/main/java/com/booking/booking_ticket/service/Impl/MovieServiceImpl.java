@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,9 +88,14 @@ public class MovieServiceImpl implements MovieService {
         movie.setDirector(request.getDirector());
         movie.setTrailerUrl(request.getTrailerUrl());
         movie.setReleaseDate(request.getReleaseDate());
-        movie.setShowingStatus(request.getShowingStatus());
         movie.setStatus(Status.ACTIVE);
-        movie.setShowingStatus(ShowingStatus.COMING_SOON);
+        if (LocalDate.now().isAfter(request.getReleaseDate()) && LocalDate.now().isBefore(request.getEndDate())) {
+            movie.setShowingStatus(ShowingStatus.NOW_SHOWING);
+        } else if (LocalDate.now().isBefore(request.getReleaseDate())) {
+            movie.setShowingStatus(ShowingStatus.COMING_SOON);
+        } else {
+            movie.setShowingStatus(ShowingStatus.STOP);
+        }
 
         movieRepository.save(movie);
     }
