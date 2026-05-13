@@ -9,10 +9,12 @@ import com.booking.booking_ticket.repository.EmployeeRepository;
 import com.booking.booking_ticket.repository.TheaterRepository;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.service.EmployeeService;
+import com.booking.booking_ticket.service.MailService;
 import com.booking.booking_ticket.utils.Role;
 import com.booking.booking_ticket.utils.Status;
 import com.booking.booking_ticket.utils.Util;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +37,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final MailService mailService;
+
     @Override
     public Page<EmployeeResponse> getList(Pageable pageable, String keyword, Status status, Role role) {
         if (keyword != null) {
@@ -50,68 +54,69 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public void addEmployee(EmployeeRequest request) {
         util.validateEmployeeCode(request.getCode(), null);
-        if(request.getUserId() != null){
-            Optional<Users> user = usersRepository.findById(request.getUserId());
-            if(user.isPresent()){
-                if(request.getUsername() != null){
-                    user.get().setUsername(request.getUsername());
-                }
-
-                if(request.getEmail() != null){
-                    user.get().setEmail(request.getEmail());
-                }
-
-                if(request.getFullname() != null){
-                    user.get().setFullname(request.getFullname());
-                }
-
-                if(request.getPhone() != null){
-                    user.get().setPhone(request.getPhone());
-                }
-
-                if(request.getDob() != null){
-                    user.get().setDob(request.getDob());
-                }
-
-                if(request.getGender() != null){
-                    user.get().setGender(request.getGender());
-                }
-
-                if(request.getNationality() != null){
-                    user.get().setNationality(request.getNationality());
-                }
-
-                if(request.getRole() != null){
-                    user.get().setRole(request.getRole());
-                }
-                usersRepository.save(user.get());
-
-                Employee employee = new Employee();
-                employee.setUser(user.get());
-                employee.setCode(request.getCode());
-                employee.setSalary(request.getSalary());
-                employee.setHireAt(request.getHireAt());
-
-                if(request.getTheaterId() != null){
-                    Optional<Theater> theater = theaterRepository.findById(request.getTheaterId());
-                    if(theater.isPresent()){
-                        employee.setTheater(theater.get());
-                    }
-                }
-                if(request.getManagerId() != null){
-                    Optional<Employee> manager = employeeRepository.findById(request.getManagerId());
-                    if(manager.isPresent()){
-                        employee.setManager(manager.get());
-                    }
-                }
-                employeeRepository.save(employee);
-            }
-        } else {
+//        if(request.getUserId() != null){
+//            Optional<Users> user = usersRepository.findById(request.getUserId());
+//            if(user.isPresent()){
+//                if(request.getUsername() != null){
+//                    user.get().setUsername(request.getUsername());
+//                }
+//
+//                if(request.getEmail() != null){
+//                    user.get().setEmail(request.getEmail());
+//                }
+//
+//                if(request.getFullname() != null){
+//                    user.get().setFullname(request.getFullname());
+//                }
+//
+//                if(request.getPhone() != null){
+//                    user.get().setPhone(request.getPhone());
+//                }
+//
+//                if(request.getDob() != null){
+//                    user.get().setDob(request.getDob());
+//                }
+//
+//                if(request.getGender() != null){
+//                    user.get().setGender(request.getGender());
+//                }
+//
+//                if(request.getNationality() != null){
+//                    user.get().setNationality(request.getNationality());
+//                }
+//
+//                if(request.getRole() != null){
+//                    user.get().setRole(request.getRole());
+//                }
+//                usersRepository.save(user.get());
+//
+//                Employee employee = new Employee();
+//                employee.setUser(user.get());
+//                employee.setCode(request.getCode());
+//                employee.setSalary(request.getSalary());
+//                employee.setHireAt(request.getHireAt());
+//
+//                if(request.getTheaterId() != null){
+//                    Optional<Theater> theater = theaterRepository.findById(request.getTheaterId());
+//                    if(theater.isPresent()){
+//                        employee.setTheater(theater.get());
+//                    }
+//                }
+//                if(request.getManagerId() != null){
+//                    Optional<Employee> manager = employeeRepository.findById(request.getManagerId());
+//                    if(manager.isPresent()){
+//                        employee.setManager(manager.get());
+//                    }
+//                }
+//                employeeRepository.save(employee);
+//            }
+//        } else {
             Users user = new Users();
             user.setUsername(request.getUsername());
             user.setEmail(request.getEmail());
             user.setFullname(request.getFullname());
-            user.setPassword(passwordEncoder.encode("123456"));
+            String password = RandomStringUtils.randomAlphanumeric(10);
+            user.setPassword(passwordEncoder.encode(password));
             user.setPhone(request.getPhone());
             user.setDob(request.getDob());
             user.setGender(request.getGender());
@@ -140,7 +145,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
             }
             employeeRepository.save(employee);
-        }
+
+            mailService.sendCreateAccountMail(request.getEmail(), request.getUsername(), password);
+        //}
     }
 
     @Override

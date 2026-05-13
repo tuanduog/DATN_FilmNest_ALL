@@ -6,8 +6,10 @@ import com.booking.booking_ticket.dto.request.UserUpdateRequest;
 import com.booking.booking_ticket.dto.response.*;
 import com.booking.booking_ticket.entity.*;
 import com.booking.booking_ticket.repository.*;
+import com.booking.booking_ticket.service.MailService;
 import com.booking.booking_ticket.service.UserService;
 import com.booking.booking_ticket.utils.*;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ComboRepository comboRepository;
+
+    @Autowired
+    private MailService mailService;
 
     @Override
     public UserResponse getUserProfile(){
@@ -153,13 +158,17 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setFullname(request.getFullname());
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode("123456"));
+        String password = RandomStringUtils.randomAlphanumeric(10);
+        user.setPassword(passwordEncoder.encode(password));
         user.setPhone(request.getPhone());
         user.setDob(request.getDob());
         user.setGender(request.getGender());
         user.setNationality(request.getNationality());
+        user.setRole(Role.USER);
         user.setStatus(Status.ACTIVE);
         usersRepository.save(user);
+
+        mailService.sendCreateAccountMail(request.getEmail(), request.getUsername(), password);
     }
 
     @Override
