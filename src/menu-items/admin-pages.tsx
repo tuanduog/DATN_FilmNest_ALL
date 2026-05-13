@@ -97,6 +97,13 @@ const admin: NavItemType = {
       icon: icons.contactus
     },
     {
+      id: 'booking',
+      title: 'booking',
+      type: 'item',
+      url: '/admin/booking',
+      icon: icons.contactus
+    },
+    {
       id: 'banner',
       title: 'banner',
       type: 'item',

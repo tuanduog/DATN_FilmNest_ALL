@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Grid,
     Card,
@@ -12,14 +12,19 @@ import {
     SelectChangeEvent,
     Avatar,
     useTheme,
-    Button
+    Button,
+    TextField,
+    Collapse,
+    CircularProgress,
+    Alert
 } from '@mui/material';
 import {
     AttachMoney,
     LocalPlay,
-    Movie,
+    EventSeat,
     Fastfood,
-    TrendingUp
+    TrendingUp,
+    TrendingDown
 } from '@mui/icons-material';
 import {
     BarChart,
@@ -30,7 +35,6 @@ import {
     Tooltip,
     Legend,
     ResponsiveContainer,
-    LineChart,
     Line,
     AreaChart,
     Area,
@@ -38,85 +42,310 @@ import {
     Pie,
     Cell
 } from 'recharts';
+import {
+    getTicketChart,
+    getRevenueStructureChart,
+    getMovieChart,
+    getTheaterChart,
+    getLastSummary,
+} from 'api/report';
 
-// --- Mock Data ---
-
-const revenueTrendData = [
-    { date: '01/05', revenue: 12000000, tickets: 150 },
-    { date: '02/05', revenue: 19000000, tickets: 220 },
-    { date: '03/05', revenue: 15000000, tickets: 180 },
-    { date: '04/05', revenue: 22000000, tickets: 280 },
-    { date: '05/05', revenue: 28000000, tickets: 350 },
-    { date: '06/05', revenue: 35000000, tickets: 450 },
-    { date: '07/05', revenue: 42000000, tickets: 550 },
-];
-
-const topMoviesData = [
-    { name: 'Lật Mặt 7', revenue: 85000000, tickets: 8500 },
-    { name: 'Godzilla x Kong', revenue: 62000000, tickets: 6200 },
-    { name: 'Mai', revenue: 45000000, tickets: 4500 },
-    { name: 'Kung Fu Panda 4', revenue: 31000000, tickets: 3100 },
-    { name: 'Exhuma', revenue: 28000000, tickets: 2800 },
-];
-
-const theaterPerformanceData = [
-    { name: 'FilmNest HN', revenue: 125000000 },
-    { name: 'FilmNest HCM', revenue: 150000000 },
-    { name: 'FilmNest ĐN', revenue: 85000000 },
-    { name: 'FilmNest CT', revenue: 45000000 },
-];
-
-const revenueSourceData = [
-    { name: 'Vé Xem Phim', value: 251000000 },
-    { name: 'Combo Đồ Ăn', value: 85000000 },
-    { name: 'Ghế VIP', value: 45000000 },
-    { name: 'Khác', value: 12000000 },
-];
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+
+/** Map UI timeFilter → backend filterType string */
+const toFilterType = (timeFilter: string): string => {
+    switch (timeFilter) {
+        case 'today': return 'TODAY';
+        case 'week': return 'WEEK';
+        case 'month': return 'MONTH';
+        case 'year': return 'YEAR';
+        default: return 'WEEK';
+    }
 };
 
-// --- Components ---
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface TicketChartItem {
+    date: string;
+    revenue: number;
+    tickets: number;
+}
+
+interface RevenueSourceItem {
+    name: string;
+    value: number;
+    count: number;
+}
+
+interface MovieChartItem {
+    name: string;
+    revenue: number;
+    tickets: number;
+}
+
+interface TheaterChartItem {
+    name: string;
+    revenue: number;
+    occupancy: number;
+}
+
+interface LastSummary {
+    totalRevenue: number;
+    tickets: number;
+    combos: number;
+    avgOccupancy: number;
+}
+
+// ---------------------------------------------------------------------------
+// Custom Tooltip
+// ---------------------------------------------------------------------------
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        const data = payload[0].payload;
+        return (
+            <Box sx={{ bgcolor: 'background.paper', p: 1.5, borderRadius: 2, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)', border: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="subtitle2" fontWeight="bold" mb={1} color="text.primary">
+                    {data.date || data.name || label}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 600 }}>
+                    Doanh thu: {formatCurrency(data.revenue ?? 0)}
+                </Typography>
+                {data.tickets !== undefined && (
+                    <Typography variant="body2" sx={{ color: 'warning.main', fontWeight: 600, mt: 0.5 }}>
+                        Số vé: {data.tickets}
+                    </Typography>
+                )}
+                {data.occupancy !== undefined && (
+                    <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 600, mt: 0.5 }}>
+                        Công suất: {data.occupancy}%
+                    </Typography>
+                )}
+            </Box>
+        );
+    }
+    return null;
+};
+
+// ---------------------------------------------------------------------------
+// Main Component
+// ---------------------------------------------------------------------------
 
 export default function AdminDashboard() {
     const theme = useTheme();
+
+    // --- Filters ---
     const [timeFilter, setTimeFilter] = useState('week');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+    const [customApplied, setCustomApplied] = useState(false);
+
+    // --- API data ---
+    const [ticketChart, setTicketChart] = useState<TicketChartItem[]>([]);
+    const [revenueSource, setRevenueSource] = useState<RevenueSourceItem[]>([]);
+    const [movieChart, setMovieChart] = useState<MovieChartItem[]>([]);
+    const [theaterChart, setTheaterChart] = useState<TheaterChartItem[]>([]);
+    const [lastSummary, setLastSummary] = useState<LastSummary | null>(null);
+
+    // --- Loading / error ---
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // ---------------------------------------------------------------------------
+    // Derived KPIs from ticketChart
+    // ---------------------------------------------------------------------------
+
+    const totalTicketRevenue = ticketChart.reduce((sum, d) => sum + (d.revenue ?? 0), 0);
+    const totalTickets = ticketChart.reduce((sum, d) => sum + (d.tickets ?? 0), 0);
+
+    const comboSource = revenueSource.find(s => s.name?.toLowerCase().includes('combo'));
+    const totalCombos = comboSource?.value ?? 0;
+    const totalComboCount = comboSource?.count ?? 0;
+
+    const totalMembership = revenueSource.find(s => {
+        const name = s.name?.toLowerCase() || '';
+        return name.includes('hội viên') || name.includes('membership');
+    })?.value ?? 0;
+
+    const totalRevenue = totalTicketRevenue + totalCombos + totalMembership;
+
+    const avgOccupancy = theaterChart.length
+        ? Math.round(theaterChart.reduce((s, t) => s + (t.occupancy ?? 0), 0) / theaterChart.length)
+        : 0;
+
+    // ---------------------------------------------------------------------------
+    // Fetch helpers
+    // ---------------------------------------------------------------------------
+
+    const fetchAll = useCallback(async (filterType: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const [ticket, source, movie, theater, lastSum] = await Promise.all([
+                getTicketChart(null, filterType),
+                getRevenueStructureChart(null, filterType),
+                getMovieChart(null, filterType),
+                getTheaterChart(filterType),
+                getLastSummary(null, filterType),
+            ]);
+
+            setTicketChart(Array.isArray(ticket?.data) ? ticket?.data : []);
+            setRevenueSource(Array.isArray(source?.data) ? source?.data : []);
+            setMovieChart(Array.isArray(movie?.data) ? movie?.data : []);
+            setTheaterChart(Array.isArray(theater?.data) ? theater?.data : []);
+            setLastSummary(lastSum?.data || null);
+        } catch (err: any) {
+            setError('Không thể tải dữ liệu. Vui lòng thử lại.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Fetch when standard filter changes
+    useEffect(() => {
+        if (timeFilter !== 'custom') {
+            fetchAll(toFilterType(timeFilter));
+        }
+    }, [timeFilter, fetchAll]);
+
+    // ---------------------------------------------------------------------------
+    // Event handlers
+    // ---------------------------------------------------------------------------
 
     const handleTimeChange = (event: SelectChangeEvent) => {
         setTimeFilter(event.target.value);
+        setCustomApplied(false);
     };
 
-    const renderKpiCard = (title: string, value: string | number, icon: React.ReactNode, color: string, trend: string) => (
-        <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
-            <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Box>
-                        <Typography variant="subtitle2" color="textSecondary" fontWeight="bold" gutterBottom>
-                            {title.toUpperCase()}
-                        </Typography>
-                        <Typography variant="h4" fontWeight="800" sx={{ mt: 1, mb: 1 }}>
-                            {value}
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <TrendingUp sx={{ color: 'success.main', fontSize: 16 }} />
-                            <Typography variant="body2" color="success.main" fontWeight="bold">
-                                {trend}
+    const handleApplyCustom = () => {
+        if (!fromDate || !toDate) return;
+        setCustomApplied(true);
+        // Determine granularity from date range
+        const diffDays = Math.ceil(
+            (new Date(toDate).getTime() - new Date(fromDate).getTime()) / (1000 * 60 * 60 * 24)
+        );
+        let ft = 'WEEK';
+        if (diffDays <= 1) ft = 'TODAY';
+        else if (diffDays <= 31) ft = 'WEEK';
+        else if (diffDays <= 90) ft = 'MONTH';
+        else ft = 'YEAR';
+        fetchAll(ft);
+    };
+
+    // ---------------------------------------------------------------------------
+    // Label helpers
+    // ---------------------------------------------------------------------------
+
+    const getChartGranularityLabel = () => {
+        switch (timeFilter) {
+            case 'today': return 'theo giờ';
+            case 'week': return 'theo ngày';
+            case 'month': return 'theo tuần';
+            case 'year': return 'theo tháng';
+            case 'custom': {
+                if (fromDate && toDate) {
+                    const d = Math.ceil((new Date(toDate).getTime() - new Date(fromDate).getTime()) / 86400000);
+                    if (d <= 1) return 'theo giờ';
+                    if (d <= 31) return 'theo ngày';
+                    if (d <= 90) return 'theo tuần';
+                    return 'theo tháng';
+                }
+                return 'theo ngày';
+            }
+            default: return 'theo ngày';
+        }
+    };
+
+    const getFilterLabel = () => {
+        switch (timeFilter) {
+            case 'today': return 'Hôm nay';
+            case 'week': return 'Tuần này';
+            case 'month': return 'Tháng này';
+            case 'year': return 'Năm nay';
+            case 'custom': return fromDate && toDate ? `${fromDate} → ${toDate}` : 'Tùy chỉnh';
+            default: return '';
+        }
+    };
+
+    // ---------------------------------------------------------------------------
+    // Sub-components
+    // ---------------------------------------------------------------------------
+
+    const renderKpiCard = (
+        title: string,
+        value: string | number,
+        icon: React.ReactNode,
+        color: string,
+        trend: string | null = null
+    ) => {
+        const trendUp = trend && trend.startsWith('+');
+        return (
+            <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
+                <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Box>
+                            <Typography variant="subtitle2" color="textSecondary" fontWeight="bold" gutterBottom>
+                                {title.toUpperCase()}
                             </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                                so với kỳ trước
+                            <Typography variant="h4" fontWeight="800" sx={{ mt: 1, mb: 1 }}>
+                                {loading ? <CircularProgress size={28} /> : value}
                             </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                {trend ? (
+                                    <>
+                                        {trendUp ? <TrendingUp sx={{ color: 'success.main', fontSize: 16 }} /> : <TrendingDown sx={{ color: 'error.main', fontSize: 16 }} />}
+                                        <Typography variant="body2" color={trendUp ? 'success.main' : 'error.main'} fontWeight="bold">
+                                            {trend}
+                                        </Typography>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TrendingUp sx={{ color: 'success.main', fontSize: 16 }} />
+                                        <Typography variant="body2" color="success.main" fontWeight="bold">
+                                            —
+                                        </Typography>
+                                    </>
+                                )}
+                                <Typography variant="body2" color="textSecondary">
+                                    {trend ? 'so với kỳ trước' : getFilterLabel()}
+                                </Typography>
+                            </Box>
                         </Box>
+                        <Avatar sx={{ bgcolor: `${color}.light`, color: `${color}.main`, width: 56, height: 56 }}>
+                            {icon}
+                        </Avatar>
                     </Box>
-                    <Avatar sx={{ bgcolor: `${color}.light`, color: `${color}.main`, width: 56, height: 56 }}>
-                        {icon}
-                    </Avatar>
-                </Box>
-            </CardContent>
-        </Card>
-    );
+                </CardContent>
+            </Card>
+        );
+    };
+
+    // ---------------------------------------------------------------------------
+    // Render
+    // ---------------------------------------------------------------------------
+
+    const calculateTrend = (current: number, last: number | undefined) => {
+        if (last === undefined || last === null) return null;
+        if (last === 0) return current > 0 ? '+100%' : '0%';
+        const diff = current - last;
+        const percent = (diff / last) * 100;
+        const sign = percent > 0 ? '+' : '';
+        return `${sign}${percent.toFixed(1)}%`;
+    };
+
+    const revTrend = calculateTrend(totalRevenue, lastSummary?.totalRevenue);
+    const tickTrend = calculateTrend(totalTickets, lastSummary?.tickets);
+    const comboTrend = calculateTrend(totalComboCount, lastSummary?.combos);
+    const occTrend = calculateTrend(avgOccupancy, lastSummary?.avgOccupancy);
 
     return (
         <Box sx={{ flexGrow: 1, p: { xs: 2, md: 3 } }}>
@@ -130,101 +359,154 @@ export default function AdminDashboard() {
                         Theo dõi hiệu suất kinh doanh rạp chiếu phim FilmNest
                     </Typography>
                 </Box>
-                <FormControl sx={{ minWidth: 180 }} size="small">
-                    <InputLabel id="time-filter-label">Kỳ báo cáo</InputLabel>
-                    <Select
-                        labelId="time-filter-label"
-                        id="time-filter"
-                        value={timeFilter}
-                        label="Kỳ báo cáo"
-                        onChange={handleTimeChange}
-                        sx={{ borderRadius: 2, bgcolor: 'background.paper' }}
-                    >
-                        <MenuItem value="today">Hôm nay</MenuItem>
-                        <MenuItem value="week">7 ngày qua</MenuItem>
-                        <MenuItem value="month">Tháng này</MenuItem>
-                        <MenuItem value="year">Năm nay</MenuItem>
-                    </Select>
-                </FormControl>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
+                    <FormControl sx={{ minWidth: 180 }} size="small">
+                        <InputLabel id="time-filter-label">Kỳ báo cáo</InputLabel>
+                        <Select
+                            labelId="time-filter-label"
+                            id="time-filter"
+                            value={timeFilter}
+                            label="Kỳ báo cáo"
+                            onChange={handleTimeChange}
+                            sx={{ borderRadius: 2, bgcolor: 'background.paper' }}
+                        >
+                            <MenuItem value="today">Hôm nay</MenuItem>
+                            <MenuItem value="week">Tuần này</MenuItem>
+                            <MenuItem value="month">Tháng này</MenuItem>
+                            <MenuItem value="year">Năm nay</MenuItem>
+                            <MenuItem value="custom">Tùy chỉnh</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Collapse in={timeFilter === 'custom'} orientation="horizontal">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <TextField
+                                id="from-date"
+                                label="Từ ngày"
+                                type="date"
+                                size="small"
+                                value={fromDate}
+                                onChange={(e) => setFromDate(e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                                inputProps={{ max: toDate || undefined }}
+                                sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: 155 }}
+                            />
+                            <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 600 }}>—</Typography>
+                            <TextField
+                                id="to-date"
+                                label="Đến ngày"
+                                type="date"
+                                size="small"
+                                value={toDate}
+                                onChange={(e) => setToDate(e.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                                inputProps={{ min: fromDate || undefined }}
+                                sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: 155 }}
+                            />
+                            <Button
+                                variant="contained"
+                                size="small"
+                                disabled={!fromDate || !toDate || loading}
+                                onClick={handleApplyCustom}
+                                sx={{ borderRadius: 2, whiteSpace: 'nowrap', height: 40 }}
+                            >
+                                Áp dụng
+                            </Button>
+                        </Box>
+                    </Collapse>
+                </Box>
             </Box>
+
+            {/* Error banner */}
+            {error && (
+                <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                    {error}
+                </Alert>
+            )}
 
             {/* KPI Cards */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderKpiCard('Tổng Doanh Thu', formatCurrency(393000000), <AttachMoney fontSize="large" />, 'primary', '+15.2%')}
+                    {renderKpiCard('Tổng Doanh Thu', formatCurrency(totalRevenue), <AttachMoney fontSize="large" />, 'primary', revTrend)}
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderKpiCard('Vé Đã Bán', '25,100', <LocalPlay fontSize="large" />, 'info', '+8.4%')}
+                    {renderKpiCard('Vé Đã Bán', totalTickets.toLocaleString('vi-VN'), <LocalPlay fontSize="large" />, 'info', tickTrend)}
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderKpiCard('Combo Đã Bán', '8,500', <Fastfood fontSize="large" />, 'warning', '+12.5%')}
+                    {renderKpiCard('Combo Đã Bán', totalComboCount.toLocaleString('vi-VN'), <Fastfood fontSize="large" />, 'warning', comboTrend)}
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderKpiCard('Phim Đang Chiếu', '24', <Movie fontSize="large" />, 'error', '+2')}
+                    {renderKpiCard('Công Suất TB', `${avgOccupancy}%`, <EventSeat fontSize="large" />, 'error', occTrend)}
                 </Grid>
             </Grid>
 
             {/* Charts Row 1 */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
+                {/* Revenue & Ticket Trend */}
                 <Grid size={{ xs: 12, lg: 8 }}>
                     <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
                         <CardContent>
-                            <Typography variant="h6" fontWeight="bold" mb={3}>Biến Động Doanh Thu & Vé (7 Ngày Qua)</Typography>
-                            <Box sx={{ height: 350 }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={revenueTrendData} margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                        <XAxis dataKey="date" axisLine={false} tickLine={false} />
-                                        <YAxis yAxisId="left" axisLine={false} tickLine={false} tickFormatter={(value) => `${value / 1000000}M`} />
-                                        <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} />
-                                        <Tooltip
-                                            formatter={(value: number, name: string) => [name === 'revenue' ? formatCurrency(value) : value, name === 'revenue' ? 'Doanh thu' : 'Số vé']}
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)' }}
-                                        />
-                                        <Legend iconType="circle" />
-                                        <Area yAxisId="left" type="monotone" dataKey="revenue" name="Doanh thu" stroke={theme.palette.primary.main} strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
-                                        <Line yAxisId="right" type="monotone" dataKey="tickets" name="Số vé" stroke={theme.palette.warning.main} strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                                    </AreaChart>
-                                </ResponsiveContainer>
+                            <Typography variant="h6" fontWeight="bold" mb={3}>
+                                Biến Động Doanh Thu &amp; Vé ({getFilterLabel()} — {getChartGranularityLabel()})
+                            </Typography>
+                            <Box sx={{ height: 350, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {loading ? (
+                                    <CircularProgress />
+                                ) : (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={ticketChart} margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
+                                            <defs>
+                                                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                            <XAxis dataKey="date" axisLine={false} tickLine={false} />
+                                            <YAxis axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}M`} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
+                                            <Legend iconType="circle" />
+                                            <Area type="monotone" dataKey="revenue" name="Doanh thu" stroke={theme.palette.primary.main} strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                )}
                             </Box>
                         </CardContent>
                     </Card>
                 </Grid>
 
+                {/* Revenue Structure Pie */}
                 <Grid size={{ xs: 12, lg: 4 }}>
                     <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
                         <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                             <Typography variant="h6" fontWeight="bold" mb={1}>Cơ Cấu Doanh Thu</Typography>
-                            <Box sx={{ flexGrow: 1, height: 300 }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={revenueSourceData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={80}
-                                            outerRadius={110}
-                                            paddingAngle={5}
-                                            dataKey="value"
-                                            stroke="none"
-                                        >
-                                            {revenueSourceData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip
-                                            formatter={(value: number) => formatCurrency(value)}
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)' }}
-                                        />
-                                        <Legend iconType="circle" verticalAlign="bottom" height={36} />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                            <Box sx={{ flexGrow: 1, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {loading ? (
+                                    <CircularProgress />
+                                ) : (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={revenueSource}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={80}
+                                                outerRadius={110}
+                                                paddingAngle={5}
+                                                dataKey="value"
+                                                stroke="none"
+                                            >
+                                                {revenueSource.map((_, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                formatter={(value: number | undefined) => formatCurrency(value ?? 0)}
+                                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)' }}
+                                            />
+                                            <Legend iconType="circle" verticalAlign="bottom" height={36} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                )}
                             </Box>
                         </CardContent>
                     </Card>
@@ -233,6 +515,7 @@ export default function AdminDashboard() {
 
             {/* Charts Row 2 */}
             <Grid container spacing={3}>
+                {/* Top Movies */}
                 <Grid size={{ xs: 12, lg: 6 }}>
                     <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
                         <CardContent>
@@ -240,47 +523,45 @@ export default function AdminDashboard() {
                                 <Typography variant="h6" fontWeight="bold">Top Phim Doanh Thu Cao Nhất</Typography>
                                 <Button size="small" variant="text">Xem tất cả</Button>
                             </Box>
-                            <Box sx={{ height: 350 }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={topMoviesData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                                        <XAxis type="number" hide />
-                                        <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={120} tick={{ fontWeight: 500 }} />
-                                        <Tooltip
-                                            formatter={(value: number, name: string) => [name === 'revenue' ? formatCurrency(value) : value, name === 'revenue' ? 'Doanh thu' : 'Số vé']}
-                                            cursor={{ fill: 'transparent' }}
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)' }}
-                                        />
-                                        <Bar dataKey="revenue" name="Doanh thu" fill={theme.palette.primary.main} radius={[0, 4, 4, 0]} barSize={20} />
-                                    </BarChart>
-                                </ResponsiveContainer>
+                            <Box sx={{ height: 350, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {loading ? (
+                                    <CircularProgress />
+                                ) : (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={movieChart} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                                            <XAxis type="number" hide />
+                                            <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={120} tick={{ fontWeight: 500 }} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
+                                            <Bar dataKey="revenue" name="Doanh thu" fill={theme.palette.primary.main} radius={[0, 4, 4, 0]} barSize={20} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                )}
                             </Box>
                         </CardContent>
                     </Card>
                 </Grid>
 
+                {/* Theater Performance */}
                 <Grid size={{ xs: 12, lg: 6 }}>
                     <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
                         <CardContent>
                             <Typography variant="h6" fontWeight="bold" mb={3}>Hiệu Suất Theo Rạp Chiếu</Typography>
-                            <Box sx={{ height: 350 }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={theaterPerformanceData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                        <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                        <YAxis tickFormatter={(value) => `${value / 1000000}M`} axisLine={false} tickLine={false} />
-                                        <Tooltip
-                                            formatter={(value: number) => formatCurrency(value)}
-                                            cursor={{ fill: 'transparent' }}
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 20px 0 rgba(0,0,0,0.1)' }}
-                                        />
-                                        <Bar dataKey="revenue" name="Doanh thu" fill={theme.palette.secondary.main} radius={[4, 4, 0, 0]} barSize={40}>
-                                            {theaterPerformanceData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={index === 1 ? theme.palette.primary.main : theme.palette.secondary.light} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
+                            <Box sx={{ height: 350, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {loading ? (
+                                    <CircularProgress />
+                                ) : (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={theaterChart} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                            <YAxis tickFormatter={(v) => `${v / 1000000}M`} axisLine={false} tickLine={false} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
+                                            <Legend iconType="circle" />
+                                            <Bar dataKey="revenue" name="Doanh thu" fill={theme.palette.primary.main} radius={[4, 4, 0, 0]} barSize={36} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                )}
                             </Box>
                         </CardContent>
                     </Card>

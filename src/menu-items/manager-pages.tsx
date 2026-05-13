@@ -24,6 +24,27 @@ const manager: NavItemType = {
             type: 'item',
             url: '/manager/dashboard',
             icon: icons.contactus
+        },
+        {
+            id: 'room',
+            title: 'room',
+            type: 'item',
+            url: '/manager/room',
+            icon: icons.contactus
+        },
+        {
+            id: 'showtime',
+            title: 'showtime',
+            type: 'item',
+            url: '/manager/showtime',
+            icon: icons.contactus
+        },
+        {
+            id: 'booking',
+            title: 'booking',
+            type: 'item',
+            url: '/manager/booking',
+            icon: icons.contactus
         }
     ]
 };
