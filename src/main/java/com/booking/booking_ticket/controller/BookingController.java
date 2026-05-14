@@ -120,59 +120,6 @@ public class BookingController {
         }
     }
 
-    @GetMapping("/get-data-for-line-chart")
-    public ResponseData<LineChartResponse> getProductMultipleSearchCol(@RequestParam String filter) {
-        LineChartResponse lc = null;
-        if(filter.equalsIgnoreCase("Year"))
-        {
-             lc = LineChartResponse.builder()
-                    .a_cus(bookingService.getCustomersThisyear())
-                    .revenue(bookingService.getRevenueThisYear())
-                    .build();
-        }else if(filter.equalsIgnoreCase("month")){
-             lc = LineChartResponse.builder()
-                    .a_cus(bookingService.getCustomersThisMonth())
-                    .revenue(bookingService.getRevenueThisMonth())
-                    .build();
-        }
-
-        try{
-            return new ResponseData<>(HttpStatus.OK.value(),"User found!",lc);
-        }
-        catch (Exception e)
-        {
-            log.error("there is an error : {}",e.getMessage());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
-    }
-
-    @GetMapping("/stats")
-    public ResponseEntity<?> getBookingStats(@RequestParam int year) {
-        Map<String, List<Number>> chartData = bookingService.getMonthlyChartData(year);
-        return ResponseEntity.ok(chartData);
-    }
-
-    @GetMapping("/stats-monthly")
-    public ResponseEntity<?> getBookingStatsMonthly(@RequestParam int month) {
-        Map<String, List<Number>> chartData = bookingService.getYearlyChartData(month);
-        return ResponseEntity.ok(chartData);
-    }
-
-    @GetMapping("/bookings-by-category")
-    public ResponseEntity<List<Map<String, Object>>> getBookingStatsByCategory() {
-        List<BookingByCategoryStats> stats = bookingService.getBookingStatsByCategory();
-
-        // Convert sang format ECharts pie: [{name, value}]
-        List<Map<String, Object>> result = stats.stream().map(stat -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("name", stat.getCategory());
-            map.put("value", stat.getTotal());
-            return map;
-        }).collect(Collectors.toList());
-
-        return ResponseEntity.ok(result);
-    }
-
     @GetMapping("/responses")
     public ResponseEntity<List<BookingResponse>> getAllBookingResponses() {
         return ResponseEntity.ok(bookingService.getAllBookingResponses());
