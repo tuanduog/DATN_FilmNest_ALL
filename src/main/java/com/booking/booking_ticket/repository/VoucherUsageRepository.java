@@ -25,4 +25,11 @@ public interface VoucherUsageRepository extends JpaRepository<VoucherUsage, Inte
             AND vu.voucher.id = :voucherId
     """)
     List<Voucher> checkVoucherUsage(Integer userId, Integer voucherId);
+
+    @Query("""
+        SELECT vu.voucher
+        FROM VoucherUsage vu
+        WHERE vu.booking.id = :id
+    """)
+    List<Voucher> findByBookingId(Integer id);
 }

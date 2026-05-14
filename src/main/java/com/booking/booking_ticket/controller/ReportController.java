@@ -55,4 +55,9 @@ public class ReportController {
                                           @RequestParam(required = false) ChartFilterType filterType) {
         return new ResponseData<>(HttpStatus.OK.value(), "Get last summary successfully", reportService.getLastSummary(theaterId, filterType));
     }
+
+    @GetMapping("/v1/showtime/today")
+    public ResponseData<?> getShowTimeToday(@RequestParam(required = false) Integer theaterId) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get show time successfully", reportService.getShowTimeToday(theaterId));
+    }
 }

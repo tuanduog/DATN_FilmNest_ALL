@@ -20,4 +20,6 @@ public class IntrospectiveResponse {
     private String membership;
 
     private String role;
+
+    private Integer theaterId;
 }

@@ -4,6 +4,8 @@ import com.booking.booking_ticket.dto.request.AuthRequest;
 import com.booking.booking_ticket.dto.request.RegisterRequest;
 import com.booking.booking_ticket.entity.InvalidToken;
 import com.booking.booking_ticket.entity.Users;
+import com.booking.booking_ticket.entity.Employee;
+import com.booking.booking_ticket.repository.EmployeeRepository;
 import com.booking.booking_ticket.repository.InvalidTokenRepsitory;
 import com.booking.booking_ticket.repository.UsersRepository;
 import com.booking.booking_ticket.utils.Role;
@@ -42,6 +44,8 @@ public class AuthServiceImpl implements AuthService {
     private final UsersRepository usersRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final EmployeeRepository employeeRepository;
 
     private final Util util;
 
@@ -85,16 +89,25 @@ public class AuthServiceImpl implements AuthService {
             role = "Admin";
         else role = "Staff";
 
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+        JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
                 .claim("scope", role)
                 .claim("user_id", account.getId())
                 .claim("email", account.getEmail())
                 .claim("phone_number", account.getPhone())
-//                .claim("membership", account.getMembership())
                 .subject(account.getUsername())
                 .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
-                .build();
+                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()));
+
+        if (account.getRole() == Role.MANAGER || account.getRole() == Role.STAFF) {
+            Optional<Employee> empOpt = employeeRepository.findByUser_Id(account.getId());
+            empOpt.ifPresent(employee -> {
+                if (employee.getTheater() != null) {
+                    claimsBuilder.claim("theater_id", employee.getTheater().getId());
+                }
+            });
+        }
+
+        JWTClaimsSet claimsSet = claimsBuilder.build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());
 
@@ -140,6 +153,12 @@ public class AuthServiceImpl implements AuthService {
         Date expirationTime = jwt.getJWTClaimsSet().getExpirationTime();
         boolean isExpired = expirationTime.before(new Date());
 
+        Integer theaterId = null;
+        Object theaterIdClaim = jwt.getJWTClaimsSet().getClaim("theater_id");
+        if (theaterIdClaim != null) {
+            theaterId = ((Number) theaterIdClaim).intValue();
+        }
+
         return IntrospectiveResponse.builder()
                 .isValid(verified && !isExpired)
                 .userId(((Number) jwt.getJWTClaimsSet().getClaim("user_id")).intValue())
@@ -148,6 +167,7 @@ public class AuthServiceImpl implements AuthService {
                 .phoneNumber((String) jwt.getJWTClaimsSet().getClaim("phone_number"))
                 .membership((String) jwt.getJWTClaimsSet().getClaim("membership"))
                 .role((String) jwt.getJWTClaimsSet().getClaim("scope"))
+                .theaterId(theaterId)
                 .build();
     }
 

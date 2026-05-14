@@ -64,4 +64,12 @@ public class ShowTimeController {
         showTimeService.deleteShowTime(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Delete showtime successful");
     }
+
+    @GetMapping("/v1/theater/{id}")
+    public ResponseData<?> getListByTheaterId(@PathVariable Integer id,
+                                              @PageableDefault() Pageable pageable,
+                                              @RequestParam(required = false) String keyword,
+                                              @RequestParam(required = false) Status status){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", showTimeService.getListByTheaterId(id, pageable, keyword, status));
+    }
 }

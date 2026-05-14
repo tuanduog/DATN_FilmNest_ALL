@@ -2,6 +2,7 @@ package com.booking.booking_ticket.service.Impl;
 
 import com.booking.booking_ticket.dto.response.*;
 import com.booking.booking_ticket.repository.BookingRepository;
+import com.booking.booking_ticket.repository.ShowTimeRepository;
 import com.booking.booking_ticket.service.ReportService;
 import com.booking.booking_ticket.utils.ChartFilterType;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import java.util.List;
 public class ReportServiceImpl implements ReportService {
 
     private final BookingRepository bookingRepository;
+
+    private final ShowTimeRepository showTimeRepository;
 
     @Override
     public List<TicketReportResponse> getTicketChart(Integer theaterId, ChartFilterType filterType) {
@@ -154,5 +157,9 @@ public class ReportServiceImpl implements ReportService {
         } else {
             return bookingRepository.getAdminLastSummary(startTime, endTime);
         }
+    }
+
+    public List<ShowTimeTodayResponse> getShowTimeToday(Integer theaterId) {
+        return showTimeRepository.findAllShowTimeToday(theaterId);
     }
 }

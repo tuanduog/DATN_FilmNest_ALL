@@ -8,6 +8,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.booking.booking_ticket.utils.ChartFilterType;
+import com.booking.booking_ticket.utils.PaymentStatus;
+import com.booking.booking_ticket.utils.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -65,6 +69,7 @@ public interface BookingRepository extends JpaRepository<Booking,Integer> {
     @Query("""
         SELECT new com.booking.booking_ticket.dto.BookingDTO(
             b.id,
+            b.code,
             b.chair,
             b.totalPrice,
             b.date,
@@ -384,5 +389,47 @@ public interface BookingRepository extends JpaRepository<Booking,Integer> {
             @Param("theaterId") Integer theaterId,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime);
+
+    @Query("""
+        SELECT new com.booking.booking_ticket.dto.response.OrderResponse(
+            b.id, b.user.username, b.code, b.chair, b.totalPrice, b.paymentStatus
+        )
+        FROM Booking b
+        WHERE (LOWER(b.code) LIKE :keyword)
+        AND (:paymentStatus IS NULL OR b.paymentStatus = :paymentStatus)
+        AND (:startDate IS NULL OR b.date >= :startDate)
+        AND (:endDate IS NULL OR b.date <= :endDate)
+    """)
+    Page<OrderResponse> findAllByKeyword(Pageable pageable,
+                                         @Param("keyword") String keyword,
+                                         @Param("paymentStatus") PaymentStatus paymentStatus,
+                                         @Param("startDate") LocalDate startDate,
+                                         @Param("endDate") LocalDate endDate);
+
+    @Query("""
+        SELECT new com.booking.booking_ticket.dto.response.OrderResponse(
+            b.id, b.user.username, b.code, b.chair, b.totalPrice, b.paymentStatus)
+        FROM Booking b
+        WHERE b.id = :id
+    """)
+    OrderResponse findOrderByBookingId(Integer id);
+
+    @Query("""
+        SELECT new com.booking.booking_ticket.dto.response.OrderResponse(
+            b.id, b.user.username, b.code, b.chair, b.totalPrice, b.paymentStatus
+        )
+        FROM Booking b
+        WHERE (LOWER(b.code) LIKE :keyword)
+            AND (:paymentStatus IS NULL OR b.paymentStatus = :paymentStatus)
+            AND (:startDate IS NULL OR b.date >= :startDate)
+            AND (:endDate IS NULL OR b.date <= :endDate)
+            AND b.showTime.room.theater.id = :id
+    """)
+    Page<OrderResponse> findAllByKeywordAndTheaterId( Integer id,
+                                         Pageable pageable,
+                                         @Param("keyword") String keyword,
+                                         @Param("paymentStatus") PaymentStatus paymentStatus,
+                                         @Param("startDate") LocalDate startDate,
+                                         @Param("endDate") LocalDate endDate);
 }
 

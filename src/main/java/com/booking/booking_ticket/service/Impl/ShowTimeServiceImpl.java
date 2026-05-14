@@ -132,4 +132,15 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         String showingStatus = ShowingStatus.NOW_SHOWING.getValue();
         return showTimeRepository.findShow_timeByRooms(id, showingStatus);
     }
+
+    @Override
+    public Page<ShowTimeResponse> getListByTheaterId(Integer id, Pageable pageable, String keyword, Status status){
+        if (keyword != null){
+            keyword = "%" + keyword.trim().toLowerCase() + "%";
+        } else {
+            keyword = "%";
+        }
+
+        return showTimeRepository.findAllByKeywordAndTheaterId(id, pageable, keyword, status);
+    }
 }

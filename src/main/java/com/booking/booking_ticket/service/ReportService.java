@@ -18,4 +18,6 @@ public interface ReportService {
     public List<OccupancyReportResponse> getRoomChart(Integer theaterId, ChartFilterType filterType);
 
     public LastSummaryResponse getLastSummary(Integer theaterId, ChartFilterType filterType);
+
+    public List<ShowTimeTodayResponse> getShowTimeToday(Integer theaterId);
 }

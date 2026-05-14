@@ -6,16 +6,20 @@ import com.booking.booking_ticket.dto.BookingSimpleDTO;
 import com.booking.booking_ticket.entity.Booking;
 import com.booking.booking_ticket.repository.BookingRepository;
 import com.booking.booking_ticket.service.BookingService;
+import com.booking.booking_ticket.utils.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +60,7 @@ public class BookingController {
                     }
                 }
             }
+            booking.setCode(generateBookingCode());
 
             Booking saved = bookingRepository.save(booking);
             return ResponseEntity.ok(saved);
@@ -64,6 +69,15 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to save booking: " + e.getMessage());
         }
+    }
+
+    private String generateBookingCode() {
+        String datePart = java.time.LocalDate.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        String randomPart = String.valueOf((int) (Math.random() * 9000) + 1000);
+
+        return "BK" + datePart + randomPart;
     }
 
     @GetMapping("/check-booking")
@@ -187,5 +201,30 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to get locked seats: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/v1")
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable,
+                                   @RequestParam(required = false) String keyword,
+                                   @RequestParam(required = false) PaymentStatus paymentStatus,
+                                   @RequestParam(required = false) LocalDate startDate,
+                                   @RequestParam(required = false) LocalDate endDate) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", bookingService.getList(pageable, keyword, paymentStatus, startDate, endDate));
+    }
+
+    @GetMapping("/v1/{id}")
+    public ResponseData<?> getById(@PathVariable Integer id) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get order successful", bookingService.getById(id));
+    }
+
+    @GetMapping("/v1/theater/{id}")
+    public ResponseData<?> getListByTheaterId(
+                                   @PathVariable Integer id,
+                                   @PageableDefault() Pageable pageable,
+                                   @RequestParam(required = false) String keyword,
+                                   @RequestParam(required = false) PaymentStatus paymentStatus,
+                                   @RequestParam(required = false) LocalDate startDate,
+                                   @RequestParam(required = false) LocalDate endDate) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", bookingService.getListByTheaterId(id, pageable, keyword, paymentStatus, startDate, endDate));
     }
 }
