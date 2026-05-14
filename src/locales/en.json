@@ -137,5 +137,14 @@
   "passwordMismatch": "Confirm password does not match!",
   "passwordChangeSuccess": "Password changed successfully!",
   "profileUpdateSuccess": "Profile updated successfully!",
-  "changesCanceled": "Changes canceled."
+  "changesCanceled": "Changes canceled.",
+  "noBookings": "You haven't booked any tickets yet.",
+  "cinemaLabel": "Cinema",
+  "roomLabel": "Room",
+  "chairLabel": "Seat",
+  "showtimeLabel": "Showtime",
+  "comboLabel": "Combo",
+  "priceLabel": "Price",
+  "none": "None",
+  "paidStatus": "Paid"
 }

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function History() {
+    const { t, i18n } = useTranslation();
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const user = JSON.parse(sessionStorage.getItem('user') || "null");
@@ -100,8 +102,8 @@ function History() {
 
     return (
         <div className="container mt-5" style={{paddingBottom: (bookings.length === 1 || bookings.length === 0) ? '120px' : '0px'}}>
-            <h2 className="mb-4 fw-bold text-primary">Lịch sử đặt vé</h2>
-            {bookings.length === 0 ? <p style={{textAlign: 'center', fontSize: '22px', paddingTop: '20px'}}>Hiện bạn chưa đặt bất kì vé nào</p> : <></>}
+            <h2 className="mb-4 fw-bold text-primary">{t('bookingHistory')}</h2>
+            {bookings.length === 0 ? <p style={{textAlign: 'center', fontSize: '22px', paddingTop: '20px'}}>{t('noBookings')}</p> : <></>}
             {bookings.map((booking) => (
                 <div key={booking.bookingId} className="card mb-4 shadow border-0" style={{ backgroundColor: "#e6f4ea" }}>
                     <div className="row g-0 align-items-center">
@@ -120,24 +122,24 @@ function History() {
                             </h5>
                             <div className="row text-dark">
                                 <div className="col-6 mb-2">
-                                    <p className="mb-1"><strong>Rạp:</strong> {booking.theaterName}, {booking.theaterLocation}</p>
-                                    <p className="mb-1"><strong>Phòng:</strong> {booking.roomName}</p>
-                                    <p className="mb-1"><strong>Ghế:</strong> {booking.chair}</p>
+                                    <p className="mb-1"><strong>{t('cinemaLabel')}:</strong> {booking.theaterName}, {booking.theaterLocation}</p>
+                                    <p className="mb-1"><strong>{t('roomLabel')}:</strong> {booking.roomName}</p>
+                                    <p className="mb-1"><strong>{t('chairLabel')}:</strong> {booking.chair}</p>
                                 </div>
                                 <div className="col-6 mb-2">
-                                    <p className="mb-1"><strong>Suất chiếu:</strong> {booking.startTime} - {new Date(booking.date).toLocaleDateString('vi-VN', {
+                                    <p className="mb-1"><strong>{t('showtimeLabel')}:</strong> {booking.startTime} - {new Date(booking.date).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'vi-VN', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric'
                                     })}</p>
-                                    <p className="mb-1"><strong>Combo:</strong> {booking.combo || "Không có"}</p>
-                                    <p className="mb-1"><strong>Giá vé:</strong> {booking.totalPrice.toLocaleString('vi-VN')}đ</p>
+                                    <p className="mb-1"><strong>{t('comboLabel')}:</strong> {booking.combo || t('none')}</p>
+                                    <p className="mb-1"><strong>{t('priceLabel')}:</strong> {booking.totalPrice.toLocaleString(i18n.language === 'en' ? 'en-US' : 'vi-VN')}đ</p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="col-md-2 d-flex flex-column justify-content-center align-items-center p-3">
-                            <span className="badge bg-success fs-6 px-3 py-2">Đã thanh toán</span>
+                            <span className="badge bg-success fs-6 px-3 py-2">{t('paidStatus')}</span>
                         </div>
                     </div>
                 </div>

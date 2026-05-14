@@ -200,9 +200,9 @@ function Movies() {
                 </div>
 
                 {/* Movie Grid */}
-                <div className="row g-4 justify-content-center mx-auto" style={{ maxWidth: '1440px' }}>
+                <div className="row g-4 justify-content-center mx-auto" style={{ maxWidth: '1140px' }}>
                     {(nowShowing ? showingNow : commingSoon).map((movie) => (
-                        <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={movie.movieId || movie.id}>
+                        <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={movie.movieId || movie.id}>
                             <article className={styles.movieCard}>
                                 <div className={styles.imageContainer}>
                                     <img

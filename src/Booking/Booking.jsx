@@ -148,7 +148,7 @@ function Booking() {
                             const seatSelecting = JSON.parse(message.body);
                             console.log("Seat selecting:", seatSelecting);
                             if (!seatSelecting || Object.keys(seatSelecting).length === 0) return;
-                            
+
                             const entries = Object.entries(seatSelecting);
                             const updates = {};
                             entries.forEach(([uid, seatsStr]) => {
@@ -157,7 +157,7 @@ function Booking() {
                                     updates[uid] = seatList;
                                 }
                             });
-                            
+
                             setOthersSelecting(prev => ({
                                 ...prev,
                                 ...updates

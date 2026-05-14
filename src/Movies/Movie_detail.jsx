@@ -34,6 +34,7 @@ function Movie_detail() {
     const [messSub, setMessSub] = useState("");
     const [messWtag, setMesWtag] = useState("");
     const [dataCmt, setDataCmt] = useState([]);
+    const [dataCmtAfterBuild, setDataCmtAfterBuild] = useState([]);
     const client = useRef(null);
 
     const handleCloseModal = () => setShowModal(false);
@@ -124,47 +125,66 @@ function Movie_detail() {
         }
     }, [id]);
 
+    const BuildCommentTree = (comments) => {
+        const map = {};
+        const roots = [];
+        comments.forEach(cmt => {
+            map[cmt.commentId] = { ...cmt, children: [] }
+        });
+
+        comments.forEach(cmt => {
+            if (cmt.parentId === 0) {
+                roots.push(map[cmt.commentId]); // comment gốc
+            } else if (map[cmt.parentId]) {
+                map[cmt.parentId].children.push(map[cmt.commentId]);
+            }
+        });
+        return roots;
+    }
+
     const fetchComments = async (movieId) => {
         try {
-            const res = await axios.get(`http://localhost:8099/api/comment/v1/${movieId}`);
-            setDataCmt(Array.isArray(res.data.data) ? res.data.data : []);
+            const res = await axios.get(`http://localhost:8099/api/comment/v1/${movieId}`, { withCredentials: true });
+            const rawList = Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
+            setDataCmtAfterBuild(rawList);
+            const tree = BuildCommentTree(rawList);
+            setDataCmt(tree);
         } catch (error) {
             console.error("Lỗi lấy comment", error);
         }
     }
 
-    const handleCmt = async (type, idCmt) => {
+    const handleCmt = (level, parentId) => {
         const userStr = sessionStorage.getItem('user');
         if (!userStr) {
             navigate("/Login");
             return;
         }
         const user = JSON.parse(userStr);
-        let content = "";
-        if (type === 0) content = message;
-        else if (type === 1) content = messSub;
-        else content = messWtag;
+        let content = null;
+        if (level === 0) content = message;
+        else if (level === 1) content = messSub;
+        else if (level === 2) content = messWtag;
 
-        let cmt = {
-            userId: user.userId,
-            movieId: movieInfo.movieId || movieInfo.id,
+        if (!content || !content.trim()) return;
+
+        const mess = {
             content: content,
-            parentId: type === 0 ? 0 : idCmt,
-            tag: type === 2 ? messWtag.split(' ')[0] : ""
+            level: level,
+            parentId: parentId,
+            userId: user.userId,
+            movieId: id,
+            userName: user.username
         };
-
         if (client.current && client.current.connected) {
-            client.current.publish({
-                destination: `/app/comment/${movieInfo.movieId || movieInfo.id}`,
-                body: JSON.stringify(cmt),
-            });
+            client.current.publish({ destination: "/app/push-cmt", body: JSON.stringify(mess) });
+            setMessSub("");
+            setMesWtag("");
+            setMessage("");
+        } else {
+            console.error("WebSocket chưa kết nối!");
         }
-
-        setMessage("");
-        setMessSub("");
-        setMesWtag("");
     };
-
 
     useEffect(() => {
         fetchMovie();
@@ -174,12 +194,38 @@ function Movie_detail() {
             hasScroll.current = true;
         }
 
+        if (client.current) {
+            client.current.deactivate();
+        }
+
         const stompClient = new Client({
             brokerURL: "ws://localhost:8099/wsocket",
+            debug: (str) => console.log("STOMP:", str),
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
             onConnect: () => {
-                stompClient.subscribe(`/topic/comments/${id}`, (msg) => {
-                    const newCmt = JSON.parse(msg.body);
-                    setDataCmt((prev) => [newCmt, ...prev]);
+                console.log("Connected to WS!");
+                stompClient.subscribe(`/topic/comment/${id}`, (msg) => {
+                    const res = JSON.parse(msg.body);
+                    setDataCmtAfterBuild((prev) => {
+                        const updated = [...prev, res];
+                        const tree = BuildCommentTree(updated);
+                        setDataCmt(tree);
+                        return updated;
+                    });
+                });
+                stompClient.subscribe(`/topic/reaction/${id}`, (msg) => {
+                    const res = JSON.parse(msg.body);
+                    setDataCmtAfterBuild((prev) => {
+                        const updated = prev.map(cmt =>
+                            cmt.commentId === res.commentId
+                                ? { ...cmt, likeCount: res.likeCount, dislikeCount: res.dislikeCount, myReaction: res.myReaction }
+                                : cmt
+                        );
+                        setDataCmt(BuildCommentTree(updated));
+                        return updated;
+                    });
                 });
             },
         });
@@ -260,8 +306,6 @@ function Movie_detail() {
                 </div>
             )}
 
-
-
             {/* Backdrop & Info Section */}
             <div className="movie-backdrop" style={{ backgroundImage: `url(${movieInfo.image})` }}>
                 <div className="backdrop-overlay"></div>
@@ -313,35 +357,79 @@ function Movie_detail() {
 
                         <div className="comment-section">
                             <h3 className="section-title">{t('comments')}</h3>
+
+                            {/* Comment list */}
                             <div className="mt-4">
-                                {Array.isArray(dataCmt) && dataCmt.map((cmt) => (
-                                    <CommentItem
-                                        key={cmt.commentId}
-                                        cmt={cmt}
-                                        handleCmt={handleCmt}
-                                        messSub={messSub}
-                                        setMessSub={setMessSub}
-                                        messWtag={messWtag}
-                                        setMesWtag={setMesWtag}
-                                    />
-                                ))}
+                                {Array.isArray(dataCmt) && dataCmt.length > 0 ? (
+                                    dataCmt.map((cmt) => (
+                                        <CommentItem
+                                            key={cmt.commentId}
+                                            cmt={cmt}
+                                            handleCmt={handleCmt}
+                                            messSub={messSub}
+                                            setMessSub={setMessSub}
+                                            messWtag={messWtag}
+                                            setMesWtag={setMesWtag}
+                                            client={client}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="no-comment">
+                                        <i className="bi bi-chat-square-text" style={{ fontSize: 40, opacity: 0.3 }}></i>
+                                        <p className="mt-2">{t('noComments') || 'Chưa có bình luận nào. Hãy là người đầu tiên!'}</p>
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="comment-input-wrapper mt-5">
-                                <textarea
-                                    className="form-control border-0 bg-white"
-                                    rows="3"
-                                    placeholder={t('commentPlaceholder')}
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                ></textarea>
-                                <div className="d-flex justify-content-end mt-3">
-                                    <button className="btn btn-primary px-4" onClick={() => handleCmt(0, 0)}>
-                                        <i className="bi bi-send-fill me-2"></i>{t('sendComment')}
-                                    </button>
+                            {/* Write comment */}
+                            <div className="comment-input-wrapper mt-4">
+                                <div className="d-flex gap-3">
+                                    <div style={{
+                                        flexShrink: 0, width: 42, height: 42, borderRadius: '50%',
+                                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: '#fff', fontWeight: 700, fontSize: 16,
+                                        boxShadow: '0 3px 8px rgba(102,126,234,0.35)'
+                                    }}>
+                                        {(JSON.parse(sessionStorage.getItem('user') || '{}')?.username || '?').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <textarea
+                                            style={{
+                                                width: '100%', border: '1px solid #e0e4f0', borderRadius: 12,
+                                                padding: '12px 16px', fontSize: 14, resize: 'none',
+                                                background: '#f7f8fc', color: '#333', outline: 'none',
+                                                transition: 'border-color 0.2s, box-shadow 0.2s'
+                                            }}
+                                            rows="3"
+                                            placeholder={t('commentPlaceholder')}
+                                            value={message}
+                                            onChange={(e) => setMessage(e.target.value)}
+                                            onFocus={e => { e.target.style.borderColor = '#0d6efd'; e.target.style.boxShadow = '0 0 0 3px rgba(13,110,253,0.1)'; e.target.style.background = '#fff'; }}
+                                            onBlur={e => { e.target.style.borderColor = '#e0e4f0'; e.target.style.boxShadow = 'none'; e.target.style.background = '#f7f8fc'; }}
+                                        />
+                                        <div className="d-flex justify-content-end mt-2">
+                                            <button
+                                                style={{
+                                                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                                                    padding: '8px 22px', background: 'linear-gradient(135deg, #0d6efd, #6610f2)',
+                                                    color: '#fff', border: 'none', borderRadius: 20,
+                                                    fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                                                    transition: 'all 0.2s ease', boxShadow: '0 3px 10px rgba(13,110,253,0.25)'
+                                                }}
+                                                onMouseEnter={e => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 6px 18px rgba(13,110,253,0.4)'; }}
+                                                onMouseLeave={e => { e.target.style.transform = ''; e.target.style.boxShadow = '0 3px 10px rgba(13,110,253,0.25)'; }}
+                                                onClick={() => handleCmt(0, 0)}
+                                            >
+                                                <i className="bi bi-send-fill"></i>
+                                                {t('sendComment')}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <div className="col-lg-4">
@@ -364,7 +452,6 @@ function Movie_detail() {
         </div>
     );
 }
-
 
 export default Movie_detail;
 

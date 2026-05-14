@@ -137,5 +137,14 @@
   "passwordMismatch": "Mật khẩu xác nhận không khớp!",
   "passwordChangeSuccess": "Đổi mật khẩu thành công!",
   "profileUpdateSuccess": "Cập nhật thông tin thành công!",
-  "changesCanceled": "Đã hủy các thay đổi."
+  "changesCanceled": "Đã hủy các thay đổi.",
+  "noBookings": "Hiện bạn chưa đặt bất kì vé nào",
+  "cinemaLabel": "Rạp",
+  "roomLabel": "Phòng",
+  "chairLabel": "Ghế",
+  "showtimeLabel": "Suất chiếu",
+  "comboLabel": "Combo",
+  "priceLabel": "Giá vé",
+  "none": "Không có",
+  "paidStatus": "Đã thanh toán"
 }
