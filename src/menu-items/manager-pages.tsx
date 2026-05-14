@@ -14,7 +14,7 @@ const icons = {
 // ==============================|| MENU ITEMS - PAGES ||============================== //
 
 const manager: NavItemType = {
-    id: 'group-pages',
+    id: 'manager-pages',
     title: 'manager',
     type: 'group',
     children: [
@@ -44,6 +44,13 @@ const manager: NavItemType = {
             title: 'booking',
             type: 'item',
             url: '/manager/booking',
+            icon: icons.contactus
+        },
+        {
+            id: 'theater-profile',
+            title: 'theater-profile',
+            type: 'item',
+            url: '/manager/theater-profile',
             icon: icons.contactus
         }
     ]

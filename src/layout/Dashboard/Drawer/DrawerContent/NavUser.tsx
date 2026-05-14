@@ -21,6 +21,7 @@ import useAuth from 'hooks/useAuth';
 // assets
 import { ArrowRight2 } from 'iconsax-reactjs';
 import avatar1 from 'assets/images/users/avatar-6.png';
+import { useIntl } from 'react-intl';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -43,6 +44,7 @@ const ExpandMore = styled(IconButton, {
 
 export default function UserList() {
   const navigate = useNavigate();
+  const intl = useIntl();
 
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
@@ -98,7 +100,7 @@ export default function UserList() {
           <ListItemAvatar>
             <Avatar alt="Avatar" src={avatar1} sx={{ ...(drawerOpen && { width: 46, height: 46 }) }} />
           </ListItemAvatar>
-          <ListItemText primary={user?.name} sx={{ ...(!drawerOpen && { display: 'none' }) }} secondary="Quản trị viên" />
+          <ListItemText primary={user?.name} sx={{ ...(!drawerOpen && { display: 'none' }) }} secondary={user?.role?.toUpperCase() === 'MANAGER' ? intl.formatMessage({ id: 'manager' }) : user?.role?.toUpperCase() === 'ADMIN' ? intl.formatMessage({ id: 'admin' }) : intl.formatMessage({ id: 'employee' })} />
         </ListItem>
       </List>
       <Menu

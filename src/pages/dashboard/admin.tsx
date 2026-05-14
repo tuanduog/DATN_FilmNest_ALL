@@ -528,12 +528,12 @@ export default function AdminDashboard() {
                                     <CircularProgress />
                                 ) : (
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={movieChart} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                                        <BarChart data={movieChart} layout="vertical" margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                                             <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                                             <XAxis type="number" hide />
-                                            <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={120} tick={{ fontWeight: 500 }} />
+                                            <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={160} tick={{ fontSize: 12, fontWeight: 500 }} />
                                             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
-                                            <Bar dataKey="revenue" name="Doanh thu" fill={theme.palette.primary.main} radius={[0, 4, 4, 0]} barSize={20} />
+                                            <Bar dataKey="revenue" name="Doanh thu" fill={theme.palette.primary.main} radius={[0, 4, 4, 0]} barSize={24} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 )}

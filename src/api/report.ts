@@ -54,4 +54,13 @@ const getLastSummary = async (theaterId: number | null, filterType: string) => {
     }
 }
 
-export { getTicketChart, getRevenueStructureChart, getMovieChart, getTheaterChart, getRoomChart, getLastSummary };
+const getShowTimeToday = async (theaterId: number | null) => {
+    try {
+        const response = await axiosServices.get(`/api/report/v1/showtime/today`, { params: { theaterId } });
+        return response.data;
+    } catch (error: Error | any) {
+        return error;
+    }
+}
+
+export { getTicketChart, getRevenueStructureChart, getMovieChart, getTheaterChart, getRoomChart, getLastSummary, getShowTimeToday };

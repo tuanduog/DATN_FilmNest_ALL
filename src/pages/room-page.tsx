@@ -61,7 +61,7 @@ import {
 // project-imports
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
-import { deleteById, getList } from 'api/room';
+import { deleteById, getList, getListByTheaterId } from 'api/room';
 
 import EmptyTable from 'components/third-party/react-table/EmptyTable';
 import HeaderSort from 'components/third-party/react-table/HeaderSort';
@@ -120,6 +120,7 @@ function EditAction({
     const navigate = useNavigate();
     const intl = useIntl();
     const { user, logout } = useAuth();
+    const isManager = user?.role?.toUpperCase() === 'MANAGER';
     const [openDelete, setOpenDelete] = useState(false);
 
     const handleDelete = async () => {
@@ -142,13 +143,13 @@ function EditAction({
     return (
         <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
             <Tooltip title={intl.formatMessage({ id: 'detail-room' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/room/detail/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
+                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/room/detail/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
                     <Eye variant="Outline" />
                 </IconButton>
             </Tooltip>
 
             <Tooltip title={intl.formatMessage({ id: 'edit-room' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/room/edit/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
+                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/room/edit/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
                     <Edit2 variant="Outline" />
                 </IconButton>
             </Tooltip>
@@ -418,7 +419,12 @@ export default function RoomPage() {
 
     useEffect(() => {
         const fetchRooms = async () => {
-            const response = await getList(pageRequest);
+            let response;
+            if (user?.role?.toUpperCase() === 'MANAGER' && user?.theaterId) {
+                response = await getListByTheaterId(Number(user.theaterId), pageRequest);
+            } else {
+                response = await getList(pageRequest);
+            }
 
             if (response.status === HttpStatusCode.Ok) {
                 setData(response.data.content);
@@ -550,7 +556,7 @@ export default function RoomPage() {
                         justifyContent: 'center',
                     }}
                     variant="contained"
-                    onClick={() => navigate('/admin/room/add')}
+                    onClick={() => navigate(`/${user?.role?.toUpperCase() === 'MANAGER' ? 'manager' : 'admin'}/room/add`)}
                     startIcon={<Add />}
                 >
                     <FormattedMessage id="add-room" />

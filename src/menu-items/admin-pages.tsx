@@ -14,7 +14,7 @@ const icons = {
 // ==============================|| MENU ITEMS - PAGES ||============================== //
 
 const admin: NavItemType = {
-  id: 'group-pages',
+  id: 'admin-pages',
   title: 'admin',
   type: 'group',
   children: [

@@ -30,6 +30,7 @@ import useAuth from 'hooks/useAuth';
 // assets
 import avatar1 from 'assets/images/users/avatar-6.png';
 import { Setting2, Profile, Logout } from 'iconsax-reactjs';
+import { useIntl } from 'react-intl';
 
 // types
 interface TabPanelProps {
@@ -76,7 +77,7 @@ const tabStyle = {
 export default function ProfilePage() {
   const theme = useTheme();
   const navigate = useNavigate();
-
+  const intl = useIntl();
   const { logout, user } = useAuth();
   const handleLogout = async () => {
     try {
@@ -161,7 +162,7 @@ export default function ProfilePage() {
                           <Stack>
                             <Typography variant="subtitle1">{user?.name}</Typography>
                             <Typography variant="body2" color="secondary">
-                              {user?.role === "Admin" ? "Quản trị viên" : "Quản lý rạp"}
+                              {user?.role === "Admin" ? intl.formatMessage({ id: 'admin' }) : intl.formatMessage({ id: 'manager' })}
                             </Typography>
                           </Stack>
                         </Stack>

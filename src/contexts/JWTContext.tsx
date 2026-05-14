@@ -12,6 +12,7 @@ import authReducer from 'contexts/auth-reducer/auth';
 import Loader from 'components/Loader';
 import axios from 'utils/axios';
 import loginApi from 'api/login';
+import { getById as getTheaterById } from 'api/theater';
 
 // types
 import { AuthInfo, AuthProps, JWTContextType } from 'types/auth';
@@ -37,12 +38,16 @@ const verifyToken: (st: string) => boolean = (serviceToken) => {
   return decoded.exp > Date.now() / 1000;
 };
 
-const setSession = (serviceToken?: string | null) => {
+const setSession = (serviceToken?: string | null, theaterId?: string | number | null) => {
   if (serviceToken) {
     localStorage.setItem('serviceToken', serviceToken);
     axios.defaults.headers.common.Authorization = `Bearer ${serviceToken}`;
+    if (theaterId) {
+      localStorage.setItem('theaterId', String(theaterId));
+    }
   } else {
     localStorage.removeItem('serviceToken');
+    localStorage.removeItem('theaterId');
     delete axios.defaults.headers.common.Authorization;
   }
 };
@@ -68,7 +73,15 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
             return;
           }
 
-          setSession(serviceToken);
+          const theaterId = decoded.theater_id || decoded.theaterId || null;
+          let theater = null;
+          if (theaterId) {
+            const theaterRes = await getTheaterById(Number(theaterId));
+            if (theaterRes.status === 200) {
+              theater = theaterRes.data;
+            }
+          }
+          setSession(serviceToken, theaterId);
           dispatch({
             type: LOGIN,
             payload: {
@@ -76,7 +89,9 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
               user: {
                 id: decoded.id || '',
                 name: decoded.sub || '',
-                role: decoded.scope || ''
+                role: decoded.scope || '',
+                theaterId: theaterId,
+                theater: theater
               }
             }
           });
@@ -117,15 +132,30 @@ export const JWTProvider = ({ children }: { children: React.ReactElement }) => {
         throw new Error('Tài khoản không có quyền truy cập vào hệ thống.');
       }
 
-      setSession(token);
+      const theaterId = decoded.theater_id || decoded.theaterId || null;
+      let theater = null;
+      if (theaterId) {
+        const theaterRes = await getTheaterById(Number(theaterId));
+        if (theaterRes.status === 200) {
+          theater = theaterRes.data;
+        }
+      }
+      setSession(token, theaterId);
+
+      const user = data?.data?.user || data?.user || {
+        id: decoded.id || '',
+        name: decoded.sub || authInfo.username,
+        role: decoded.scope || ''
+      };
+
       dispatch({
         type: LOGIN,
         payload: {
           isLoggedIn: true,
-          user: data?.data?.user || data?.user || {
-            id: decoded.id || '',
-            name: decoded.sub || authInfo.username,
-            role: decoded.scope || ''
+          user: {
+            ...user,
+            theaterId,
+            theater
           }
         }
       });

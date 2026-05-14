@@ -61,35 +61,28 @@ import {
 // project-imports
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
-import { deleteById, getList, getListByTheaterId } from 'api/showtime';
+import { getList, getListByTheaterId } from 'api/booking';
 
 import EmptyTable from 'components/third-party/react-table/EmptyTable';
 import HeaderSort from 'components/third-party/react-table/HeaderSort';
 import RowEditable from 'components/third-party/react-table/RowEditable';
 
 // assets
-import { Add, ArrowDown2, ArrowRight2, Command, Edit2, Eye, Lock, TableDocument, Trash } from 'iconsax-reactjs';
+import { ArrowDown2, ArrowRight2, Command, Eye, TableDocument } from 'iconsax-reactjs';
 import { DEFAULT_PAGE_SIZE, PageRequest } from 'types/paging';
+import type { Booking } from 'types/booking';
 import {
     Alert,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     FormControl,
     Grid,
-    Snackbar
+    Snackbar,
+    TextField
 } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
-import { Showtime } from 'types/showtime';
-import formatDate from 'utils/formatDateTime';
-import { formatTime } from 'utils/formatDateTime';
 
-const fuzzyFilter: FilterFn<Showtime> = (row, columnId, value, addMeta) => {
+const fuzzyFilter: FilterFn<Booking> = (row, columnId, value, addMeta) => {
     // rank the item
     const itemRank = rankItem(row.getValue(columnId), value);
 
@@ -103,91 +96,22 @@ const fuzzyFilter: FilterFn<Showtime> = (row, columnId, value, addMeta) => {
 // ==============================|| REACT TABLE - EDIT ACTION ||============================== //
 
 function EditAction({
-    row,
-    reload,
-    setReload,
-    setAlert
+    row
 }: {
-    row: Row<Showtime>;
-    reload: boolean;
-    setReload: (e: boolean) => void;
-    setAlert: React.Dispatch<
-        React.SetStateAction<{
-            open: boolean;
-            message: string;
-            severity: 'success' | 'error' | 'info' | 'warning';
-        }>
-    >;
+    row: Row<Booking>;
 }) {
     const navigate = useNavigate();
     const intl = useIntl();
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const isManager = user?.role?.toUpperCase() === 'MANAGER';
-    const [openDelete, setOpenDelete] = useState(false);
-
-    const handleDelete = async () => {
-        const response = await deleteById(Number(row.original.id));
-
-        if (response.status == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: intl.formatMessage({ id: 'delete-showtime-success' }), severity: 'success' });
-            setReload(!reload);
-        } else if (response.status == HttpStatusCode.Unauthorized) {
-            logout();
-        } else if (response.status == HttpStatusCode.UnprocessableEntity) {
-            setAlert({ open: true, message: response.data, severity: 'error' });
-        } else {
-            setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
-        }
-
-        setOpenDelete(false);
-    };
 
     return (
         <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-            <Tooltip title={intl.formatMessage({ id: 'detail-showtime' })}>
-                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/showtime/detail/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
+            <Tooltip title={intl.formatMessage({ id: 'detail-booking', defaultMessage: 'Detail' })}>
+                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/booking/detail/${row.id}`)}>
                     <Eye variant="Outline" />
                 </IconButton>
             </Tooltip>
-
-            <Tooltip title={intl.formatMessage({ id: 'edit-showtime' })}>
-                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/showtime/edit/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
-                    <Edit2 variant="Outline" />
-                </IconButton>
-            </Tooltip>
-
-            <Tooltip title={intl.formatMessage({ id: 'delete-showtime' })}>
-                <IconButton color="error" onClick={() => setOpenDelete(true)} disabled={row.original.status === 'INACTIVE'}>
-                    <Trash variant="Outline" />
-                </IconButton>
-            </Tooltip>
-
-            <Dialog
-                open={openDelete}
-                onClose={() => setOpenDelete(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {intl.formatMessage({ id: 'delete-showtime-confirm' })}
-                </DialogTitle>
-
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        {intl.formatMessage({ id: 'delete-showtime-description' })}
-                    </DialogContentText>
-                </DialogContent>
-
-                <DialogActions>
-                    <Button variant="contained" color="primary" onClick={() => setOpenDelete(false)}>
-                        {intl.formatMessage({ id: 'cancel' })}
-                    </Button>
-
-                    <Button variant="contained" color="error" onClick={() => handleDelete()} autoFocus>
-                        {intl.formatMessage({ id: 'confirm' })}
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Stack>
     );
 }
@@ -299,11 +223,11 @@ function DraggableRow({ row }: { row: Row<any> }) {
 
 // ==============================|| REACT TABLE - MAIN ||============================== //
 
-export default function ShowtimePage() {
+export default function BookingPage() {
     const { logout, user } = useAuth();
     const intl = useIntl();
-    const [reload, setReload] = useState(false);
-    const columns = useMemo<ColumnDef<Showtime>[]>(
+    const [reload] = useState(false);
+    const columns = useMemo<ColumnDef<Booking>[]>(
         () => [
             {
                 id: 'id',
@@ -316,79 +240,77 @@ export default function ShowtimePage() {
                 meta: { className: 'cell-center' }
             },
             {
-                id: 'movieName',
-                header: intl.formatMessage({ id: 'movie-name' }),
-                accessorKey: 'movieName',
+                id: 'code',
+                header: intl.formatMessage({ id: 'booking-code', defaultMessage: 'Code' }),
+                accessorKey: 'code',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '15%' }
             },
             {
-                id: 'showDate',
-                header: intl.formatMessage({ id: 'show-date' }),
-                accessorKey: 'showDate',
-                dataType: 'date',
-                enableGrouping: false,
-                cell: (cell) => { return formatDate(cell.getValue() as string) },
-                meta: { width: '35%' }
-            },
-            {
-                id: 'startTime',
-                header: intl.formatMessage({ id: 'start-time' }),
-                accessorKey: 'startTime',
-                dataType: 'time',
-                enableGrouping: false,
-                cell: (cell) => { return formatTime(cell.getValue() as string) },
-                meta: { width: '35%' }
-            },
-            {
-                id: 'roomName',
-                header: intl.formatMessage({ id: 'room-name' }),
-                accessorKey: 'roomName',
+                id: 'username',
+                header: intl.formatMessage({ id: 'username', defaultMessage: 'Username' }),
+                accessorKey: 'username',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '20%' }
             },
             {
-                id: 'theaterName',
-                header: intl.formatMessage({ id: 'theater-name' }),
-                accessorKey: 'theaterName',
+                id: 'chair',
+                header: intl.formatMessage({ id: 'chair', defaultMessage: 'Chair' }),
+                accessorKey: 'chair',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '15%' }
             },
             {
-                id: 'status',
-                header: intl.formatMessage({ id: 'status' }),
-                accessorKey: 'status',
+                id: 'totalPrice',
+                header: intl.formatMessage({ id: 'total-price', defaultMessage: 'Total Price' }),
+                accessorKey: 'totalPrice',
+                dataType: 'text',
+                enableGrouping: false,
                 cell: (cell) => {
-                    const { status } = cell.row.original;
-
+                    const price = cell.getValue() as number;
+                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+                },
+                meta: { width: '15%' }
+            },
+            {
+                id: 'paymentStatus',
+                header: intl.formatMessage({ id: 'payment-status', defaultMessage: 'Payment Status' }),
+                accessorKey: 'paymentStatus',
+                cell: ({ row }) => {
+                    const booking = row.original;
                     return (
                         <Chip
                             label={
-                                status === 'ACTIVE' ? intl.formatMessage({ id: 'active' }) : status === 'INACTIVE' ? intl.formatMessage({ id: 'inactive' }) : 'UNKNOWN'
+                                (booking.paymentStatus || '').toUpperCase() === 'DONE' ? intl.formatMessage({ id: 'done', defaultMessage: 'Done' })
+                                    : (booking.paymentStatus || '').toUpperCase() === 'PENDING' ? intl.formatMessage({ id: 'pending', defaultMessage: 'Pending' })
+                                        : (booking.paymentStatus || '').toUpperCase() === 'FAILED' || (booking.paymentStatus || '').toUpperCase() === 'CANCELLED' ? intl.formatMessage({ id: 'cancelled', defaultMessage: 'Cancelled' })
+                                            : booking.paymentStatus
                             }
-                            color={status === 'ACTIVE' ? 'success' : 'error'}
+                            color={(booking.paymentStatus || '').toUpperCase() === 'DONE' ? 'success' : (booking.paymentStatus || '').toUpperCase() === 'FAILED' || (booking.paymentStatus || '').toUpperCase() === 'CANCELLED' ? 'error' : 'warning'}
+                            size="medium"
+                            sx={{ fontWeight: 'bold', px: 1 }}
                         />
                     );
                 },
                 dataType: 'select',
                 enableGrouping: false,
-                meta: { width: '20%' }
+                meta: { width: '15%' }
             },
             {
                 id: 'edit',
-                header: intl.formatMessage({ id: 'action' }),
-                cell: ({ row }) => <EditAction row={row} reload={reload} setReload={setReload} setAlert={setAlert} />,
+                header: intl.formatMessage({ id: 'action', defaultMessage: 'Action' }),
+                cell: ({ row }) => <EditAction row={row} />,
                 enableGrouping: false,
                 meta: { className: 'cell-center', width: '10%' }
             }
         ],
-        [intl, reload]
+        [intl]
     );
     let options: number[] = [10, 25, 50, 100];
-    const [data, setData] = useState<Showtime[]>([]);
+    const [data, setData] = useState<Booking[]>([]);
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [pageNumber, setPageNumber] = useState(0);
@@ -397,14 +319,13 @@ export default function ShowtimePage() {
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: ''
+        paymentStatus: ''
     });
     const [alert, setAlert] = useState({
         open: false,
         message: '',
         severity: 'success' as 'success' | 'error' | 'info' | 'warning'
     });
-    const navigate = useNavigate();
     const location = useLocation();
     const [columnOrder, setColumnOrder] = useState<string[]>(() => columns.map((c) => c.id!));
 
@@ -422,31 +343,35 @@ export default function ShowtimePage() {
     const [selectedRow, setSelectedRow] = useState({});
 
     const handleChangePageSize = (event: SelectChangeEvent<number>) => {
-        setPageRequest((prev) => ({ ...prev, size: event.target.value, page: 0 }));
+        setPageRequest((prev) => ({ ...prev, size: Number(event.target.value), page: 0 }));
     };
 
     useEffect(() => {
-        const fetchShowtimes = async () => {
+        const fetchBookings = async () => {
             let response;
             if (user?.role?.toUpperCase() === 'MANAGER' && user?.theaterId) {
                 response = await getListByTheaterId(Number(user.theaterId), pageRequest);
             } else {
                 response = await getList(pageRequest);
             }
-
-            if (response.status === HttpStatusCode.Ok) {
-                setData(response.data.content);
-                setTotalPages(response.data.totalPages);
-                setTotalElements(response.data.totalElements);
-                setPageNumber(response.data.pageable.pageNumber);
-            } else if (response.status === HttpStatusCode.Unauthorized) {
+            if (response?.status === HttpStatusCode.Ok) {
+                const respData = response.data;
+                if (respData.content) {
+                    setData(respData.content);
+                    setTotalPages(respData.totalPages);
+                    setTotalElements(respData.totalElements);
+                    setPageNumber(respData.pageable ? respData.pageable.pageNumber : 0);
+                }
+            } else if (response?.status === HttpStatusCode.Unauthorized) {
                 logout();
+            } else if (response?.code === "ERR_NETWORK" || response?.name === "AxiosError") {
+                setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error', defaultMessage: 'Unknown Error' }), severity: 'error' });
             } else {
-                setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
+                setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error', defaultMessage: 'Unknown Error' }), severity: 'error' });
             }
         };
 
-        fetchShowtimes();
+        fetchBookings();
     }, [pageRequest, intl, logout, reload]);
 
     useEffect(() => {
@@ -461,7 +386,7 @@ export default function ShowtimePage() {
         columns,
         manualPagination: true,
         defaultColumn: { cell: RowEditable },
-        getRowId: (row: Showtime) => (row.id ?? '').toString(),
+        getRowId: (row: Booking) => (row.id ?? '').toString(),
         state: { rowSelection, columnFilters, sorting, grouping, columnOrder, columnVisibility },
         enableRowSelection: true,
         onRowSelectionChange: setRowSelection,
@@ -490,13 +415,13 @@ export default function ShowtimePage() {
             setSelectedRow,
             revertData: (rowIndex: number, revert: unknown) => {
                 if (revert) {
-                    setData((old: Showtime[]) => old.map((row, index) => (index === rowIndex ? originalData[rowIndex] : row)));
+                    setData((old: Booking[]) => old.map((row, index) => (index === rowIndex ? originalData[rowIndex] : row)));
                 } else {
                     setOriginalData((old) => old.map((row, index) => (index === rowIndex ? data[rowIndex] : row)));
                 }
             },
             updateData: (rowIndex, columnId, value) => {
-                setData((old: Showtime[]) =>
+                setData((old: Booking[]) =>
                     old.map((row, index) => {
                         if (index === rowIndex) {
                             return { ...old[rowIndex]!, [columnId]: value };
@@ -554,21 +479,9 @@ export default function ShowtimePage() {
                 })}
             >
                 <Typography variant="h3" gutterBottom>
-                    <FormattedMessage id="showtime-list" />
+                    <FormattedMessage id="booking-list" defaultMessage="Booking List" />
                 </Typography>
 
-                <Button
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                    variant="contained"
-                    onClick={() => navigate(`/${user?.role?.toUpperCase() === 'MANAGER' ? 'manager' : 'admin'}/showtime/add`)}
-                    startIcon={<Add />}
-                >
-                    <FormattedMessage id="add-showtime" />
-                </Button>
             </Stack>
 
             <MainCard content={false}>
@@ -590,7 +503,7 @@ export default function ShowtimePage() {
                             px: 2
                         }}
                     >
-                        {alert?.message || intl.formatMessage({ id: 'no-notification' })}
+                        {alert?.message || intl.formatMessage({ id: 'no-notification', defaultMessage: 'No notification' })}
                     </Alert>
                 </Snackbar>
 
@@ -612,7 +525,7 @@ export default function ShowtimePage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={intl.formatMessage({ id: 'search-showtime-placeholder' })}
+                            placeholder={intl.formatMessage({ id: 'search-booking-placeholder', defaultMessage: 'Search booking...' })}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {
@@ -626,27 +539,52 @@ export default function ShowtimePage() {
                             }}
                         />
 
+                        <TextField
+                            label={intl.formatMessage({ id: 'from-date', defaultMessage: 'Từ ngày' })}
+                            type="date"
+                            size="medium"
+                            value={pageRequest.startDate || ''}
+                            onChange={(e) => setPageRequest({ ...pageRequest, page: 0, startDate: e.target.value })}
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{ max: pageRequest.endDate || undefined }}
+                            sx={{ minWidth: 155 }}
+                        />
+
+                        <TextField
+                            label={intl.formatMessage({ id: 'to-date', defaultMessage: 'Đến ngày' })}
+                            type="date"
+                            size="medium"
+                            value={pageRequest.endDate || ''}
+                            onChange={(e) => setPageRequest({ ...pageRequest, page: 0, endDate: e.target.value })}
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: pageRequest.startDate || undefined }}
+                            sx={{ minWidth: 155 }}
+                        />
+
                         <Select
-                            value={pageRequest.status}
-                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, status: event.target.value })}
+                            value={pageRequest.paymentStatus || ''}
+                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, paymentStatus: event.target.value })}
                             displayEmpty
                             input={<OutlinedInput />}
-                            slotProps={{ input: { 'aria-label': 'Status Filter' } }}
+                            slotProps={{ input: { 'aria-label': 'Payment Status Filter' } }}
                         >
                             <MenuItem value="">
-                                <FormattedMessage id="status" />
+                                <FormattedMessage id="payment-status" defaultMessage="Payment Status" />
                             </MenuItem>
-                            <MenuItem value="ACTIVE">
-                                <FormattedMessage id="active" />
+                            <MenuItem value="DONE">
+                                <FormattedMessage id="done" defaultMessage="Done" />
                             </MenuItem>
-                            <MenuItem value="INACTIVE">
-                                <FormattedMessage id="inactive" />
+                            <MenuItem value="PENDING">
+                                <FormattedMessage id="pending" defaultMessage="Pending" />
+                            </MenuItem>
+                            <MenuItem value="CANCELLED">
+                                <FormattedMessage id="cancelled" defaultMessage="Cancelled" />
                             </MenuItem>
                         </Select>
                     </Stack>
 
                     <Typography variant="caption" color="secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-                        <FormattedMessage id="total" />: {totalElements} <FormattedMessage id="records" />
+                        <FormattedMessage id="total" defaultMessage="Total" />: {totalElements} <FormattedMessage id="records" defaultMessage="records" />
                     </Typography>
                 </Stack>
 
@@ -690,7 +628,7 @@ export default function ShowtimePage() {
                                     ) : (
                                         <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                                             <TableCell colSpan={table.getAllColumns().length}>
-                                                <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
+                                                <EmptyTable msg={intl.formatMessage({ id: 'no-data', defaultMessage: 'No data' })} />
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -707,7 +645,7 @@ export default function ShowtimePage() {
                         <Stack direction="row" sx={{ gap: 1, alignItems: 'center', marginLeft: 2 }}>
                             <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
                                 <Typography variant="caption" color="secondary">
-                                    <FormattedMessage id="row-per-page" />
+                                    <FormattedMessage id="row-per-page" defaultMessage="Rows per page" />
                                 </Typography>
 
                                 <FormControl sx={{ m: 1 }}>

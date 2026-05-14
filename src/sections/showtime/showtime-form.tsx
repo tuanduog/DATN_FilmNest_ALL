@@ -25,6 +25,8 @@ import { Room } from 'types/room';
 import MovieDialog from './movie-dialog';
 import TheaterDialog from './theater-dialog';
 import RoomDialog from './room-dialog';
+import useAuth from 'hooks/useAuth';
+import { getById as getTheaterById } from 'api/theater';
 
 interface ShowtimeFormProps {
     handleNext: () => void;
@@ -42,6 +44,8 @@ const validationSchema = (intl: any) => Yup.object({
 
 export default function ShowtimeForm({ handleNext, setShowtime, showtime }: ShowtimeFormProps) {
     const intl = useIntl();
+    const { user } = useAuth();
+    const isManager = user?.role?.toUpperCase() === 'MANAGER';
     const [selectedTheater, setSelectedTheater] = useState<Theater | null>(showtime.theaterId ? { id: showtime.theaterId, name: showtime.theaterName } as any : null);
     const [selectedMovie, setSelectedMovie] = useState<Movie | null>(showtime.movieId ? { id: showtime.movieId, name: showtime.movieName } as any : null);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(showtime.roomId ? { id: showtime.roomId, name: showtime.roomName } as any : null);
@@ -70,6 +74,18 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
             handleNext();
         }
     });
+
+    useEffect(() => {
+        const fetchDefaultTheater = async () => {
+            if (isManager && user?.theaterId && !selectedTheater) {
+                const response = await getTheaterById(Number(user.theaterId));
+                if (response.status === 200) {
+                    setSelectedTheater(response.data);
+                }
+            }
+        };
+        fetchDefaultTheater();
+    }, [isManager, user?.theaterId, selectedTheater]);
 
     return (
         <Box>
@@ -112,17 +128,25 @@ export default function ShowtimeForm({ handleNext, setShowtime, showtime }: Show
                                     size="small"
                                     placeholder={intl.formatMessage({ id: 'select-theater' })}
                                     value={selectedTheater?.name || ''}
-                                    onClick={() => setOpenTheaterDialog(true)}
+                                    onClick={() => !isManager && setOpenTheaterDialog(true)}
                                     autoComplete="off"
                                     slotProps={{
                                         input: {
                                             readOnly: true,
-                                            endAdornment: (
+                                            endAdornment: !isManager && (
                                                 <InputAdornment position="end">
                                                     <ArrowDropDownIcon />
                                                 </InputAdornment>
                                             )
                                         }
+                                    }}
+                                    sx={{
+                                        ...(isManager && {
+                                            '& .MuiOutlinedInput-root': {
+                                                backgroundColor: 'action.hover',
+                                                '& fieldset': { border: 'none' }
+                                            }
+                                        })
                                     }}
                                 />
                             </Grid>

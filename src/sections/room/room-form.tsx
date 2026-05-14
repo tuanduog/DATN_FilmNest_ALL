@@ -16,13 +16,15 @@ import {
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AnimateButton from 'components/@extended/AnimateButton';
 import TheaterDialog from './theater-dialog';
 import { Theater } from 'types/theater';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Room } from 'types/room';
 import { useIntl, FormattedMessage } from 'react-intl';
+import useAuth from 'hooks/useAuth';
+import { getById as getTheaterById } from 'api/theater';
 
 interface RoomFormProps {
     handleNext: () => void;
@@ -38,6 +40,8 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
         severity: 'success' as 'success' | 'error' | 'info' | 'warning'
     });
     const [openTheaterDialog, setOpenTheaterDialog] = useState<boolean>(false);
+    const { user } = useAuth();
+    const isManager = user?.role?.toUpperCase() === 'MANAGER';
 
     const validationSchema = Yup.object({
         name: Yup.string().required(intl.formatMessage({ id: 'room-name-required' })),
@@ -54,6 +58,19 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
             handleNext();
         }
     });
+
+    useEffect(() => {
+        const fetchDefaultTheater = async () => {
+            if (isManager && user?.theaterId && !formik.values.theaterId) {
+                const response = await getTheaterById(Number(user.theaterId));
+                if (response.status === 200) {
+                    formik.setFieldValue('theaterId', response.data.id);
+                    formik.setFieldValue('theaterName', response.data.name);
+                }
+            }
+        };
+        fetchDefaultTheater();
+    }, [isManager, user?.theaterId, formik]);
 
     if (Object.keys(formik.errors).length > 0 && formik.submitCount > 0) {
         console.log('Validation Errors:', formik.errors);
@@ -118,7 +135,7 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                                     <FormattedMessage id="belong-to-theater" />
                                 </InputLabel>
                                 <Box
-                                    onClick={() => setOpenTheaterDialog(true)}
+                                    onClick={() => !isManager && setOpenTheaterDialog(true)}
                                     sx={{
                                         border: formik.touched.theaterId && formik.errors.theaterId
                                             ? '1px solid #d32f2f'
@@ -129,10 +146,12 @@ export default function RoomForm({ handleNext, setRoom, room }: RoomFormProps) {
                                         justifyContent: 'space-between',
                                         px: 1,
                                         py: 0.5,
-                                        cursor: 'pointer',
+                                        cursor: isManager ? 'default' : 'pointer',
                                         fontSize: 12,
                                         height: 36.3,
-                                        userSelect: 'none'
+                                        userSelect: 'none',
+                                        bgcolor: isManager ? 'action.hover' : 'inherit',
+                                        opacity: isManager ? 0.8 : 1
                                     }}
                                 >
                                     {formik.values.theaterName ? (
