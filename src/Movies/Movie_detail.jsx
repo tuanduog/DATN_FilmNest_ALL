@@ -9,6 +9,8 @@ import CommentItem from './CommentItem';
 import { useParams } from 'react-router-dom';
 import ShowtimePopup from '../Home/Showtime-popup';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import { containsProfanity, filterProfanity } from '../utils/profanityFilter';
 
 function Movie_detail() {
     const { t, i18n } = useTranslation();
@@ -168,8 +170,11 @@ function Movie_detail() {
 
         if (!content || !content.trim()) return;
 
+        // Tự động che từ ngữ không phù hợp thay vì chặn
+        const safeContent = filterProfanity(content);
+
         const mess = {
-            content: content,
+            content: safeContent,
             level: level,
             parentId: parentId,
             userId: user.userId,

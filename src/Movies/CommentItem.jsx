@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import './CommentItem.css';
+import { filterProfanity } from '../utils/profanityFilter';
 
 function ChildReactionButtons({ child, client }) {
     const [likeCount, setLikeCount] = useState(child.likeCount ?? 0);
     const [dislikeCount, setDislikeCount] = useState(child.dislikeCount ?? 0);
     const [reaction, setReaction] = useState(child.myReaction ?? null);
 
-    // Sync khi WebSocket cập nhật props từ parent
     useEffect(() => { setLikeCount(child.likeCount ?? 0); }, [child.likeCount]);
     useEffect(() => { setDislikeCount(child.dislikeCount ?? 0); }, [child.dislikeCount]);
     useEffect(() => { setReaction(child.myReaction ?? null); }, [child.myReaction]);
@@ -159,7 +159,7 @@ function CommentItem({ cmt, handleCmt, messSub, setMessSub, messWtag, setMesWtag
                     </div>
 
                     {/* Content */}
-                    <p className="comment-content">{cmt.content}</p>
+                    <p className="comment-content">{filterProfanity(cmt.content)}</p>
 
                     {/* Actions */}
                     <div className="comment-actions">
@@ -226,7 +226,7 @@ function CommentItem({ cmt, handleCmt, messSub, setMessSub, messWtag, setMesWtag
                                             <span className="comment-username">{child.userName}</span>
                                             <span className="comment-time">{timeAgo(child.createdAt)}</span>
                                         </div>
-                                        <p className="comment-content">{toBlue(child.content)}</p>
+                                        <p className="comment-content">{toBlue(filterProfanity(child.content))}</p>
 
                                         {/* Child actions */}
                                         <div className="comment-actions">
