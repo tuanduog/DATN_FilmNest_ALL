@@ -49,6 +49,7 @@ import {
     getTheaterChart,
     getLastSummary,
 } from 'api/report';
+import { useIntl } from 'react-intl';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -109,7 +110,7 @@ interface LastSummary {
 // Custom Tooltip
 // ---------------------------------------------------------------------------
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, intl }: any) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload;
         return (
@@ -118,16 +119,16 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                     {data.date || data.name || label}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'primary.main', fontWeight: 600 }}>
-                    Doanh thu: {formatCurrency(data.revenue ?? 0)}
+                    {intl.formatMessage({ id: 'revenue' })}: {formatCurrency(data.revenue ?? 0)}
                 </Typography>
                 {data.tickets !== undefined && (
                     <Typography variant="body2" sx={{ color: 'warning.main', fontWeight: 600, mt: 0.5 }}>
-                        Số vé: {data.tickets}
+                        {intl.formatMessage({ id: 'ticket-count' })}: {data.tickets}
                     </Typography>
                 )}
                 {data.occupancy !== undefined && (
                     <Typography variant="body2" sx={{ color: 'error.main', fontWeight: 600, mt: 0.5 }}>
-                        Công suất: {data.occupancy}%
+                        {intl.formatMessage({ id: 'occupancy' })}: {data.occupancy}%
                     </Typography>
                 )}
             </Box>
@@ -142,6 +143,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function AdminDashboard() {
     const theme = useTheme();
+    const intl = useIntl();
 
     // --- Filters ---
     const [timeFilter, setTimeFilter] = useState('week');
@@ -204,7 +206,7 @@ export default function AdminDashboard() {
             setTheaterChart(Array.isArray(theater?.data) ? theater?.data : []);
             setLastSummary(lastSum?.data || null);
         } catch (err: any) {
-            setError('Không thể tải dữ liệu. Vui lòng thử lại.');
+            setError(intl.formatMessage({ id: 'fetch-error' }));
         } finally {
             setLoading(false);
         }
@@ -247,31 +249,31 @@ export default function AdminDashboard() {
 
     const getChartGranularityLabel = () => {
         switch (timeFilter) {
-            case 'today': return 'theo giờ';
-            case 'week': return 'theo ngày';
-            case 'month': return 'theo tuần';
-            case 'year': return 'theo tháng';
+            case 'today': return intl.formatMessage({ id: 'hourly' });
+            case 'week': return intl.formatMessage({ id: 'daily' });
+            case 'month': return intl.formatMessage({ id: 'weekly' });
+            case 'year': return intl.formatMessage({ id: 'monthly' });
             case 'custom': {
                 if (fromDate && toDate) {
                     const d = Math.ceil((new Date(toDate).getTime() - new Date(fromDate).getTime()) / 86400000);
-                    if (d <= 1) return 'theo giờ';
-                    if (d <= 31) return 'theo ngày';
-                    if (d <= 90) return 'theo tuần';
-                    return 'theo tháng';
+                    if (d <= 1) return intl.formatMessage({ id: 'hourly' });
+                    if (d <= 31) return intl.formatMessage({ id: 'daily' });
+                    if (d <= 90) return intl.formatMessage({ id: 'weekly' });
+                    return intl.formatMessage({ id: 'monthly' });
                 }
-                return 'theo ngày';
+                return intl.formatMessage({ id: 'daily' });
             }
-            default: return 'theo ngày';
+            default: return intl.formatMessage({ id: 'daily' });
         }
     };
 
     const getFilterLabel = () => {
         switch (timeFilter) {
-            case 'today': return 'Hôm nay';
-            case 'week': return 'Tuần này';
-            case 'month': return 'Tháng này';
-            case 'year': return 'Năm nay';
-            case 'custom': return fromDate && toDate ? `${fromDate} → ${toDate}` : 'Tùy chỉnh';
+            case 'today': return intl.formatMessage({ id: 'today' });
+            case 'week': return intl.formatMessage({ id: 'this-week' });
+            case 'month': return intl.formatMessage({ id: 'this-month' });
+            case 'year': return intl.formatMessage({ id: 'this-year' });
+            case 'custom': return fromDate && toDate ? `${fromDate} → ${toDate}` : intl.formatMessage({ id: 'custom' });
             default: return '';
         }
     };
@@ -316,7 +318,7 @@ export default function AdminDashboard() {
                                     </>
                                 )}
                                 <Typography variant="body2" color="textSecondary">
-                                    {trend ? 'so với kỳ trước' : getFilterLabel()}
+                                    {trend ? intl.formatMessage({ id: 'vs-previous-period' }) : getFilterLabel()}
                                 </Typography>
                             </Box>
                         </Box>
@@ -353,35 +355,35 @@ export default function AdminDashboard() {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
                 <Box>
                     <Typography variant="h3" component="h1" fontWeight="800" sx={{ mb: 0.5 }}>
-                        Thống kê hệ thống
+                        {intl.formatMessage({ id: 'system-stats' })}
                     </Typography>
                     <Typography variant="body1" color="textSecondary">
-                        Theo dõi hiệu suất kinh doanh rạp chiếu phim FilmNest
+                        {intl.formatMessage({ id: 'system-stats-desc' })}
                     </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
                     <FormControl sx={{ minWidth: 180 }} size="small">
-                        <InputLabel id="time-filter-label">Kỳ báo cáo</InputLabel>
+                        <InputLabel id="time-filter-label">{intl.formatMessage({ id: 'report-period' })}</InputLabel>
                         <Select
                             labelId="time-filter-label"
                             id="time-filter"
                             value={timeFilter}
-                            label="Kỳ báo cáo"
+                            label={intl.formatMessage({ id: 'report-period' })}
                             onChange={handleTimeChange}
                             sx={{ borderRadius: 2, bgcolor: 'background.paper' }}
                         >
-                            <MenuItem value="today">Hôm nay</MenuItem>
-                            <MenuItem value="week">Tuần này</MenuItem>
-                            <MenuItem value="month">Tháng này</MenuItem>
-                            <MenuItem value="year">Năm nay</MenuItem>
-                            <MenuItem value="custom">Tùy chỉnh</MenuItem>
+                            <MenuItem value="today">{intl.formatMessage({ id: 'today' })}</MenuItem>
+                            <MenuItem value="week">{intl.formatMessage({ id: 'this-week' })}</MenuItem>
+                            <MenuItem value="month">{intl.formatMessage({ id: 'this-month' })}</MenuItem>
+                            <MenuItem value="year">{intl.formatMessage({ id: 'this-year' })}</MenuItem>
+                            <MenuItem value="custom">{intl.formatMessage({ id: 'custom' })}</MenuItem>
                         </Select>
                     </FormControl>
                     <Collapse in={timeFilter === 'custom'} orientation="horizontal">
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                             <TextField
                                 id="from-date"
-                                label="Từ ngày"
+                                label={intl.formatMessage({ id: 'from-date' })}
                                 type="date"
                                 size="small"
                                 value={fromDate}
@@ -393,7 +395,7 @@ export default function AdminDashboard() {
                             <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 600 }}>—</Typography>
                             <TextField
                                 id="to-date"
-                                label="Đến ngày"
+                                label={intl.formatMessage({ id: 'to-date' })}
                                 type="date"
                                 size="small"
                                 value={toDate}
@@ -409,7 +411,7 @@ export default function AdminDashboard() {
                                 onClick={handleApplyCustom}
                                 sx={{ borderRadius: 2, whiteSpace: 'nowrap', height: 40 }}
                             >
-                                Áp dụng
+                                {intl.formatMessage({ id: 'apply' })}
                             </Button>
                         </Box>
                     </Collapse>
@@ -426,16 +428,16 @@ export default function AdminDashboard() {
             {/* KPI Cards */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderKpiCard('Tổng Doanh Thu', formatCurrency(totalRevenue), <AttachMoney fontSize="large" />, 'primary', revTrend)}
+                    {renderKpiCard(intl.formatMessage({ id: 'total-revenue' }), formatCurrency(totalRevenue), <AttachMoney fontSize="large" />, 'primary', revTrend)}
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderKpiCard('Vé Đã Bán', totalTickets.toLocaleString('vi-VN'), <LocalPlay fontSize="large" />, 'info', tickTrend)}
+                    {renderKpiCard(intl.formatMessage({ id: 'tickets-sold' }), totalTickets.toLocaleString('vi-VN'), <LocalPlay fontSize="large" />, 'info', tickTrend)}
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderKpiCard('Combo Đã Bán', totalComboCount.toLocaleString('vi-VN'), <Fastfood fontSize="large" />, 'warning', comboTrend)}
+                    {renderKpiCard(intl.formatMessage({ id: 'combos-sold' }), totalComboCount.toLocaleString('vi-VN'), <Fastfood fontSize="large" />, 'warning', comboTrend)}
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    {renderKpiCard('Công Suất TB', `${avgOccupancy}%`, <EventSeat fontSize="large" />, 'error', occTrend)}
+                    {renderKpiCard(intl.formatMessage({ id: 'avg-occupancy' }), `${avgOccupancy}%`, <EventSeat fontSize="large" />, 'error', occTrend)}
                 </Grid>
             </Grid>
 
@@ -446,7 +448,7 @@ export default function AdminDashboard() {
                     <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
                         <CardContent>
                             <Typography variant="h6" fontWeight="bold" mb={3}>
-                                Biến Động Doanh Thu &amp; Vé ({getFilterLabel()} — {getChartGranularityLabel()})
+                                {intl.formatMessage({ id: 'revenue-ticket-trend' })} ({getFilterLabel()} — {getChartGranularityLabel()})
                             </Typography>
                             <Box sx={{ height: 350, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 {loading ? (
@@ -463,9 +465,9 @@ export default function AdminDashboard() {
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                             <XAxis dataKey="date" axisLine={false} tickLine={false} />
                                             <YAxis axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000000}M`} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
+                                            <Tooltip content={<CustomTooltip intl={intl} />} cursor={{ strokeDasharray: '3 3' }} />
                                             <Legend iconType="circle" />
-                                            <Area type="monotone" dataKey="revenue" name="Doanh thu" stroke={theme.palette.primary.main} strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                                            <Area type="monotone" dataKey="revenue" name={intl.formatMessage({ id: 'revenue' })} stroke={theme.palette.primary.main} strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 )}
@@ -478,7 +480,7 @@ export default function AdminDashboard() {
                 <Grid size={{ xs: 12, lg: 4 }}>
                     <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
                         <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                            <Typography variant="h6" fontWeight="bold" mb={1}>Cơ Cấu Doanh Thu</Typography>
+                            <Typography variant="h6" fontWeight="bold" mb={1}>{intl.formatMessage({ id: 'revenue-structure' })}</Typography>
                             <Box sx={{ flexGrow: 1, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 {loading ? (
                                     <CircularProgress />
@@ -520,8 +522,8 @@ export default function AdminDashboard() {
                     <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
                         <CardContent>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                                <Typography variant="h6" fontWeight="bold">Top Phim Doanh Thu Cao Nhất</Typography>
-                                <Button size="small" variant="text">Xem tất cả</Button>
+                                <Typography variant="h6" fontWeight="bold">{intl.formatMessage({ id: 'top-revenue-movies' })}</Typography>
+                                <Button size="small" variant="text">{intl.formatMessage({ id: 'view-all' })}</Button>
                             </Box>
                             <Box sx={{ height: 350, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 {loading ? (
@@ -532,8 +534,8 @@ export default function AdminDashboard() {
                                             <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                                             <XAxis type="number" hide />
                                             <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={160} tick={{ fontSize: 12, fontWeight: 500 }} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
-                                            <Bar dataKey="revenue" name="Doanh thu" fill={theme.palette.primary.main} radius={[0, 4, 4, 0]} barSize={24} />
+                                            <Tooltip content={<CustomTooltip intl={intl} />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
+                                            <Bar dataKey="revenue" name={intl.formatMessage({ id: 'revenue' })} fill={theme.palette.primary.main} radius={[0, 4, 4, 0]} barSize={24} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 )}
@@ -546,7 +548,7 @@ export default function AdminDashboard() {
                 <Grid size={{ xs: 12, lg: 6 }}>
                     <Card sx={{ height: '100%', borderRadius: 3, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)' }}>
                         <CardContent>
-                            <Typography variant="h6" fontWeight="bold" mb={3}>Hiệu Suất Theo Rạp Chiếu</Typography>
+                            <Typography variant="h6" fontWeight="bold" mb={3}>{intl.formatMessage({ id: 'performance-by-theater' })}</Typography>
                             <Box sx={{ height: 350, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 {loading ? (
                                     <CircularProgress />
@@ -556,9 +558,9 @@ export default function AdminDashboard() {
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                             <XAxis dataKey="name" axisLine={false} tickLine={false} />
                                             <YAxis tickFormatter={(v) => `${v / 1000000}M`} axisLine={false} tickLine={false} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
+                                            <Tooltip content={<CustomTooltip intl={intl} />} cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
                                             <Legend iconType="circle" />
-                                            <Bar dataKey="revenue" name="Doanh thu" fill={theme.palette.primary.main} radius={[4, 4, 0, 0]} barSize={36} />
+                                            <Bar dataKey="revenue" name={intl.formatMessage({ id: 'revenue' })} fill={theme.palette.primary.main} radius={[4, 4, 0, 0]} barSize={36} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 )}

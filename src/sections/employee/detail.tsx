@@ -147,7 +147,7 @@ export default function EmployeeDetail() {
                                 {intl.formatMessage({ id: 'role' })}
                             </InputLabel>
 
-                            <Typography>{employee?.role}</Typography>
+                            <Typography>{employee?.role === "manager" ? intl.formatMessage({ id: 'manager' }) : intl.formatMessage({ id: 'staff' })}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
@@ -174,13 +174,13 @@ export default function EmployeeDetail() {
                             <Typography>{employee?.theaterName}</Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        {/* <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="managerName" sx={{ mb: 1 }}>
                                 {intl.formatMessage({ id: 'direct-manager' })}
                             </InputLabel>
 
                             <Typography>{employee?.managerName}</Typography>
-                        </Grid>
+                        </Grid> */}
                     </Grid>
                 </Box>
 

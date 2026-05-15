@@ -348,11 +348,15 @@ export default function BookingPage() {
 
     useEffect(() => {
         const fetchBookings = async () => {
+            const cleanParams = Object.fromEntries(
+                Object.entries(pageRequest).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+            );
+
             let response;
             if (user?.role?.toUpperCase() === 'MANAGER' && user?.theaterId) {
-                response = await getListByTheaterId(Number(user.theaterId), pageRequest);
+                response = await getListByTheaterId(Number(user.theaterId), cleanParams);
             } else {
-                response = await getList(pageRequest);
+                response = await getList(cleanParams);
             }
             if (response?.status === HttpStatusCode.Ok) {
                 const respData = response.data;

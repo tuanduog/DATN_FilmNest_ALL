@@ -194,7 +194,7 @@ export default function RoomDetail() {
                                 <Box>
                                     <Typography variant="caption" color="textSecondary"><FormattedMessage id="room-type" /></Typography>
                                     <Typography variant="body1" fontWeight={600}>
-                                        {(room.type || '').toUpperCase() === 'STANDARD' ? <FormattedMessage id="standard-2d" /> : (room.type || '').toUpperCase() === 'THREE_D' ? '3D' : room.type}
+                                        {(room.type || '').toUpperCase() === 'STANDARD' ? <FormattedMessage id="standard" /> : (room.type || '').toUpperCase() === 'THREE_D' ? <FormattedMessage id="3D" /> : <FormattedMessage id="IMAX" />}
                                     </Typography>
                                 </Box>
                             </Stack>

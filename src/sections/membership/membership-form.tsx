@@ -191,9 +191,9 @@ export default function MembershipForm({ handleNext, setMembership, membership }
                                                 {intl.formatMessage({ id: 'select-membership-type' })}
                                             </Box>
                                         </MenuItem>
-                                        <MenuItem value="PREMIUM">Premium</MenuItem>
-                                        <MenuItem value="GOLD">Gold</MenuItem>
-                                        <MenuItem value="SILVER">Silver</MenuItem>
+                                        <MenuItem value="PLATINUM">{intl.formatMessage({ id: 'platinum' })}</MenuItem>
+                                        <MenuItem value="GOLD">{intl.formatMessage({ id: 'gold' })}</MenuItem>
+                                        <MenuItem value="SILVER">{intl.formatMessage({ id: 'silver' })}</MenuItem>
                                     </Select>
 
                                     <FormHelperText>

@@ -389,7 +389,8 @@ export default function RoomPage() {
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: ''
+        status: '',
+        type: ''
     });
     const [alert, setAlert] = useState({
         open: false,
@@ -419,11 +420,14 @@ export default function RoomPage() {
 
     useEffect(() => {
         const fetchRooms = async () => {
+            const cleanParams = Object.fromEntries(
+                Object.entries(pageRequest).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+            );
             let response;
             if (user?.role?.toUpperCase() === 'MANAGER' && user?.theaterId) {
-                response = await getListByTheaterId(Number(user.theaterId), pageRequest);
+                response = await getListByTheaterId(Number(user.theaterId), cleanParams);
             } else {
-                response = await getList(pageRequest);
+                response = await getList(cleanParams);
             }
 
             if (response.status === HttpStatusCode.Ok) {
@@ -633,6 +637,27 @@ export default function RoomPage() {
                             </MenuItem>
                             <MenuItem value="INACTIVE">
                                 <FormattedMessage id="inactive" />
+                            </MenuItem>
+                        </Select>
+
+                        <Select
+                            value={pageRequest.type || ''}
+                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, type: event.target.value })}
+                            displayEmpty
+                            input={<OutlinedInput />}
+                            slotProps={{ input: { 'aria-label': 'Type Filter' } }}
+                        >
+                            <MenuItem value="">
+                                <FormattedMessage id="room-type" />
+                            </MenuItem>
+                            <MenuItem value="STANDARD">
+                                <FormattedMessage id="standard" />
+                            </MenuItem>
+                            <MenuItem value="IMAX">
+                                <FormattedMessage id="IMAX" />
+                            </MenuItem>
+                            <MenuItem value="THREE_D">
+                                <FormattedMessage id="3D" />
                             </MenuItem>
                         </Select>
                     </Stack>

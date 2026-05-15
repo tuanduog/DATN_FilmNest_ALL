@@ -121,7 +121,7 @@ export default function MembershipDetail() {
                                 {intl.formatMessage({ id: 'membership-type' })}
                             </InputLabel>
 
-                            <Typography>{membership?.type}</Typography>
+                            <Typography>{membership?.type === "gold" ? intl.formatMessage({ id: 'gold' }) : membership?.type === "silver" ? intl.formatMessage({ id: 'silver' }) : intl.formatMessage({ id: 'platinum' })}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>

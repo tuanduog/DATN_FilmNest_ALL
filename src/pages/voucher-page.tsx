@@ -386,7 +386,8 @@ export default function VoucherPage() {
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: ''
+        status: '',
+        type: ''
     });
     const [alert, setAlert] = useState({
         open: false,
@@ -416,7 +417,10 @@ export default function VoucherPage() {
 
     useEffect(() => {
         const fetchVouchers = async () => {
-            const response = await getList(pageRequest);
+            const cleanParams = Object.fromEntries(
+                Object.entries(pageRequest).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+            );
+            const response = await getList(cleanParams);
 
             if (response.status === HttpStatusCode.Ok) {
                 setData(response.data.content);
@@ -625,6 +629,24 @@ export default function VoucherPage() {
                             </MenuItem>
                             <MenuItem value="INACTIVE">
                                 <FormattedMessage id="inactive" />
+                            </MenuItem>
+                        </Select>
+
+                        <Select
+                            value={pageRequest.type || ''}
+                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, type: event.target.value })}
+                            displayEmpty
+                            input={<OutlinedInput />}
+                            slotProps={{ input: { 'aria-label': 'Type Filter' } }}
+                        >
+                            <MenuItem value="">
+                                <FormattedMessage id="type" />
+                            </MenuItem>
+                            <MenuItem value="PUBLIC">
+                                <FormattedMessage id="public" />
+                            </MenuItem>
+                            <MenuItem value="PERSONAL">
+                                <FormattedMessage id="personal" />
                             </MenuItem>
                         </Select>
                     </Stack>

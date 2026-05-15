@@ -330,7 +330,7 @@ export default function MembershipPage() {
                 meta: { width: '20%' },
                 cell: (cell) => {
                     const { type } = cell.row.original;
-                    return <Typography>{type === 'gold' ? intl.formatMessage({ id: 'Gold' }) : type === 'silver' ? intl.formatMessage({ id: 'Silver' }) : intl.formatMessage({ id: 'Premium' })}</Typography>;
+                    return <Typography>{type.toUpperCase() === 'GOLD' ? intl.formatMessage({ id: 'gold' }) : type.toUpperCase() === 'SILVER' ? intl.formatMessage({ id: 'silver' }) : intl.formatMessage({ id: 'platinum' })}</Typography>;
                 }
             },
             {
@@ -402,7 +402,8 @@ export default function MembershipPage() {
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: ''
+        status: '',
+        type: ''
     });
     const [alert, setAlert] = useState({
         open: false,
@@ -432,7 +433,10 @@ export default function MembershipPage() {
 
     useEffect(() => {
         const fetchMemberships = async () => {
-            const response = await getList(pageRequest);
+            const cleanParams = Object.fromEntries(
+                Object.entries(pageRequest).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+            );
+            const response = await getList(cleanParams);
 
             if (response.status === HttpStatusCode.Ok) {
                 setData(response.data.content);
@@ -641,6 +645,27 @@ export default function MembershipPage() {
                             </MenuItem>
                             <MenuItem value="INACTIVE">
                                 <FormattedMessage id="inactive" />
+                            </MenuItem>
+                        </Select>
+
+                        <Select
+                            value={pageRequest.type || ''}
+                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, type: event.target.value })}
+                            displayEmpty
+                            input={<OutlinedInput />}
+                            slotProps={{ input: { 'aria-label': 'Type Filter' } }}
+                        >
+                            <MenuItem value="">
+                                <FormattedMessage id="membership-type" />
+                            </MenuItem>
+                            <MenuItem value="GOLD">
+                                <FormattedMessage id="gold" />
+                            </MenuItem>
+                            <MenuItem value="SILVER">
+                                <FormattedMessage id="silver" />
+                            </MenuItem>
+                            <MenuItem value="PLATINUM">
+                                <FormattedMessage id="platinum" />
                             </MenuItem>
                         </Select>
                     </Stack>

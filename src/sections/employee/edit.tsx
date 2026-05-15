@@ -391,7 +391,7 @@ export default function EditEmployee() {
                                             <Box component="span" sx={{ color: 'text.secondary' }}>{intl.formatMessage({ id: 'role-placeholder' })}</Box>
                                         </MenuItem>
                                         <MenuItem value="MANAGER">{intl.formatMessage({ id: 'manager' })}</MenuItem>
-                                        <MenuItem value="STAFF">{intl.formatMessage({ id: 'staff' })}</MenuItem>
+                                        {/* <MenuItem value="STAFF">{intl.formatMessage({ id: 'staff' })}</MenuItem> */}
                                     </Select>
 
                                     <FormHelperText>

@@ -16,6 +16,7 @@ import { getById } from 'api/combo';
 import { HttpStatusCode } from 'axios';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router';
+import formatPrice from 'utils/formatPrice';
 
 export default function ComboDetail() {
     const { id } = useParams<{ id: string }>();
@@ -82,7 +83,7 @@ export default function ComboDetail() {
                                 Giá tiền (VND)
                             </InputLabel>
 
-                            <Typography>{combo?.price}</Typography>
+                            <Typography>{combo?.price ? formatPrice(combo.price) : ''}</Typography>
                         </Grid>
 
                         <Grid size={12}>

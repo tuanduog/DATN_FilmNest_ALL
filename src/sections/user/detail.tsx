@@ -147,8 +147,8 @@ export default function UserDetail() {
                 <Grid size={12} sx={{ p: 0, m: 0 }}>
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
-                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/user/edit/${id}`)}>
-                                Cập nhật
+                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(-1)}>
+                                Quay lại
                             </Button>
                         </AnimateButton>
                     </Stack>
