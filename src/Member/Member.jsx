@@ -145,9 +145,7 @@ function Member() {
                     );
                     toast.success(t('subscribeSuccess', { plan: member.vip }) || `Đăng ký gói ${member.vip} thành công!`);
                     localStorage.removeItem('member');
-                    // Refresh data
                     fetchMember();
-                    // Clear URL params
                     navigate('/Member', { replace: true });
                 } catch (error) {
                     console.error("Cập nhật membership thất bại", error);

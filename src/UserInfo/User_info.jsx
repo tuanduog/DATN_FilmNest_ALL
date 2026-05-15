@@ -85,6 +85,23 @@ function UserInfo() {
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
+
+        if (email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                toast.warning(t('invalidEmail') || "Email không hợp lệ!");
+                return;
+            }
+        }
+
+        if (phoneNumber) {
+            const phoneRegex = /^0\d{9}$/;
+            if (!phoneRegex.test(phoneNumber)) {
+                toast.warning(t('invalidPhone') || "Số điện thoại không hợp lệ! (10 số, bắt đầu bằng 0)");
+                return;
+            }
+        }
+
         try {
             const updateData = {
                 username: userName,
@@ -153,171 +170,211 @@ function UserInfo() {
         }
         fetchUserProfile();
     }, []);
+
     return (
-        <div className="container py-5">
-            <div className="row">
-                <div className="col-md-3 text-center mt-4">
-                    {/* <i className="fa fa-circle-user" style={{fontSize: '100px'}}></i> */}
-
-                    <UserCircle size={110} strokeWidth={1.7} className="text-secondary" />
-
-                    <ul className="list-unstyled mt-4">
-                        <li className="mb-3 fw-bold text-primary">
-                            <UserCircle size={18} className="me-2" />
-                            {t('accountInfo')}
-                        </li>
-                        <li className={`mb-3 ${styles.dx}`} onClick={handleLogout}>
-                            <LogOut size={18} className="me-2" />
-                            {t('logout')}
-                        </li>
-                    </ul>
-                </div>
-
-                <div className="col-md-9">
-                    <h3 className="mb-4">{t('accountInfo')}</h3>
-                    <form className="row g-3">
-                        <div className="col-md-6">
-                            <label className="form-label">{t('fullname')}</label>
-                            <input type="text" className="form-control" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+        <div className={styles.pageContainer}>
+            <div className="container">
+                <div className={styles.profileCard}>
+                    {/* Sidebar */}
+                    <div className={styles.sidebar}>
+                        <div className={styles.avatarWrapper}>
+                            <div className={styles.avatar}>
+                                <UserCircle size={100} strokeWidth={1} />
+                            </div>
                         </div>
+                        <h5 className="fw-bold mb-1 text-dark text-center">{fullName}</h5>
+                        <p className="text-muted small mb-4">@{userName}</p>
 
-                        <div className="col-md-6">
-                            <label className="form-label">{t('username')}</label>
-                            <input type="text" className="form-control" value={userName} onChange={(e) => setUserName(e.target.value)} readOnly />
-                        </div>
+                        <ul className={styles.sideNav}>
+                            <li className={`${styles.navItem} ${styles.navItemActive}`}>
+                                <UserCircle size={20} />
+                                {t('accountInfo')}
+                            </li>
+                            <li className={`${styles.navItem} ${styles.navItemLogout}`} onClick={handleLogout}>
+                                <LogOut size={20} />
+                                {t('logout')}
+                            </li>
+                        </ul>
+                    </div>
 
-                        <div className="col-md-6">
-                            <label className="form-label">{t('email')}</label>
-                            <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        </div>
-                        <div className="col-md-6">
-                            <label className="form-label">{t('phone')}</label>
-                            <input type="text" className="form-control" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-                        </div>
-                        <div className="col-md-6">
-                            <label className="form-label">{t('gender')}</label>
-                            <Dropdown onSelect={(val) => setGender(val)} className="w-100">
-                                <Dropdown.Toggle
-                                    as="div"
-                                    className={`form-select d-flex align-items-center justify-content-between ${styles.customToggle}`}
-                                    style={{ cursor: 'pointer', height: '38px' }}
-                                >
-                                    <span style={{ fontSize: '15px' }}>
-                                        {gender === "MALE" ? t('male') : gender === "FEMALE" ? t('female') : gender === "OTHER" ? t('other') : t('selectGender')}
-                                    </span>
-                                </Dropdown.Toggle>
+                    {/* Main Content */}
+                    <div className={styles.contentArea}>
+                        <h2 className={styles.sectionTitle}>{t('accountInfo')}</h2>
+                        <form className="row g-4" onSubmit={handleUpdateProfile}>
+                            <div className="col-md-6">
+                                <label className={styles.formLabel}>{t('fullname')}</label>
+                                <input
+                                    type="text"
+                                    className={`form-control ${styles.formControl}`}
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                />
+                            </div>
 
-                                <Dropdown.Menu className="w-100 shadow-sm border">
-                                    <Dropdown.Item eventKey="">{t('selectGender')}</Dropdown.Item>
-                                    <Dropdown.Item eventKey="MALE" className="py-2 px-3" style={{ fontSize: '14px' }}>{t('male')}</Dropdown.Item>
-                                    <Dropdown.Item eventKey="FEMALE" className="py-2 px-3" style={{ fontSize: '14px' }}>{t('female')}</Dropdown.Item>
-                                    <Dropdown.Item eventKey="OTHER" className="py-2 px-3" style={{ fontSize: '14px' }}>{t('other')}</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </div>
-                        <div className="col-md-6">
-                            <label className="form-label">{t('dob')}</label>
-                            <input
-                                type="date"
-                                className="form-control"
-                                value={dob}
-                                onChange={(e) => setDob(e.target.value)}
-                            />
-                        </div>
+                            <div className="col-md-6">
+                                <label className={styles.formLabel}>{t('username')}</label>
+                                <input
+                                    type="text"
+                                    className={`form-control ${styles.formControl}`}
+                                    value={userName}
+                                    readOnly
+                                    style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed' }}
+                                />
+                            </div>
 
-                        <div className="col-md-6">
-                            <label className="form-label">{t('nationality')}</label>
-                            <Dropdown onSelect={(val) => setNationality(val)} className="w-100">
-                                <Dropdown.Toggle
-                                    as="div"
-                                    className={`form-select d-flex align-items-center justify-content-between ${styles.customToggle}`}
-                                    style={{ cursor: 'pointer', height: '38px' }}
-                                >
-                                    <div className="d-flex align-items-center overflow-hidden">
-                                        {nationality && countries.find(c => c.label === nationality)?.flag && (
-                                            <img
-                                                src={countries.find(c => c.label === nationality).flag}
-                                                alt=""
-                                                style={{ width: 22, height: 14, marginRight: 10, borderRadius: 2, objectFit: 'cover' }}
-                                            />
-                                        )}
-                                        <span className="text-truncate" style={{ fontSize: '15px' }}>
-                                            {nationality || t('selectNationality')}
+                            <div className="col-md-6">
+                                <label className={styles.formLabel}>{t('email')}</label>
+                                <input
+                                    type="text"
+                                    className={`form-control ${styles.formControl}`}
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+                            <div className="col-md-6">
+                                <label className={styles.formLabel}>{t('phone')}</label>
+                                <input
+                                    type="text"
+                                    className={`form-control ${styles.formControl}`}
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                />
+                            </div>
+                            <div className="col-md-6">
+                                <label className={styles.formLabel}>{t('gender')}</label>
+                                <Dropdown onSelect={(val) => setGender(val)} className="w-100">
+                                    <Dropdown.Toggle
+                                        as="div"
+                                        className={`form-select d-flex align-items-center justify-content-between ${styles.customToggle}`}
+                                        style={{ cursor: 'pointer', height: '45px' }}
+                                    >
+                                        <span style={{ fontSize: '15px' }}>
+                                            {gender === "MALE" ? t('male') : gender === "FEMALE" ? t('female') : gender === "OTHER" ? t('other') : t('selectGender')}
                                         </span>
-                                    </div>
-                                </Dropdown.Toggle>
+                                    </Dropdown.Toggle>
 
-                                <Dropdown.Menu className="w-100 shadow-sm border" style={{ maxHeight: '250px', overflowY: 'auto' }}>
-                                    <Dropdown.Item eventKey="">{t('selectNationality')}</Dropdown.Item>
-                                    {countries.map((c) => (
-                                        <Dropdown.Item
-                                            key={c.code}
-                                            eventKey={c.label}
-                                            className="d-flex align-items-center py-2"
-                                        >
-                                            <img
-                                                src={c.flag}
-                                                alt=""
-                                                style={{ width: 22, height: 14, marginRight: 12, borderRadius: 2, objectFit: 'cover' }}
-                                            />
-                                            <span style={{ fontSize: '14px' }}>{c.label}</span>
-                                        </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </div>
-                        <div className="col-9">
-                            {showOk ? <p style={{ color: 'green', fontSize: '14px', fontStyle: 'italic' }}>{textOk}</p> : <></>}
-                        </div>
-                        <div className="col-3 d-flex justify-content-end mt-2">
-                            <button type="button" className={`btn btn-link text-primary px-0 ${styles.doimk}`} onClick={handleOpen}>
-                                <Key size={16} className="me-1" /> {t('changePassword')}
-                            </button>
-                        </div>
-                        <div className="col-12 mt-4 pt-2 border-top">
-                            <button type="submit" className="btn btn-primary px-4 fw-bold" onClick={handleUpdateProfile}>{t('saveChanges')}</button>
-                            <button type="button" className="btn btn-outline-secondary ms-3 px-4" onClick={handleCancel}>{t('cancel')}</button>
-                        </div>
-                    </form>
+                                    <Dropdown.Menu className="w-100 shadow-lg border-0 rounded-4">
+                                        <Dropdown.Item eventKey="">{t('selectGender')}</Dropdown.Item>
+                                        <Dropdown.Item eventKey="MALE" className="py-2 px-3">{t('male')}</Dropdown.Item>
+                                        <Dropdown.Item eventKey="FEMALE" className="py-2 px-3">{t('female')}</Dropdown.Item>
+                                        <Dropdown.Item eventKey="OTHER" className="py-2 px-3">{t('other')}</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
+                            <div className="col-md-6">
+                                <label className={styles.formLabel}>{t('dob')}</label>
+                                <input
+                                    type="date"
+                                    className={`form-control ${styles.formControl}`}
+                                    value={dob}
+                                    onChange={(e) => setDob(e.target.value)}
+                                    style={{ height: '45px' }}
+                                />
+                            </div>
+
+                            <div className="col-md-6">
+                                <label className={styles.formLabel}>{t('nationality')}</label>
+                                <Dropdown onSelect={(val) => setNationality(val)} className="w-100">
+                                    <Dropdown.Toggle
+                                        as="div"
+                                        className={`form-select d-flex align-items-center justify-content-between ${styles.customToggle}`}
+                                        style={{ cursor: 'pointer', height: '45px' }}
+                                    >
+                                        <div className="d-flex align-items-center overflow-hidden">
+                                            {nationality && countries.find(c => c.label === nationality)?.flag && (
+                                                <img
+                                                    src={countries.find(c => c.label === nationality).flag}
+                                                    alt=""
+                                                    style={{ width: 22, height: 14, marginRight: 10, borderRadius: 2, objectFit: 'cover' }}
+                                                />
+                                            )}
+                                            <span className="text-truncate" style={{ fontSize: '15px' }}>
+                                                {nationality || t('selectNationality')}
+                                            </span>
+                                        </div>
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu className="w-100 shadow-lg border-0 rounded-4" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                                        <Dropdown.Item eventKey="">{t('selectNationality')}</Dropdown.Item>
+                                        {countries.map((c) => (
+                                            <Dropdown.Item
+                                                key={c.code}
+                                                eventKey={c.label}
+                                                className="d-flex align-items-center py-2"
+                                            >
+                                                <img
+                                                    src={c.flag}
+                                                    alt=""
+                                                    style={{ width: 22, height: 14, marginRight: 12, borderRadius: 2, objectFit: 'cover' }}
+                                                />
+                                                <span style={{ fontSize: '14px' }}>{c.label}</span>
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
+
+                            <div className="col-12 d-flex justify-content-between align-items-center mt-3">
+                                <div className="text-success small italic">
+                                    {showOk && textOk}
+                                </div>
+                                <button type="button" className={`btn btn-link ${styles.doimk}`} onClick={handleOpen}>
+                                    <Key size={18} /> {t('changePassword')}
+                                </button>
+                            </div>
+
+                            <div className="col-12 mt-5 pt-4 border-top d-flex gap-3">
+                                <button type="submit" className={`btn btn-primary ${styles.btnPrimary}`}>
+                                    {t('saveChanges')}
+                                </button>
+                                <button type="button" className="btn btn-outline-secondary px-4 rounded-3 fw-bold" onClick={handleCancel}>
+                                    {t('cancel')}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <Modal show={showDoiMK} onHide={handleClose} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>{t('changePassword')}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
 
-                    <div className="row mb-3">
-                        <div className="col-4 mt-1">
-                            <label>{t('oldPasswordLabel')} </label>
-                        </div>
-                        <div className="col-7">
-                            <input type="password" className="form-control" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
-                        </div>
+            <Modal show={showDoiMK} onHide={handleClose} centered className="border-0">
+                <Modal.Header closeButton className="border-0 pb-0 pt-4 px-4">
+                    <Modal.Title className="fw-bold">{t('changePassword')}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-4">
+                    <div className="mb-3">
+                        <label className={styles.formLabel}>{t('oldPasswordLabel')}</label>
+                        <input
+                            type="password"
+                            className={`form-control ${styles.formControl}`}
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                        />
                     </div>
-                    <div className="row mb-3">
-                        <div className="col-4 mt-1">
-                            <label>{t('newPasswordLabel')} </label>
-                        </div>
-                        <div className="col-7">
-                            <input type="password" className="form-control" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                        </div>
+                    <div className="mb-3">
+                        <label className={styles.formLabel}>{t('newPasswordLabel')}</label>
+                        <input
+                            type="password"
+                            className={`form-control ${styles.formControl}`}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
                     </div>
-                    <div className="row mb-3">
-                        <div className="col-4 mt-1">
-                            <label>{t('confirmPasswordLabel')} </label>
-                        </div>
-                        <div className="col-7">
-                            <input type="password" className="form-control" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                        </div>
+                    <div className="mb-3">
+                        <label className={styles.formLabel}>{t('confirmPasswordLabel')}</label>
+                        <input
+                            type="password"
+                            className={`form-control ${styles.formControl}`}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
                     </div>
-                    {showAlert ? <p style={{ color: 'red', fontSize: '14px', fontStyle: 'italic' }}>{textAlert}</p> : <></>}
+                    {showAlert && <p className="text-danger small mt-2">{textAlert}</p>}
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
+                <Modal.Footer className="border-0 p-4 pt-0">
+                    <Button variant="light" className="px-4 fw-bold text-muted" onClick={handleClose}>
                         {t('close')}
                     </Button>
-                    <Button variant="primary" onClick={handleChangePassword}>
+                    <Button className={`btn btn-primary ${styles.btnPrimary}`} onClick={handleChangePassword}>
                         {t('confirm')}
                     </Button>
                 </Modal.Footer>

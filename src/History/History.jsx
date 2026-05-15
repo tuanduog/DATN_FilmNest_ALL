@@ -3,6 +3,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import styles from "./History.module.css";
+import { FaMapMarkerAlt, FaChair, FaClock, FaGift, FaTicketAlt, FaCheckCircle, FaFilm } from "react-icons/fa";
 
 function History() {
     const { t, i18n } = useTranslation();
@@ -101,49 +103,101 @@ function History() {
     }, []);
 
     return (
-        <div className="container mt-5" style={{paddingBottom: (bookings.length === 1 || bookings.length === 0) ? '120px' : '0px'}}>
-            <h2 className="mb-4 fw-bold text-primary">{t('bookingHistory')}</h2>
-            {bookings.length === 0 ? <p style={{textAlign: 'center', fontSize: '22px', paddingTop: '20px'}}>{t('noBookings')}</p> : <></>}
-            {bookings.map((booking) => (
-                <div key={booking.bookingId} className="card mb-4 shadow border-0" style={{ backgroundColor: "#e6f4ea" }}>
-                    <div className="row g-0 align-items-center">
-                        <div className="col-md-3 p-3 text-center">
+        <div className={styles.pageContainer}>
+            {/* Hero Section */}
+            <div className={styles.heroSection}>
+                <div className="container">
+                    <p className={styles.pageSubtitle}>{t('yourActivity')}</p>
+                    <h1 className={styles.pageTitle}>{t('bookingHistory')}</h1>
+                </div>
+            </div>
+
+            <div className={`${styles.historyContent} container`} style={{paddingBottom: (bookings.length === 1 || bookings.length === 0) ? '120px' : '40px'}}>
+                {bookings.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        <FaTicketAlt className={styles.emptyIcon} />
+                        <p className="fs-4 fw-bold text-muted">{t('noBookings')}</p>
+                        <p className="text-muted">{t('startBookingToday')}</p>
+                    </div>
+                ) : null}
+                
+                {bookings.map((booking) => (
+                    <div key={booking.bookingId} className={styles.ticketCard}>
+                        <div className={styles.ticketImageWrapper}>
                             <img
                                 src={booking.movieImage}
-                                alt="picture"
-                                className="img-fluid rounded shadow-sm"
-                                style={{ maxHeight: "150px", objectFit: "cover" }}
+                                alt="movie poster"
+                                className={styles.ticketImage}
                             />
                         </div>
 
-                        <div className="col-md-7 p-3">
-                            <h5 className="fw-bold text-dark mb-3" style={{ fontSize: "1.25rem" }}>
-                                {booking.movieName}
+                        <div className={styles.ticketContent}>
+                            <h5 className={styles.movieTitle}>
+                                <FaFilm color="#0d6efd" /> {booking.movieName}
                             </h5>
-                            <div className="row text-dark">
-                                <div className="col-6 mb-2">
-                                    <p className="mb-1"><strong>{t('cinemaLabel')}:</strong> {booking.theaterName}, {booking.theaterLocation}</p>
-                                    <p className="mb-1"><strong>{t('roomLabel')}:</strong> {booking.roomName}</p>
-                                    <p className="mb-1"><strong>{t('chairLabel')}:</strong> {booking.chair}</p>
+                            
+                            <div className={styles.infoGrid}>
+                                <div className={styles.infoItem}>
+                                    <FaMapMarkerAlt className={styles.infoIcon} />
+                                    <div className={styles.infoText}>
+                                        <span className={styles.infoLabel}>{t('cinemaLabel')}</span>
+                                        <span className={styles.infoValue}>{booking.theaterName}</span>
+                                    </div>
                                 </div>
-                                <div className="col-6 mb-2">
-                                    <p className="mb-1"><strong>{t('showtimeLabel')}:</strong> {booking.startTime} - {new Date(booking.date).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'vi-VN', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric'
-                                    })}</p>
-                                    <p className="mb-1"><strong>{t('comboLabel')}:</strong> {booking.combo || t('none')}</p>
-                                    <p className="mb-1"><strong>{t('priceLabel')}:</strong> {booking.totalPrice.toLocaleString(i18n.language === 'en' ? 'en-US' : 'vi-VN')}đ</p>
+                                
+                                <div className={styles.infoItem}>
+                                    <FaClock className={styles.infoIcon} />
+                                    <div className={styles.infoText}>
+                                        <span className={styles.infoLabel}>{t('showtimeLabel')}</span>
+                                        <span className={styles.infoValue}>
+                                            {booking.startTime} • {new Date(booking.date).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'vi-VN', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric'
+                                            })}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className={styles.infoItem}>
+                                    <FaChair className={styles.infoIcon} />
+                                    <div className={styles.infoText}>
+                                        <span className={styles.infoLabel}>{t('roomLabel')} & {t('chairLabel')}</span>
+                                        <span className={styles.infoValue}>{booking.roomName} • {booking.chair}</span>
+                                    </div>
+                                </div>
+                                
+                                <div className={styles.infoItem}>
+                                    <FaGift className={styles.infoIcon} />
+                                    <div className={styles.infoText}>
+                                        <span className={styles.infoLabel}>{t('comboLabel')}</span>
+                                        <span className={styles.infoValue}>{booking.combo || t('none')}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="col-md-2 d-flex flex-column justify-content-center align-items-center p-3">
-                            <span className="badge bg-success fs-6 px-3 py-2">{t('paidStatus')}</span>
+                        <div className={styles.ticketDivider}></div>
+
+                        <div className={styles.ticketAction}>
+                            <div className="text-center w-100">
+                                <div className={styles.bookingCode}>
+                                    #{booking.code || booking.bookingId}
+                                </div>
+                                <div className={styles.priceLabel}>{t('totalPrice')}</div>
+                                <div className={styles.priceValue}>
+                                    {booking.totalPrice.toLocaleString(i18n.language === 'en' ? 'en-US' : 'vi-VN')}đ
+                                </div>
+                                <div className="d-flex justify-content-center">
+                                    <div className={styles.statusBadge}>
+                                        <FaCheckCircle /> {t('paidStatus')}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 }
