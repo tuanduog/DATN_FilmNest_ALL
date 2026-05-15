@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public enum MembershipType {
 
-    PREMIUM("premium"), GOLD("gold"), SILVER("silver");
+    PLATINUM("platinum"), GOLD("gold"), SILVER("silver");
 
     private final String value;
 

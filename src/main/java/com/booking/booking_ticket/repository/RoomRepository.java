@@ -3,6 +3,7 @@ package com.booking.booking_ticket.repository;
 import com.booking.booking_ticket.dto.response.RoomResponse;
 import com.booking.booking_ticket.dto.response.TheaterResponse;
 import com.booking.booking_ticket.entity.Room;
+import com.booking.booking_ticket.utils.RoomType;
 import com.booking.booking_ticket.utils.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,19 +25,21 @@ public interface RoomRepository extends JpaRepository<Room,Integer> {
         SELECT new com.booking.booking_ticket.dto.response.RoomResponse(r.id, r.name, r.capacity, r.totalRow, r.totalColumn, r.type, r.theater.name, r.status)
         FROM Room r
         WHERE (LOWER(r.name) LIKE :keyword)
-        AND (:status IS NULL OR r.status = :status)
+            AND (:status IS NULL OR r.status = :status)
+            AND (:type IS NULL OR r.type = :type)
     """)
-    Page<RoomResponse> findAllByKeyword(Pageable pageable, String keyword, Status status);
+    Page<RoomResponse> findAllByKeyword(Pageable pageable, String keyword, Status status, RoomType type);
 
     @Query("""
         SELECT new com.booking.booking_ticket.dto.response.RoomResponse(r.id, r.name, r.capacity, r.totalRow, r.totalColumn, r.type, r.theater.name, r.status)
         FROM Room r
             JOIN Theater t ON t.id = r.theater.id
         WHERE t.id = :theaterId
-        AND (LOWER(r.name) LIKE :keyword)
-        AND (:status IS NULL OR r.status = :status)
+            AND (LOWER(r.name) LIKE :keyword)
+            AND (:status IS NULL OR r.status = :status)
+            AND (:type IS NULL OR r.type = :type)
     """)
-    Page<RoomResponse> findAllByTheaterId(Integer theaterId, Pageable pageable, String keyword, Status status);
+    Page<RoomResponse> findAllByTheaterId(Integer theaterId, Pageable pageable, String keyword, Status status, RoomType type);
 
     @Query("""
         SELECT r

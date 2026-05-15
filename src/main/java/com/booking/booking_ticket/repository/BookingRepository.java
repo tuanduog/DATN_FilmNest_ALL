@@ -360,8 +360,8 @@ public interface BookingRepository extends JpaRepository<Booking,Integer> {
         FROM Booking b
         WHERE (LOWER(b.code) LIKE :keyword)
         AND (:paymentStatus IS NULL OR b.paymentStatus = :paymentStatus)
-        AND (:startDate IS NULL OR b.date >= :startDate)
-        AND (:endDate IS NULL OR b.date <= :endDate)
+        AND (CAST(:startDate AS date) IS NULL OR b.date >= :startDate)
+        AND (CAST(:endDate AS date) IS NULL OR b.date <= :endDate)
     """)
     Page<OrderResponse> findAllByKeyword(Pageable pageable,
                                          @Param("keyword") String keyword,
@@ -384,8 +384,8 @@ public interface BookingRepository extends JpaRepository<Booking,Integer> {
         FROM Booking b
         WHERE (LOWER(b.code) LIKE :keyword)
             AND (:paymentStatus IS NULL OR b.paymentStatus = :paymentStatus)
-            AND (:startDate IS NULL OR b.date >= :startDate)
-            AND (:endDate IS NULL OR b.date <= :endDate)
+            AND (CAST(:startDate AS date) IS NULL OR b.date >= :startDate)
+            AND (CAST(:endDate AS date) IS NULL OR b.date <= :endDate)
             AND b.showTime.room.theater.id = :id
     """)
     Page<OrderResponse> findAllByKeywordAndTheaterId( Integer id,
