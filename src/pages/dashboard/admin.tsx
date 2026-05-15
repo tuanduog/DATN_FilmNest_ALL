@@ -146,10 +146,7 @@ export default function AdminDashboard() {
     const intl = useIntl();
 
     // --- Filters ---
-    const [timeFilter, setTimeFilter] = useState('week');
-    const [fromDate, setFromDate] = useState('');
-    const [toDate, setToDate] = useState('');
-    const [customApplied, setCustomApplied] = useState(false);
+    const [timeFilter, setTimeFilter] = useState('today');
 
     // --- API data ---
     const [ticketChart, setTicketChart] = useState<TicketChartItem[]>([]);
@@ -214,9 +211,7 @@ export default function AdminDashboard() {
 
     // Fetch when standard filter changes
     useEffect(() => {
-        if (timeFilter !== 'custom') {
-            fetchAll(toFilterType(timeFilter));
-        }
+        fetchAll(toFilterType(timeFilter));
     }, [timeFilter, fetchAll]);
 
     // ---------------------------------------------------------------------------
@@ -225,22 +220,6 @@ export default function AdminDashboard() {
 
     const handleTimeChange = (event: SelectChangeEvent) => {
         setTimeFilter(event.target.value);
-        setCustomApplied(false);
-    };
-
-    const handleApplyCustom = () => {
-        if (!fromDate || !toDate) return;
-        setCustomApplied(true);
-        // Determine granularity from date range
-        const diffDays = Math.ceil(
-            (new Date(toDate).getTime() - new Date(fromDate).getTime()) / (1000 * 60 * 60 * 24)
-        );
-        let ft = 'WEEK';
-        if (diffDays <= 1) ft = 'TODAY';
-        else if (diffDays <= 31) ft = 'WEEK';
-        else if (diffDays <= 90) ft = 'MONTH';
-        else ft = 'YEAR';
-        fetchAll(ft);
     };
 
     // ---------------------------------------------------------------------------
@@ -253,16 +232,6 @@ export default function AdminDashboard() {
             case 'week': return intl.formatMessage({ id: 'daily' });
             case 'month': return intl.formatMessage({ id: 'weekly' });
             case 'year': return intl.formatMessage({ id: 'monthly' });
-            case 'custom': {
-                if (fromDate && toDate) {
-                    const d = Math.ceil((new Date(toDate).getTime() - new Date(fromDate).getTime()) / 86400000);
-                    if (d <= 1) return intl.formatMessage({ id: 'hourly' });
-                    if (d <= 31) return intl.formatMessage({ id: 'daily' });
-                    if (d <= 90) return intl.formatMessage({ id: 'weekly' });
-                    return intl.formatMessage({ id: 'monthly' });
-                }
-                return intl.formatMessage({ id: 'daily' });
-            }
             default: return intl.formatMessage({ id: 'daily' });
         }
     };
@@ -273,7 +242,6 @@ export default function AdminDashboard() {
             case 'week': return intl.formatMessage({ id: 'this-week' });
             case 'month': return intl.formatMessage({ id: 'this-month' });
             case 'year': return intl.formatMessage({ id: 'this-year' });
-            case 'custom': return fromDate && toDate ? `${fromDate} → ${toDate}` : intl.formatMessage({ id: 'custom' });
             default: return '';
         }
     };
@@ -376,45 +344,8 @@ export default function AdminDashboard() {
                             <MenuItem value="week">{intl.formatMessage({ id: 'this-week' })}</MenuItem>
                             <MenuItem value="month">{intl.formatMessage({ id: 'this-month' })}</MenuItem>
                             <MenuItem value="year">{intl.formatMessage({ id: 'this-year' })}</MenuItem>
-                            <MenuItem value="custom">{intl.formatMessage({ id: 'custom' })}</MenuItem>
                         </Select>
                     </FormControl>
-                    <Collapse in={timeFilter === 'custom'} orientation="horizontal">
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <TextField
-                                id="from-date"
-                                label={intl.formatMessage({ id: 'from-date' })}
-                                type="date"
-                                size="small"
-                                value={fromDate}
-                                onChange={(e) => setFromDate(e.target.value)}
-                                InputLabelProps={{ shrink: true }}
-                                inputProps={{ max: toDate || undefined }}
-                                sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: 155 }}
-                            />
-                            <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 600 }}>—</Typography>
-                            <TextField
-                                id="to-date"
-                                label={intl.formatMessage({ id: 'to-date' })}
-                                type="date"
-                                size="small"
-                                value={toDate}
-                                onChange={(e) => setToDate(e.target.value)}
-                                InputLabelProps={{ shrink: true }}
-                                inputProps={{ min: fromDate || undefined }}
-                                sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: 155 }}
-                            />
-                            <Button
-                                variant="contained"
-                                size="small"
-                                disabled={!fromDate || !toDate || loading}
-                                onClick={handleApplyCustom}
-                                sx={{ borderRadius: 2, whiteSpace: 'nowrap', height: 40 }}
-                            >
-                                {intl.formatMessage({ id: 'apply' })}
-                            </Button>
-                        </Box>
-                    </Collapse>
                 </Box>
             </Box>
 

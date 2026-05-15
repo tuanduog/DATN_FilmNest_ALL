@@ -147,13 +147,13 @@ export default function RoomDetail() {
         : [];
 
     const countByType = (type: SeatType) =>
-        (room.seats as Seat[] | undefined)?.filter(
-            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE'
-        ).length ?? 0;
+        seatsGrid.flat().filter(
+            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE' && !s.isHidden
+        ).length;
 
     const getPriceByType = (type: SeatType) =>
-        (room.seats as Seat[] | undefined)?.find(
-            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE'
+        seatsGrid.flat().find(
+            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE' && !s.isHidden
         )?.price ?? 0;
 
     return (

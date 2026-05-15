@@ -123,7 +123,6 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
     const autoCapacity = useMemo(
         () => seats.flat().reduce((acc, s) => {
             if (s.type === 'DELETED' || s.isHidden) return acc;
-            if (s.type === 'SWEETBOX') return acc + 2;
             return acc + 1;
         }, 0),
         [seats]
@@ -144,22 +143,29 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
             const rowLabel = generateAlphabetLabel(rIndex);
             let seatNumber = 1;
             let skipNext = false;
-            return row.map((seat) => {
+            let lastLabel = '';
+            return row.map((seat): SeatInfo => {
                 if (skipNext) {
                     skipNext = false;
-                    return { ...seat, type: seat.type === 'SWEETBOX' ? 'STANDARD' : seat.type, label: '', isHidden: true };
+                    return { ...seat, type: 'SWEETBOX' as SeatDisplayType, label: lastLabel, isHidden: true };
                 }
 
                 if (seat.type === 'DELETED') {
                     return { ...seat, label: '', isHidden: false };
                 }
 
+                let effectiveType: SeatDisplayType = seat.type;
+                if (seat.isHidden && effectiveType === 'SWEETBOX') {
+                    effectiveType = 'STANDARD';
+                }
+
                 const newLabel = `${rowLabel}${seatNumber}`;
+                lastLabel = newLabel;
                 seatNumber++;
-                if (seat.type === 'SWEETBOX') {
+                if (effectiveType === 'SWEETBOX') {
                     skipNext = true;
                 }
-                return { ...seat, label: newLabel, isHidden: false };
+                return { ...seat, type: effectiveType, label: newLabel, isHidden: false };
             });
         });
     };
@@ -236,7 +242,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
 
     const handleConfirmSeats = () => {
         const payload: Seat[] = seats.flat().map((seat) => {
-            const isEffectivelyDeleted = seat.type === 'DELETED' || seat.isHidden;
+            const isEffectivelyDeleted = seat.type === 'DELETED';
             return {
                 row: seat.row,
                 col: seat.col,

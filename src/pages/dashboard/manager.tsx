@@ -178,9 +178,7 @@ export default function ManagerDashboard() {
     const theaterId = user?.theaterId ? Number(user.theaterId) : null;
 
     // --- State ---
-    const [timeFilter, setTimeFilter] = useState('week');
-    const [fromDate, setFromDate] = useState('');
-    const [toDate, setToDate] = useState('');
+    const [timeFilter, setTimeFilter] = useState('today');
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -222,26 +220,11 @@ export default function ManagerDashboard() {
     }, [theaterId]);
 
     useEffect(() => {
-        if (timeFilter !== 'custom') {
-            fetchAll(toFilterType(timeFilter));
-        }
+        fetchAll(toFilterType(timeFilter));
     }, [timeFilter, fetchAll]);
 
     const handleTimeChange = (event: SelectChangeEvent) => {
         setTimeFilter(event.target.value);
-    };
-
-    const handleApplyCustom = () => {
-        if (!fromDate || !toDate) return;
-        const diffDays = Math.ceil(
-            (new Date(toDate).getTime() - new Date(fromDate).getTime()) / (1000 * 60 * 60 * 24)
-        );
-        let ft = 'WEEK';
-        if (diffDays <= 1) ft = 'TODAY';
-        else if (diffDays <= 31) ft = 'WEEK';
-        else if (diffDays <= 90) ft = 'MONTH';
-        else ft = 'YEAR';
-        fetchAll(ft);
     };
 
     // --- Derived Data ---
@@ -267,18 +250,6 @@ export default function ManagerDashboard() {
             case 'week': return 'theo ngày';
             case 'month': return 'theo tuần';
             case 'year': return 'theo tháng';
-            case 'custom': {
-                if (fromDate && toDate) {
-                    const diffDays = Math.ceil(
-                        (new Date(toDate).getTime() - new Date(fromDate).getTime()) / (1000 * 60 * 60 * 24)
-                    );
-                    if (diffDays <= 1) return 'theo giờ';
-                    if (diffDays <= 31) return 'theo ngày';
-                    if (diffDays <= 90) return 'theo tuần';
-                    return 'theo tháng';
-                }
-                return 'theo ngày';
-            }
             default: return 'theo ngày';
         }
     };
@@ -289,7 +260,6 @@ export default function ManagerDashboard() {
             case 'week': return 'Tuần này';
             case 'month': return 'Tháng này';
             case 'year': return 'Năm nay';
-            case 'custom': return fromDate && toDate ? `${fromDate} → ${toDate}` : 'Tùy chỉnh';
             default: return '';
         }
     };
@@ -383,43 +353,8 @@ export default function ManagerDashboard() {
                             <MenuItem value="week">Tuần qua</MenuItem>
                             <MenuItem value="month">Tháng này</MenuItem>
                             <MenuItem value="year">Năm nay</MenuItem>
-                            <MenuItem value="custom">Tùy chỉnh</MenuItem>
                         </Select>
                     </FormControl>
-                    <Collapse in={timeFilter === 'custom'} orientation="horizontal">
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <TextField
-                                id="mgr-from-date"
-                                label="Từ ngày"
-                                type="date"
-                                size="small"
-                                value={fromDate}
-                                onChange={(e) => setFromDate(e.target.value)}
-                                InputLabelProps={{ shrink: true }}
-                                sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: 155 }}
-                            />
-                            <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 600 }}>—</Typography>
-                            <TextField
-                                id="mgr-to-date"
-                                label="Đến ngày"
-                                type="date"
-                                size="small"
-                                value={toDate}
-                                onChange={(e) => setToDate(e.target.value)}
-                                InputLabelProps={{ shrink: true }}
-                                sx={{ bgcolor: 'background.paper', borderRadius: 2, minWidth: 155 }}
-                            />
-                            <Button
-                                variant="contained"
-                                size="small"
-                                disabled={!fromDate || !toDate || loading}
-                                onClick={handleApplyCustom}
-                                sx={{ borderRadius: 2, whiteSpace: 'nowrap', height: 40 }}
-                            >
-                                Áp dụng
-                            </Button>
-                        </Box>
-                    </Collapse>
                 </Box>
             </Box>
 

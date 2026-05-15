@@ -111,14 +111,18 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
         })()
         : [];
 
+    const calculatedCapacity = seats.flat().filter(
+        (s) => (s.seatStatus || 'ACTIVE').toUpperCase() === 'ACTIVE' && !s.isHidden
+    ).length;
+
     const countByType = (type: SeatType) =>
-        (room.seats as Seat[] | undefined)?.filter(
-            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE'
-        ).length ?? 0;
+        seats.flat().filter(
+            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || 'ACTIVE').toUpperCase() === 'ACTIVE' && !s.isHidden
+        ).length;
 
     const getPriceByType = (type: SeatType) =>
-        (room.seats as Seat[] | undefined)?.find(
-            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE'
+        seats.flat().find(
+            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || 'ACTIVE').toUpperCase() === 'ACTIVE' && !s.isHidden
         )?.price ?? 0;
 
     const handleSubmit = async () => {
@@ -127,7 +131,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
             const payload = {
                 id: room.id,
                 name: room.name,
-                capacity: room.capacity,
+                capacity: calculatedCapacity,
                 totalRow: room.totalRow,
                 totalColumn: room.totalColumn,
                 type: room.type,
@@ -208,7 +212,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                                 <EventSeatIcon color="primary" />
                                 <Box>
                                     <Typography variant="caption" color="textSecondary"><FormattedMessage id="planned-capacity" /></Typography>
-                                    <Typography variant="body1" fontWeight={600}>{room.capacity} <FormattedMessage id="seats" /></Typography>
+                                    <Typography variant="body1" fontWeight={600}>{calculatedCapacity} <FormattedMessage id="seats" /></Typography>
                                 </Box>
                             </Stack>
 
