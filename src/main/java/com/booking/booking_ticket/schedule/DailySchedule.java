@@ -1,13 +1,17 @@
 package com.booking.booking_ticket.schedule;
 
 import com.booking.booking_ticket.entity.Movie;
+import com.booking.booking_ticket.entity.UsersMembership;
 import com.booking.booking_ticket.repository.MovieRepository;
+import com.booking.booking_ticket.repository.UsersMembershipRepository;
+import com.booking.booking_ticket.utils.MembershipPaymentStatus;
 import com.booking.booking_ticket.utils.ShowingStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -15,6 +19,9 @@ public class DailySchedule {
 
     @Autowired
     private MovieRepository movieRepository;
+
+    @Autowired
+    private UsersMembershipRepository usersMembershipRepository;
 
     @Scheduled(cron = "0 0 0 * * *")
     public void updateShowingStatus() {
@@ -38,5 +45,18 @@ public class DailySchedule {
         }
 
         movieRepository.saveAll(movies);
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    public void updateMembershipStatus() {
+        List<UsersMembership> usersMemberships = usersMembershipRepository.findAllWithStatus(MembershipPaymentStatus.ACTIVE);
+        LocalDateTime now = LocalDateTime.now();
+
+        for (UsersMembership usersMembership : usersMemberships) {
+            if (usersMembership.getExpiredDate().isBefore(now)) {
+                usersMembership.setMembershipPaymentStatus(MembershipPaymentStatus.EXPIRED);
+                usersMembershipRepository.save(usersMembership);
+            }
+        }
     }
 }

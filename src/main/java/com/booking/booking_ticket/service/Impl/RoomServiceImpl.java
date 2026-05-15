@@ -99,6 +99,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public void updateRoom(Integer id, RoomRequest request){
         Room room = roomRepository.findById(id).orElseThrow(()-> new RuntimeException("Room does not exist"));
         Optional<Room> validateName = roomRepository.validateByName(request.getName(), id);
