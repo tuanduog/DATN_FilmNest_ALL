@@ -12,7 +12,6 @@ import Message from './Message';
 import MobileSection from './MobileSection';
 import Notification from './Notification';
 import Profile from './Profile';
-import Search from './Search';
 
 import { MenuOrientation } from 'config';
 import useConfig from 'hooks/useConfig';
@@ -30,7 +29,8 @@ export default function HeaderContent() {
   return (
     <>
       {menuOrientation === MenuOrientation.HORIZONTAL && !downLG && <DrawerHeader open={true} />}
-      {!downLG && <Search />}
+      {!downLG && <Box sx={{ flexGrow: 1 }} />}
+
       {!downLG && localization}
       {downLG && <Box sx={{ width: 1, ml: 1 }} />}
 

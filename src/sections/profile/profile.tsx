@@ -21,7 +21,8 @@ import {
     Stack,
     Chip,
     InputAdornment,
-    IconButton
+    IconButton,
+    Autocomplete
 } from '@mui/material';
 import {
     Person as PersonIcon,
@@ -92,6 +93,22 @@ export default function ProfilePage() {
             setLoading(false);
         };
         fetch();
+    }, []);
+
+    const [countries, setCountries] = useState<{ code: string; label: string; flag: string }[]>([]);
+
+    useEffect(() => {
+        fetch('https://restcountries.com/v3.1/all?fields=name,flags,cca2')
+            .then((res) => res.json())
+            .then((data) => {
+                const countryData = data.map((country: any) => ({
+                    code: country.cca2,
+                    label: country.name.common,
+                    flag: country.flags?.png
+                }));
+                setCountries(countryData.sort((a: any, b: any) => a.label.localeCompare(b.label)));
+            })
+            .catch((error) => console.error('Error fetching countries:', error));
     }, []);
 
     // ── Info form ─────────────────────────────────────────────────────────────
@@ -253,9 +270,11 @@ export default function ProfilePage() {
                                 </Stack>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <PublicIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                    <Typography variant="body2" color="text.secondary">
-                                        {profile?.nationality || '—'}
-                                    </Typography>
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {countries.find((c) => c.code === profile?.nationality)?.label || profile?.nationality || '—'}
+                                        </Typography>
+                                    </Box>
                                 </Stack>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <CakeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
@@ -433,18 +452,57 @@ export default function ProfilePage() {
                                             <InputLabel sx={{ mb: 0.75, fontWeight: 600, fontSize: '0.875rem' }}>
                                                 <FormattedMessage id="nationality" />
                                             </InputLabel>
-                                            <TextField
-                                                fullWidth
-                                                size="small"
-                                                name="nationality"
-                                                value={infoFormik.values.nationality}
-                                                onChange={infoFormik.handleChange}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            <PublicIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                                                        </InputAdornment>
-                                                    )
+                                            <Autocomplete
+                                                id="nationality"
+                                                options={countries}
+                                                getOptionLabel={(option) => option.label}
+                                                value={countries.find((c) => c.code === infoFormik.values.nationality) || null}
+                                                onChange={(_, newValue) => {
+                                                    infoFormik.setFieldValue('nationality', newValue ? newValue.code : '');
+                                                }}
+                                                onBlur={infoFormik.handleBlur}
+                                                isOptionEqualToValue={(option, value) => option.code === value.code}
+                                                renderOption={(props, option) => {
+                                                    const { key, ...restProps } = props as any;
+                                                    return (
+                                                        <Box component="li" key={option.code} sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...restProps}>
+                                                            <img loading="lazy" width="24" src={option.flag} alt="" style={{ border: '1px solid #eee' }} />
+                                                            {option.label}
+                                                        </Box>
+                                                    );
+                                                }}
+                                                renderInput={(params) => {
+                                                    const selectedCountry = countries.find((c) => c.code === infoFormik.values.nationality);
+                                                    return (
+                                                        <TextField
+                                                            {...params}
+                                                            name="nationality"
+                                                            placeholder={intl.formatMessage({ id: 'select-nationality' })}
+                                                            size="small"
+                                                            fullWidth
+                                                            error={infoFormik.touched.nationality && Boolean(infoFormik.errors.nationality)}
+                                                            helperText={infoFormik.touched.nationality && infoFormik.errors.nationality}
+                                                            InputProps={{
+                                                                ...params.InputProps,
+                                                                startAdornment: (
+                                                                    <>
+                                                                        {selectedCountry ? (
+                                                                            <img
+                                                                                loading="lazy"
+                                                                                width="20"
+                                                                                src={selectedCountry.flag}
+                                                                                alt=""
+                                                                                style={{ marginRight: 8, marginLeft: 4, border: '1px solid #eee' }}
+                                                                            />
+                                                                        ) : (
+                                                                            <PublicIcon sx={{ fontSize: 18, color: 'text.secondary', ml: 1, mr: 1 }} />
+                                                                        )}
+                                                                        {params.InputProps.startAdornment}
+                                                                    </>
+                                                                )
+                                                            }}
+                                                        />
+                                                    );
                                                 }}
                                             />
                                         </Grid>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 
 // material-ui
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -12,6 +12,8 @@ import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Divider from '@mui/material/Divider';
 
 // project-imports
 import { useGetMenuMaster } from 'api/menu';
@@ -19,9 +21,9 @@ import Avatar from 'components/@extended/Avatar';
 import useAuth from 'hooks/useAuth';
 
 // assets
-import { ArrowRight2 } from 'iconsax-reactjs';
+import { ArrowRight2, Logout, Profile } from 'iconsax-reactjs';
 import avatar1 from 'assets/images/users/avatar-6.png';
-import { useIntl } from 'react-intl';
+import { useIntl, FormattedMessage } from 'react-intl';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -43,6 +45,7 @@ const ExpandMore = styled(IconButton, {
 // ==============================|| LIST - USER ||============================== //
 
 export default function UserList() {
+  const theme = useTheme();
   const navigate = useNavigate();
   const intl = useIntl();
 
@@ -108,16 +111,31 @@ export default function UserList() {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        slotProps={{ list: { 'aria-labelledby': 'basic-button' } }}
+        slotProps={{
+          list: { 'aria-labelledby': 'basic-button' },
+          paper: {
+            sx: {
+              width: 160,
+              minWidth: 160,
+              boxShadow: (theme) => theme.customShadows.z1
+            }
+          }
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <MenuItem onClick={handleLogout}>Logout</MenuItem>
-        <MenuItem component={Link} to="#!" onClick={handleClose}>
-          Profile
+        <MenuItem component={Link} to="/admin/profile" onClick={handleClose}>
+          <ListItemIcon>
+            <Profile size={18} variant="Bulk" />
+          </ListItemIcon>
+          <ListItemText primary={<FormattedMessage id="view-profile" />} />
         </MenuItem>
-        <MenuItem component={Link} to="#!" onClick={handleClose}>
-          My account
+        <Divider />
+        <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+          <ListItemIcon>
+            <Logout size={18} variant="Bulk" color={theme.palette.error.main} />
+          </ListItemIcon>
+          <ListItemText primary={<FormattedMessage id="logout" />} />
         </MenuItem>
       </Menu>
     </Box>

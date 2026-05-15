@@ -1,12 +1,37 @@
-// assets
-import { I24Support, MessageProgramming } from 'iconsax-reactjs';
+import {
+  Category,
+  Box as BoxIcon,
+  Buildings,
+  User,
+  People,
+  Medal,
+  VideoSquare,
+  Video,
+  Clock,
+  Ticket,
+  Gallery,
+  TicketDiscount,
+  MessageProgramming,
+  I24Support
+} from 'iconsax-reactjs';
 
 // type
 import { NavItemType } from 'types/menu';
 
 // icons
-// icons
 const icons = {
+  dashboard: Category,
+  combo: BoxIcon,
+  theater: Buildings,
+  user: User,
+  employee: People,
+  membership: Medal,
+  room: VideoSquare,
+  movie: Video,
+  showtime: Clock,
+  booking: Ticket,
+  banner: Gallery,
+  voucher: TicketDiscount,
   maintenance: MessageProgramming,
   contactus: I24Support
 };
@@ -38,84 +63,84 @@ const admin: NavItemType = {
       title: 'dashboard',
       type: 'item',
       url: '/admin/dashboard',
-      icon: icons.contactus
+      icon: icons.dashboard
     },
     {
       id: 'combo',
       title: 'combo',
       type: 'item',
       url: '/admin/combo',
-      icon: icons.contactus
+      icon: icons.combo
     },
     {
       id: 'theater',
       title: 'theater',
       type: 'item',
       url: '/admin/theater',
-      icon: icons.contactus
+      icon: icons.theater
     },
     {
       id: 'user',
       title: 'user',
       type: 'item',
       url: '/admin/user',
-      icon: icons.contactus
+      icon: icons.user
     },
     {
       id: 'employee',
       title: 'employee',
       type: 'item',
       url: '/admin/employee',
-      icon: icons.contactus
+      icon: icons.employee
     },
     {
       id: 'membership',
       title: 'membership',
       type: 'item',
       url: '/admin/membership',
-      icon: icons.contactus
+      icon: icons.membership
     },
     {
       id: 'room',
       title: 'room',
       type: 'item',
       url: '/admin/room',
-      icon: icons.contactus
+      icon: icons.room
     },
     {
       id: 'movie',
       title: 'movie',
       type: 'item',
       url: '/admin/movie',
-      icon: icons.contactus
+      icon: icons.movie
     },
     {
       id: 'showtime',
       title: 'showtime',
       type: 'item',
       url: '/admin/showtime',
-      icon: icons.contactus
+      icon: icons.showtime
     },
     {
       id: 'booking',
       title: 'booking',
       type: 'item',
       url: '/admin/booking',
-      icon: icons.contactus
+      icon: icons.booking
     },
     {
       id: 'banner',
       title: 'banner',
       type: 'item',
       url: '/admin/banner',
-      icon: icons.contactus
+      icon: icons.banner
     },
     {
       id: 'voucher',
       title: 'voucher',
       type: 'item',
       url: '/admin/voucher',
-      icon: icons.contactus
+      icon: icons.voucher
     }
   ]
 };
