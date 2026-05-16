@@ -168,5 +168,13 @@
   "noMoviesFound": "Không tìm thấy phim nào",
   "tryAnotherSearch": "Hãy thử thay đổi từ khóa hoặc bộ lọc để tìm phim phù hợp.",
   "invalidEmail": "Email không hợp lệ!",
-  "invalidPhone": "Số điện thoại không hợp lệ! (10 số, bắt đầu bằng 0)"
+  "invalidPhone": "Số điện thoại không hợp lệ! (10 số, bắt đầu bằng 0)",
+  "usernameRequired": "Vui lòng nhập tên đăng nhập",
+  "usernameTooShort": "Tên đăng nhập phải có ít nhất 3 ký tự",
+  "emailRequired": "Vui lòng nhập email",
+  "emailInvalid": "Email không hợp lệ",
+  "passwordRequired": "Vui lòng nhập mật khẩu",
+  "retypePasswordRequired": "Vui lòng nhập lại mật khẩu",
+  "phoneRequired": "Vui lòng nhập số điện thoại",
+  "phoneInvalid": "Số điện thoại không hợp lệ"
 }

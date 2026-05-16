@@ -130,6 +130,7 @@ function Header() {
             setUser(null);
             setJustLoggedOut(true);
             localStorage.removeItem('theater');
+            window.dispatchEvent(new Event('theaterChange'));
             navigate('/');
             setTimeout(() => {
                 handleAuth();
