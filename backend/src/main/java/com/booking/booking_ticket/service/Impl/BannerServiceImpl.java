@@ -55,7 +55,7 @@ public class BannerServiceImpl implements BannerService {
 
     public void updateBanner(Integer id, BannerRequest request){
         util.validateBanner(request.getName(), id);
-        Banner banner = new Banner();
+        Banner banner = bannerRepository.findById(id).orElseThrow(() -> new RuntimeException("Banner does not exist"));
         if(request.getName() != null){
             banner.setName(request.getName());
         }

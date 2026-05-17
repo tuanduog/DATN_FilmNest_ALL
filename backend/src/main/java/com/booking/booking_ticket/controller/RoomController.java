@@ -6,6 +6,7 @@ import com.booking.booking_ticket.dto.response.ResponseError;
 import com.booking.booking_ticket.entity.Room;
 import com.booking.booking_ticket.service.Impl.RoomServiceImpl;
 import com.booking.booking_ticket.service.RoomService;
+import com.booking.booking_ticket.utils.RoomType;
 import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +48,11 @@ public class RoomController {
     }
 
     @GetMapping("/v1")
-    public ResponseData<?> getList(@PageableDefault() Pageable pageable, @RequestParam(required = false) String keyword, @RequestParam(required = false) Status status){
-        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", roomService.getList(pageable, keyword, status));
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable,
+                                   @RequestParam(required = false) String keyword,
+                                   @RequestParam(required = false) Status status,
+                                   @RequestParam(required = false) RoomType type) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", roomService.getList(pageable, keyword, status, type));
     }
 
     @GetMapping("/v1/{id}")
@@ -78,7 +82,8 @@ public class RoomController {
     public ResponseData<?> getListByTheaterId(@PathVariable Integer id,
                                               @PageableDefault() Pageable pageable,
                                               @RequestParam(required = false) String keyword,
-                                              @RequestParam(required = false) Status status){
-        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", roomService.getListByTheaterId(id, pageable, keyword, status));
+                                              @RequestParam(required = false) Status status,
+                                              @RequestParam(required = false) RoomType type){
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", roomService.getListByTheaterId(id, pageable, keyword, status, type));
     }
 }

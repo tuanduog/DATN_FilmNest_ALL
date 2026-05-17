@@ -16,6 +16,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Booking extends BaseEntity {
 
+    @Column(name = "code", nullable = false, unique = true)
+    String code;
+
     @Column(name = "chair", nullable = false)
     String chair;
 

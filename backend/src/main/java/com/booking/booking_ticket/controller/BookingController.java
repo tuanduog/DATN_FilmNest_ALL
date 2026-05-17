@@ -6,16 +6,20 @@ import com.booking.booking_ticket.dto.BookingSimpleDTO;
 import com.booking.booking_ticket.entity.Booking;
 import com.booking.booking_ticket.repository.BookingRepository;
 import com.booking.booking_ticket.service.BookingService;
+import com.booking.booking_ticket.utils.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +60,7 @@ public class BookingController {
                     }
                 }
             }
+            booking.setCode(generateBookingCode());
 
             Booking saved = bookingRepository.save(booking);
             return ResponseEntity.ok(saved);
@@ -64,6 +69,15 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to save booking: " + e.getMessage());
         }
+    }
+
+    private String generateBookingCode() {
+        String datePart = java.time.LocalDate.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        String randomPart = String.valueOf((int) (Math.random() * 9000) + 1000);
+
+        return "BK" + datePart + randomPart;
     }
 
     @GetMapping("/check-booking")
@@ -106,59 +120,6 @@ public class BookingController {
         }
     }
 
-    @GetMapping("/get-data-for-line-chart")
-    public ResponseData<LineChartResponse> getProductMultipleSearchCol(@RequestParam String filter) {
-        LineChartResponse lc = null;
-        if(filter.equalsIgnoreCase("Year"))
-        {
-             lc = LineChartResponse.builder()
-                    .a_cus(bookingService.getCustomersThisyear())
-                    .revenue(bookingService.getRevenueThisYear())
-                    .build();
-        }else if(filter.equalsIgnoreCase("month")){
-             lc = LineChartResponse.builder()
-                    .a_cus(bookingService.getCustomersThisMonth())
-                    .revenue(bookingService.getRevenueThisMonth())
-                    .build();
-        }
-
-        try{
-            return new ResponseData<>(HttpStatus.OK.value(),"User found!",lc);
-        }
-        catch (Exception e)
-        {
-            log.error("there is an error : {}",e.getMessage());
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
-    }
-
-    @GetMapping("/stats")
-    public ResponseEntity<?> getBookingStats(@RequestParam int year) {
-        Map<String, List<Number>> chartData = bookingService.getMonthlyChartData(year);
-        return ResponseEntity.ok(chartData);
-    }
-
-    @GetMapping("/stats-monthly")
-    public ResponseEntity<?> getBookingStatsMonthly(@RequestParam int month) {
-        Map<String, List<Number>> chartData = bookingService.getYearlyChartData(month);
-        return ResponseEntity.ok(chartData);
-    }
-
-    @GetMapping("/bookings-by-category")
-    public ResponseEntity<List<Map<String, Object>>> getBookingStatsByCategory() {
-        List<BookingByCategoryStats> stats = bookingService.getBookingStatsByCategory();
-
-        // Convert sang format ECharts pie: [{name, value}]
-        List<Map<String, Object>> result = stats.stream().map(stat -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("name", stat.getCategory());
-            map.put("value", stat.getTotal());
-            return map;
-        }).collect(Collectors.toList());
-
-        return ResponseEntity.ok(result);
-    }
-
     @GetMapping("/responses")
     public ResponseEntity<List<BookingResponse>> getAllBookingResponses() {
         return ResponseEntity.ok(bookingService.getAllBookingResponses());
@@ -187,5 +148,30 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to get locked seats: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/v1")
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable,
+                                   @RequestParam(required = false) String keyword,
+                                   @RequestParam(required = false) PaymentStatus paymentStatus,
+                                   @RequestParam(required = false) LocalDate startDate,
+                                   @RequestParam(required = false) LocalDate endDate) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", bookingService.getList(pageable, keyword, paymentStatus, startDate, endDate));
+    }
+
+    @GetMapping("/v1/{id}")
+    public ResponseData<?> getById(@PathVariable Integer id) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get order successful", bookingService.getById(id));
+    }
+
+    @GetMapping("/v1/theater/{id}")
+    public ResponseData<?> getListByTheaterId(
+                                   @PathVariable Integer id,
+                                   @PageableDefault() Pageable pageable,
+                                   @RequestParam(required = false) String keyword,
+                                   @RequestParam(required = false) PaymentStatus paymentStatus,
+                                   @RequestParam(required = false) LocalDate startDate,
+                                   @RequestParam(required = false) LocalDate endDate) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", bookingService.getListByTheaterId(id, pageable, keyword, paymentStatus, startDate, endDate));
     }
 }

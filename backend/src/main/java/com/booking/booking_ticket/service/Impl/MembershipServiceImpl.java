@@ -7,10 +7,7 @@ import com.booking.booking_ticket.dto.response.MembershipResponse;
 import com.booking.booking_ticket.entity.*;
 import com.booking.booking_ticket.repository.*;
 import com.booking.booking_ticket.service.MembershipService;
-import com.booking.booking_ticket.utils.BenefitType;
-import com.booking.booking_ticket.utils.MembershipPaymentStatus;
-import com.booking.booking_ticket.utils.Status;
-import com.booking.booking_ticket.utils.Util;
+import com.booking.booking_ticket.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,14 +46,14 @@ public class MembershipServiceImpl implements MembershipService {
     private UsersRepository usersRepository;
 
     @Override
-    public Page<MembershipResponse> getList(Pageable pageable, String keyword, Status status){
+    public Page<MembershipResponse> getList(Pageable pageable, String keyword, Status status, MembershipType type){
         if (keyword != null){
             keyword = "%" + keyword.trim().toLowerCase() + "%";
         } else {
             keyword = "%";
         }
 
-        return membershipRepository.getList(pageable, keyword, status);
+        return membershipRepository.getList(pageable, keyword, status, type);
     }
 
     @Override

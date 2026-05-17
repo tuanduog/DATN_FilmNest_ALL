@@ -30,4 +30,11 @@ public interface UsersMembershipRepository extends JpaRepository<UsersMembership
             AND mb.type <> :type
     """)
     List<MembershipBenefit> findUserBenefit(Integer userId, LocalDateTime now, BenefitType type);
+
+    @Query("""
+        SELECT um
+        FROM UsersMembership um
+        WHERE um.membershipPaymentStatus = :status
+    """)
+    List<UsersMembership> findAllWithStatus(MembershipPaymentStatus status);
 }

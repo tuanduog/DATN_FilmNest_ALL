@@ -11,6 +11,7 @@ import com.booking.booking_ticket.repository.RoomRepository;
 import com.booking.booking_ticket.repository.SeatRepository;
 import com.booking.booking_ticket.repository.TheaterRepository;
 import com.booking.booking_ticket.service.RoomService;
+import com.booking.booking_ticket.utils.RoomType;
 import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,25 +42,25 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Page<RoomResponse> getList(Pageable pageable, String keyword, Status status) {
+    public Page<RoomResponse> getList(Pageable pageable, String keyword, Status status, RoomType type) {
         if (keyword != null){
             keyword = "%" + keyword.trim().toLowerCase() + "%";
         } else {
             keyword = "%";
         }
 
-        return roomRepository.findAllByKeyword(pageable, keyword, status);
+        return roomRepository.findAllByKeyword(pageable, keyword, status, type);
     }
 
     @Override
-    public Page<RoomResponse> getListByTheaterId(Integer theaterId, Pageable pageable, String keyword, Status status) {
+    public Page<RoomResponse> getListByTheaterId(Integer theaterId, Pageable pageable, String keyword, Status status, RoomType type) {
         if (keyword != null){
             keyword = "%" + keyword.trim().toLowerCase() + "%";
         } else {
             keyword = "%";
         }
 
-        return roomRepository.findAllByTheaterId(theaterId, pageable, keyword, status);
+        return roomRepository.findAllByTheaterId(theaterId, pageable, keyword, status, type);
     }
 
     @Override
@@ -98,6 +99,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public void updateRoom(Integer id, RoomRequest request){
         Room room = roomRepository.findById(id).orElseThrow(()-> new RuntimeException("Room does not exist"));
         Optional<Room> validateName = roomRepository.validateByName(request.getName(), id);

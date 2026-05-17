@@ -2,6 +2,7 @@ package com.booking.booking_ticket.repository;
 
 import com.booking.booking_ticket.dto.response.MembershipResponse;
 import com.booking.booking_ticket.entity.Membership;
+import com.booking.booking_ticket.utils.MembershipType;
 import com.booking.booking_ticket.utils.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,9 +30,10 @@ public interface MembershipRepository extends JpaRepository<Membership, Integer>
         SELECT new com.booking.booking_ticket.dto.response.MembershipResponse(m.id, m.name, m.type, m. price, m.duration, m.status)
         FROM Membership m
         WHERE (LOWER(m.name) LIKE :keyword)
-        AND (:status IS NULL OR m.status = :status)
+            AND (:status IS NULL OR m.status = :status)
+            AND (:type IS NULL OR m.type = :type)
     """)
-    Page<MembershipResponse> getList(Pageable pageable, String keyword, Status status);
+    Page<MembershipResponse> getList(Pageable pageable, String keyword, Status status, MembershipType type);
 
     @Query("""
         SELECT m

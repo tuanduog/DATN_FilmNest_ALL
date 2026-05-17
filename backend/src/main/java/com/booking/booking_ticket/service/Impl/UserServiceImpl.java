@@ -6,16 +6,20 @@ import com.booking.booking_ticket.dto.request.UserUpdateRequest;
 import com.booking.booking_ticket.dto.response.*;
 import com.booking.booking_ticket.entity.*;
 import com.booking.booking_ticket.repository.*;
+import com.booking.booking_ticket.service.MailService;
 import com.booking.booking_ticket.service.UserService;
 import com.booking.booking_ticket.utils.*;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ComboRepository comboRepository;
+
+    @Autowired
+    private MailService mailService;
 
     @Override
     public UserResponse getUserProfile(){
@@ -111,7 +118,7 @@ public class UserServiceImpl implements UserService {
         Users user = util.getLoginUser();
 
         if (!BCrypt.checkpw(request.getOldPassword(), user.getPassword())){
-            throw new RuntimeException("Old password not match");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password not match");
         } else {
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
             usersRepository.save(user);
@@ -126,7 +133,7 @@ public class UserServiceImpl implements UserService {
             keyword = "%";
         }
 
-        return usersRepository.findAllByKeyword(pageable, keyword, status);
+        return usersRepository.findAllByKeyword(pageable, keyword, status, Role.USER);
     }
 
     @Override
@@ -151,14 +158,17 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setFullname(request.getFullname());
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode("123456"));
+        String password = RandomStringUtils.randomAlphanumeric(10);
+        user.setPassword(passwordEncoder.encode(password));
         user.setPhone(request.getPhone());
         user.setDob(request.getDob());
         user.setGender(request.getGender());
         user.setNationality(request.getNationality());
-        user.setRole(request.getRole());
+        user.setRole(Role.USER);
         user.setStatus(Status.ACTIVE);
         usersRepository.save(user);
+
+        mailService.sendCreateAccountMail(request.getEmail(), request.getUsername(), password);
     }
 
     @Override
@@ -175,7 +185,14 @@ public class UserServiceImpl implements UserService {
         user.setDob(request.getDob());
         user.setGender(request.getGender());
         user.setNationality(request.getNationality());
-        user.setRole(request.getRole());
+
+        if (request.getStatus() != null){
+            if (user.getStatus().equals(Status.ACTIVE)){
+                user.setStatus(Status.INACTIVE);
+            } else {
+                user.setStatus(Status.ACTIVE);
+            }
+        }
         usersRepository.save(user);
     }
 

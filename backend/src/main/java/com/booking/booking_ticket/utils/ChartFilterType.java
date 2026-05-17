@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Arrays;
 
-public enum MembershipType {
+public enum ChartFilterType {
 
-    PLATINUM("platinum"), GOLD("gold"), SILVER("silver");
+    TODAY("today"), WEEK("week"), MONTH("month"), YEAR("year");
 
     private final String value;
 
-    MembershipType(String value) {
+    ChartFilterType(String value) {
         this.value = value;
     }
 
@@ -21,10 +21,10 @@ public enum MembershipType {
     }
 
     @JsonCreator
-    public static MembershipType fromValue(String value) {
-        return Arrays.stream(MembershipType.values())
+    public static ChartFilterType fromValue(String value) {
+        return Arrays.stream(ChartFilterType.values())
                 .filter(s -> s.value.equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid status " + value));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid type " + value));
     }
 }

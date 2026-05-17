@@ -27,5 +27,5 @@ public interface ShowTimeService {
 
     public List<ShowTimeResponse> getShowtimeByRoomId(int id);
 
-
+    public Page<ShowTimeResponse> getListByTheaterId(Integer theaterId, Pageable pageable, String keyword, Status status);
 }

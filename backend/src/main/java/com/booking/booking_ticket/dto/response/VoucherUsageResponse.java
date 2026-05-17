@@ -32,4 +32,13 @@ public class VoucherUsageResponse {
     Double minOrderValue;
 
     Integer quantity;
+
+    public VoucherUsageResponse(Integer id, String code, String description, Double discount, VoucherType type, Integer quantity) {
+        this.id = id;
+        this.code = code;
+        this.description = description;
+        this.discount = discount;
+        this.type = type;
+        this.quantity = quantity;
+    }
 }

@@ -81,7 +81,7 @@ public class MovieController {
     @GetMapping("/v1")
     public ResponseData<?> getList(@PageableDefault() Pageable pageable,
                                    @RequestParam(required = false) String keyword,
-                                   @RequestParam(required = false)ShowingStatus showingStatus,
+                                   @RequestParam(required = false) ShowingStatus showingStatus,
                                    @RequestParam(required = false) Status status){
         return new ResponseData<>(HttpStatus.OK.value(), "Get list successful", movieService.getList(pageable, keyword, showingStatus, status));
     }

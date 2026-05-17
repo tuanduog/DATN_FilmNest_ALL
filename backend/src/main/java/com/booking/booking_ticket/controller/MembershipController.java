@@ -4,6 +4,7 @@ import com.booking.booking_ticket.dto.request.MembershipRequest;
 import com.booking.booking_ticket.dto.response.MembershipResponse;
 import com.booking.booking_ticket.dto.response.ResponseData;
 import com.booking.booking_ticket.service.MembershipService;
+import com.booking.booking_ticket.utils.MembershipType;
 import com.booking.booking_ticket.utils.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,11 @@ public class MembershipController {
     private final MembershipService membershipService;
 
     @GetMapping("/v1")
-    public ResponseData<?> getList(@PageableDefault() Pageable pageable, @RequestParam(required = false) String keyword, @RequestParam(required = false) Status status){
-        Page<MembershipResponse> data = membershipService.getList(pageable, keyword, status);
+    public ResponseData<?> getList(@PageableDefault() Pageable pageable,
+                                   @RequestParam(required = false) String keyword,
+                                   @RequestParam(required = false) Status status,
+                                   @RequestParam(required = false)MembershipType type){
+        Page<MembershipResponse> data = membershipService.getList(pageable, keyword, status, type);
         return new ResponseData<>(HttpStatus.OK.value(), "Get List Successful", data);
     }
 

@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Arrays;
 
-public enum MembershipType {
+public enum ReactionType {
 
-    PLATINUM("platinum"), GOLD("gold"), SILVER("silver");
+    LIKE("like"), DISLIKE("dislike"), UNLIKE("unlike"), UNDISLIKE("undislike");
 
     private final String value;
 
-    MembershipType(String value) {
+    ReactionType(String value) {
         this.value = value;
     }
 
@@ -21,8 +21,8 @@ public enum MembershipType {
     }
 
     @JsonCreator
-    public static MembershipType fromValue(String value) {
-        return Arrays.stream(MembershipType.values())
+    public static ReactionType fromValue(String value) {
+        return Arrays.stream(ReactionType.values())
                 .filter(s -> s.value.equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid status " + value));

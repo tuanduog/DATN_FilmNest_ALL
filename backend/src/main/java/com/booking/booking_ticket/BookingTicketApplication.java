@@ -2,11 +2,13 @@ package com.booking.booking_ticket;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @EnableScheduling
 @SpringBootApplication
+@EnableAsync
 public class BookingTicketApplication {
 
 	public static void main(String[] args) {
