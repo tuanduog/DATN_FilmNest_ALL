@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 
 // project-imports
 import Loadable from 'components/Loadable';
@@ -6,9 +7,10 @@ import { SimpleLayoutType } from 'config';
 import DashboardLayout from 'layout/Dashboard';
 import PagesLayout from 'layout/Pages';
 import SimpleLayout from 'layout/Simple';
+import useAuth from 'hooks/useAuth';
 import AdminDashboard from 'pages/dashboard/admin';
 import ManagerDashboard from 'pages/dashboard/manager';
-import StaffDashboard from 'pages/dashboard/staff';
+import ManagerTheaterProfile from 'pages/manager-theater-profile';
 import ComboPage from 'pages/combo-page';
 import AddCombo from 'sections/combo/add';
 import ComboDetail from 'sections/combo/detail';
@@ -49,6 +51,9 @@ import AddVoucher from 'sections/voucher/add';
 import EditVoucher from 'sections/voucher/edit';
 import VoucherPage from 'pages/voucher-page';
 import VoucherDetail from 'sections/voucher/detail';
+import ProfilePage from 'sections/profile/profile';
+import BookingPage from 'pages/booking-page';
+import BookingDetail from 'sections/booking/detail';
 
 
 // pages routing
@@ -65,6 +70,14 @@ const ContactUS = Loadable(lazy(() => import('pages/contact-us')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 
+const DashboardRedirect = () => {
+  const { user } = useAuth();
+  if (user?.role?.toUpperCase() === 'ADMIN') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  return <Navigate to="/manager/dashboard" replace />;
+};
+
 const MainRoutes = {
   path: '/',
   children: [
@@ -73,16 +86,20 @@ const MainRoutes = {
       element: <DashboardLayout />,
       children: [
         {
+          index: true,
+          element: <Navigate to="/dashboard" replace />
+        },
+        {
+          path: 'dashboard',
+          element: <DashboardRedirect />
+        },
+        {
           path: 'admin/dashboard',
           element: < AdminDashboard />
         },
         {
           path: 'manager/dashboard',
           element: <ManagerDashboard />
-        },
-        {
-          path: 'staff/dashboard',
-          element: <StaffDashboard />
         },
         {
           path: 'admin/combo',
@@ -243,6 +260,79 @@ const MainRoutes = {
         {
           path: 'admin/voucher/detail/:id',
           element: <VoucherDetail />
+        },
+        {
+          path: 'admin/profile',
+          element: <ProfilePage />
+        },
+        {
+          path: 'admin/booking',
+          element: <BookingPage />
+        },
+        {
+          path: 'admin/booking/detail/:id',
+          element: <BookingDetail />
+        },
+        // MANAGER ROUTES
+        {
+          path: 'manager/booking',
+          element: <BookingPage />
+        },
+        {
+          path: 'manager/booking/detail/:id',
+          element: <BookingDetail />
+        },
+        {
+          path: 'manager/showtime',
+          element: <ShowtimePage />
+        },
+        {
+          path: 'manager/showtime/add',
+          element: <AddShowtime />
+        },
+        {
+          path: 'manager/showtime/edit/:id',
+          element: <EditShowtime />
+        },
+        {
+          path: 'manager/showtime/detail/:id',
+          element: <ShowtimeDetail />
+        },
+        {
+          path: 'manager/movie',
+          element: <MoviePage />
+        },
+        {
+          path: 'manager/movie/detail/:id',
+          element: <MovieDetail />
+        },
+        {
+          path: 'manager/theater-profile',
+          element: <ManagerTheaterProfile />
+        },
+        {
+          path: 'manager/theater/edit/:id',
+          element: <EditTheater />
+        },
+        {
+          path: 'manager/room',
+          element: <RoomPage />
+        },
+        {
+          path: 'manager/room/add',
+          element: <AddRoom />
+        },
+        {
+          path: 'manager/room/edit/:id',
+          element: <EditRoom />
+        },
+        {
+          path: 'manager/room/detail/:id',
+          element: <RoomDetail />
+        },
+        {
+          path: 'manager/profile',
+          element: <ProfilePage />
         }
       ]
     },

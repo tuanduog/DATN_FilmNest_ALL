@@ -55,8 +55,7 @@ export default function AddConfirmForm({ handleBack, user }: ConfirmProps) {
             phone: user.phone,
             gender: user.gender,
             dob: user.dob,
-            nationality: user.nationality,
-            role: user.role,
+            nationality: user.nationality
         };
 
         try {
@@ -148,13 +147,6 @@ export default function AddConfirmForm({ handleBack, user }: ConfirmProps) {
                                         {countries.find((c) => c.code === user.nationality)?.label || user.nationality}
                                     </Typography>
                                 </Stack>
-                            </Stack>
-                        </Grid>
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Stack sx={{ gap: 1 }}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Vai trò</InputLabel>
-                                <Typography>{user.role === 'USER' ? 'Người dùng' : user.role === 'MANAGER' ? 'Quản lý rạp' : 'Nhân viên'}</Typography>
                             </Stack>
                         </Grid>
                     </Grid>

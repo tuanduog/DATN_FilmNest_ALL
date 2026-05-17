@@ -53,14 +53,14 @@ export default function MovieDetail() {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Thông tin phim
+                        {intl.formatMessage({ id: 'movie-info' })}
                     </Typography>
 
                     <Grid container spacing={2}>
                         {movie?.image && (
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
-                                    <InputLabel sx={{ mb: 1 }}>Hình ảnh phim</InputLabel>
+                                    <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'movie-image' })}</InputLabel>
                                     <img
                                         src={movie.image}
                                         alt="movie"
@@ -72,7 +72,7 @@ export default function MovieDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="name" sx={{ mb: 1 }}>
-                                Tên phim
+                                {intl.formatMessage({ id: 'movie-name' })}
                             </InputLabel>
 
                             <Typography>{movie?.name}</Typography>
@@ -80,7 +80,7 @@ export default function MovieDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="duration" sx={{ mb: 1 }}>
-                                Thời lượng (phút)
+                                {intl.formatMessage({ id: 'duration-minutes' })}
                             </InputLabel>
 
                             <Typography>{movie?.duration}</Typography>
@@ -88,7 +88,7 @@ export default function MovieDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="director" sx={{ mb: 1 }}>
-                                Đạo diễn
+                                {intl.formatMessage({ id: 'director' })}
                             </InputLabel>
 
                             <Typography>{movie?.director}</Typography>
@@ -96,7 +96,7 @@ export default function MovieDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="actor" sx={{ mb: 1 }}>
-                                Diễn viên
+                                {intl.formatMessage({ id: 'actor' })}
                             </InputLabel>
 
                             <Typography>{movie?.actor}</Typography>
@@ -104,7 +104,7 @@ export default function MovieDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="genre" sx={{ mb: 1 }}>
-                                Thể loại
+                                {intl.formatMessage({ id: 'genre' })}
                             </InputLabel>
 
                             <Typography>{movie?.genre}</Typography>
@@ -112,7 +112,7 @@ export default function MovieDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="releaseDate" sx={{ mb: 1 }}>
-                                Ngày chiếu
+                                {intl.formatMessage({ id: 'release-date' })}
                             </InputLabel>
 
                             <Typography>{formatDate(movie?.releaseDate)}</Typography>
@@ -120,7 +120,7 @@ export default function MovieDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="endDate" sx={{ mb: 1 }}>
-                                Ngày kết thúc
+                                {intl.formatMessage({ id: 'end-date' })}
                             </InputLabel>
 
                             <Typography>{formatDate(movie?.endDate)}</Typography>
@@ -128,7 +128,7 @@ export default function MovieDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="trailerUrl" sx={{ mb: 1 }}>
-                                Link trailer
+                                {intl.formatMessage({ id: 'trailer-link' })}
                             </InputLabel>
 
                             <Typography>{movie?.trailerUrl}</Typography>
@@ -136,7 +136,7 @@ export default function MovieDetail() {
 
                         <Grid size={12}>
                             <InputLabel htmlFor="description" sx={{ mb: 1 }}>
-                                Mô tả
+                                {intl.formatMessage({ id: 'description' })}
                             </InputLabel>
 
                             <Typography>{movie?.description}</Typography>
@@ -148,7 +148,7 @@ export default function MovieDetail() {
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
                             <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/movie/edit/${id}`)}>
-                                Cập nhật
+                                {intl.formatMessage({ id: 'update' })}
                             </Button>
                         </AnimateButton>
                     </Stack>

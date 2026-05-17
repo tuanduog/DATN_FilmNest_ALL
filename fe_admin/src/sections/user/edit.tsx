@@ -321,39 +321,6 @@ export default function EditUser() {
                                     }}
                                 />
                             </Grid>
-
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <InputLabel htmlFor="role" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Vai trò
-                                </InputLabel>
-
-                                <FormControl
-                                    fullWidth
-                                    size="small"
-                                    error={formik.touched.role && Boolean(formik.errors.role)}
-                                >
-                                    <Select
-                                        labelId="role-label"
-                                        id="role"
-                                        name="role"
-                                        value={formik.values.role}
-                                        displayEmpty
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                    >
-                                        <MenuItem value="" disabled sx={{ display: 'none' }}>
-                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn vai trò</Box>
-                                        </MenuItem>
-                                        <MenuItem value="MANAGER">{intl.formatMessage({ id: 'manager' })}</MenuItem>
-                                        <MenuItem value="USER">{intl.formatMessage({ id: 'user' })}</MenuItem>
-                                        <MenuItem value="STAFF">{intl.formatMessage({ id: 'staff' })}</MenuItem>
-                                    </Select>
-
-                                    <FormHelperText>
-                                        {formik.touched.role && formik.errors.role}
-                                    </FormHelperText>
-                                </FormControl>
-                            </Grid>
                         </Grid>
                     </Box>
 

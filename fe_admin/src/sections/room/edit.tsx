@@ -11,8 +11,9 @@ import RoomConfirmForm from './add-confirm-form';
 import { Room } from 'types/room';
 import { getById } from 'api/room';
 import { HttpStatusCode } from 'axios';
+import { FormattedMessage } from 'react-intl';
 
-const steps = ['Thông tin phòng chiếu', 'Thiết lập ghế', 'Xác nhận'];
+const stepKeys = ['room-info', 'seat-config', 'confirm'];
 
 function getStepContent(
     step: number,
@@ -100,7 +101,7 @@ export default function EditRoom() {
     if (!room) {
         return (
             <Box p={3}>
-                <Typography color="error">Không tìm thấy thông tin phòng chiếu.</Typography>
+                <Typography color="error"><FormattedMessage id="room-not-found" /></Typography>
             </Box>
         );
     }
@@ -108,13 +109,13 @@ export default function EditRoom() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Chỉnh sửa phòng chiếu</Typography>
+                <Typography variant="h3"><FormattedMessage id="edit-room" /></Typography>
             </Box>
 
             <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
-                {steps.map((label) => (
-                    <Step key={label}>
-                        <StepLabel>{label}</StepLabel>
+                {stepKeys.map((key) => (
+                    <Step key={key}>
+                        <StepLabel><FormattedMessage id={key} /></StepLabel>
                     </Step>
                 ))}
             </Stepper>

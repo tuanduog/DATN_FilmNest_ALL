@@ -29,38 +29,38 @@ import { getById, update } from 'api/voucher';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 
-const validationSchema = Yup.object({
-    code: Yup.string().required('Mã khuyến mãi là bắt buộc').max(20, 'Mã không được quá 20 ký tự'),
-    type: Yup.string().required('Loại khuyến mãi là bắt buộc'),
-    description: Yup.string().required('Mô tả là bắt buộc'),
-    isUnlimited: Yup.boolean(),
-    startDate: Yup.date().when('isUnlimited', {
-        is: false,
-        then: (schema) => schema.required('Ngày bắt đầu là bắt buộc'),
-        otherwise: (schema) => schema.nullable()
-    }),
-    endDate: Yup.date().when('isUnlimited', {
-        is: false,
-        then: (schema) => schema.required('Ngày kết thúc là bắt buộc').min(Yup.ref('startDate'), 'Ngày kết thúc phải sau ngày bắt đầu'),
-        otherwise: (schema) => schema.nullable()
-    }),
-    discount: Yup.number().required('Mức giảm giá là bắt buộc').min(1, 'Mức giảm giá phải lớn hơn 0').max(100, 'Mức giảm giá không quá 100%'),
-    quantity: Yup.number().when('type', {
-        is: 'PUBLIC',
-        then: (schema) => schema.required('Số lượng là bắt buộc').min(1, 'Số lượng phải lớn hơn 0'),
-        otherwise: (schema) => schema.nullable()
-    }),
-    minOrderValue: Yup.number().when('type', {
-        is: 'PUBLIC',
-        then: (schema) => schema.required('Giá trị đơn hàng tối thiểu là bắt buộc').min(0, 'Giá trị không được âm'),
-        otherwise: (schema) => schema.nullable().min(0, 'Giá trị không được âm')
-    })
-});
-
 export default function EditVoucher() {
     const { id } = useParams<{ id: string }>();
     const intl = useIntl();
     const navigate = useNavigate();
+
+    const validationSchema = Yup.object({
+        code: Yup.string().required(intl.formatMessage({ id: 'voucher-code-required' })).max(20, intl.formatMessage({ id: 'voucher-code-max' })),
+        type: Yup.string().required(intl.formatMessage({ id: 'voucher-type-required' })),
+        description: Yup.string().required(intl.formatMessage({ id: 'description-required' })),
+        isUnlimited: Yup.boolean(),
+        startDate: Yup.date().when('isUnlimited', {
+            is: false,
+            then: (schema) => schema.required(intl.formatMessage({ id: 'start-date-required' })),
+            otherwise: (schema) => schema.nullable()
+        }),
+        endDate: Yup.date().when('isUnlimited', {
+            is: false,
+            then: (schema) => schema.required(intl.formatMessage({ id: 'end-date-required' })).min(Yup.ref('startDate'), intl.formatMessage({ id: 'end-date-min' })),
+            otherwise: (schema) => schema.nullable()
+        }),
+        discount: Yup.number().required(intl.formatMessage({ id: 'discount-required' })).min(1, intl.formatMessage({ id: 'discount-min' })).max(100, intl.formatMessage({ id: 'discount-max' })),
+        quantity: Yup.number().when('type', {
+            is: 'PUBLIC',
+            then: (schema) => schema.required(intl.formatMessage({ id: 'quantity-required' })).min(1, intl.formatMessage({ id: 'quantity-min' })),
+            otherwise: (schema) => schema.nullable()
+        }),
+        minOrderValue: Yup.number().when('type', {
+            is: 'PUBLIC',
+            then: (schema) => schema.required(intl.formatMessage({ id: 'min-order-value-required' })).min(0, intl.formatMessage({ id: 'min-order-value-min' })),
+            otherwise: (schema) => schema.nullable().min(0, intl.formatMessage({ id: 'min-order-value-min' }))
+        })
+    });
 
     const [alert, setAlert] = useState({
         open: false,
@@ -134,7 +134,7 @@ export default function EditVoucher() {
 
                 if (response.status === HttpStatusCode.Ok) {
                     navigate('/admin/voucher', {
-                        state: { alert: { open: true, severity: 'success', message: 'Cập nhật khuyến mãi thành công' } }
+                        state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'update-voucher-success' }) } }
                     });
                 } else if (response.status === HttpStatusCode.BadRequest) {
                     setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
@@ -150,25 +150,25 @@ export default function EditVoucher() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Chỉnh sửa khuyến mãi</Typography>
+                <Typography variant="h3">{intl.formatMessage({ id: 'edit-voucher' })}</Typography>
             </Box>
 
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 20 }, mr: { xs: 0, lg: 20 }, borderRadius: 2 }}>
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                            Thông tin khuyến mãi
+                            {intl.formatMessage({ id: 'voucher-info' })}
                         </Typography>
 
                         <Grid container spacing={3}>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="code" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Mã khuyến mãi
+                                    {intl.formatMessage({ id: 'voucher-code' })}
                                 </InputLabel>
                                 <TextField
                                     id="code"
                                     name="code"
-                                    placeholder="Ví dụ: GIAM20"
+                                    placeholder={intl.formatMessage({ id: 'voucher-code-example' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.code}
@@ -181,7 +181,7 @@ export default function EditVoucher() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="type" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Loại khuyến mãi
+                                    {intl.formatMessage({ id: 'voucher-type' })}
                                 </InputLabel>
                                 <FormControl
                                     fullWidth
@@ -197,10 +197,12 @@ export default function EditVoucher() {
                                         onBlur={formik.handleBlur}
                                     >
                                         <MenuItem value="" disabled sx={{ display: 'none' }}>
-                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn loại khuyến mãi</Box>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}>
+                                                {intl.formatMessage({ id: 'select-voucher-type' })}
+                                            </Box>
                                         </MenuItem>
-                                        <MenuItem value="PUBLIC">Chung (Công khai)</MenuItem>
-                                        <MenuItem value="PERSONAL">Cá nhân (Gói hội viên)</MenuItem>
+                                        <MenuItem value="PUBLIC">{intl.formatMessage({ id: 'public-voucher' })}</MenuItem>
+                                        <MenuItem value="PERSONAL">{intl.formatMessage({ id: 'personal-voucher' })}</MenuItem>
                                     </Select>
                                     {formik.touched.type && formik.errors.type && (
                                         <FormHelperText>{formik.errors.type}</FormHelperText>
@@ -210,12 +212,12 @@ export default function EditVoucher() {
 
                             <Grid size={{ xs: 12 }}>
                                 <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Mô tả
+                                    {intl.formatMessage({ id: 'description' })}
                                 </InputLabel>
                                 <TextField
                                     id="description"
                                     name="description"
-                                    placeholder="Nhập mô tả chi tiết về khuyến mãi"
+                                    placeholder={intl.formatMessage({ id: 'voucher-description-placeholder' })}
                                     size="small"
                                     fullWidth
                                     multiline
@@ -244,7 +246,7 @@ export default function EditVoucher() {
                                             name="isUnlimited"
                                         />
                                     }
-                                    label="Không giới hạn thời gian"
+                                    label={intl.formatMessage({ id: 'unlimited-time' })}
                                 />
                             </Grid>
 
@@ -252,7 +254,7 @@ export default function EditVoucher() {
                                 <>
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <InputLabel htmlFor="startDate" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                            Ngày bắt đầu
+                                            {intl.formatMessage({ id: 'start-date' })}
                                         </InputLabel>
                                         <TextField
                                             id="startDate"
@@ -271,7 +273,7 @@ export default function EditVoucher() {
 
                                     <Grid size={{ xs: 12, md: 6 }}>
                                         <InputLabel htmlFor="endDate" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                            Ngày kết thúc
+                                            {intl.formatMessage({ id: 'end-date' })}
                                         </InputLabel>
                                         <TextField
                                             id="endDate"
@@ -292,13 +294,13 @@ export default function EditVoucher() {
 
                             <Grid size={{ xs: 12, md: formik.values.type === 'PUBLIC' ? 6 : 12 }}>
                                 <InputLabel htmlFor="discount" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Mức giảm giá (%)
+                                    {intl.formatMessage({ id: 'discount-value' })} (%)
                                 </InputLabel>
                                 <TextField
                                     id="discount"
                                     name="discount"
                                     type="number"
-                                    placeholder="Nhập số tiền giảm"
+                                    placeholder={intl.formatMessage({ id: 'discount-value-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.discount}
@@ -312,13 +314,13 @@ export default function EditVoucher() {
                             {formik.values.type === 'PUBLIC' && (
                                 <Grid size={{ xs: 12, md: 6 }}>
                                     <InputLabel htmlFor="quantity" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                        Số lượng
+                                        {intl.formatMessage({ id: 'quantity' })}
                                     </InputLabel>
                                     <TextField
                                         id="quantity"
                                         name="quantity"
                                         type="number"
-                                        placeholder="Nhập số lượng phát hành"
+                                        placeholder={intl.formatMessage({ id: 'quantity-placeholder' })}
                                         size="small"
                                         fullWidth
                                         value={formik.values.quantity}
@@ -337,13 +339,13 @@ export default function EditVoucher() {
                                         required={formik.values.type === 'PUBLIC'}
                                         sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}
                                     >
-                                        Giá trị đơn tối thiểu (VNĐ)
+                                        {intl.formatMessage({ id: 'min-order-value-label' })}
                                     </InputLabel>
                                     <TextField
                                         id="minOrderValue"
                                         name="minOrderValue"
                                         type="number"
-                                        placeholder="Giá trị đơn hàng tối thiểu"
+                                        placeholder={intl.formatMessage({ id: 'min-order-value-placeholder' })}
                                         size="small"
                                         fullWidth
                                         value={formik.values.minOrderValue}
@@ -357,7 +359,7 @@ export default function EditVoucher() {
 
                             <Grid size={{ xs: 12, md: formik.values.type === 'PUBLIC' ? 6 : 12 }}>
                                 <InputLabel htmlFor="status" sx={{ mb: 1 }}>
-                                    Trạng thái
+                                    {intl.formatMessage({ id: 'status' })}
                                 </InputLabel>
                                 <FormControl fullWidth size="small">
                                     <Select
@@ -366,8 +368,8 @@ export default function EditVoucher() {
                                         value={formik.values.status}
                                         onChange={formik.handleChange}
                                     >
-                                        <MenuItem value="ACTIVE">Hoạt động</MenuItem>
-                                        <MenuItem value="INACTIVE">Không hoạt động</MenuItem>
+                                        <MenuItem value="ACTIVE">{intl.formatMessage({ id: 'active' })}</MenuItem>
+                                        <MenuItem value="INACTIVE">{intl.formatMessage({ id: 'inactive' })}</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -376,11 +378,11 @@ export default function EditVoucher() {
 
                     <Stack direction="row" justifyContent="flex-end" spacing={2}>
                         <Button variant="outlined" color="secondary" onClick={() => navigate('/admin/voucher')}>
-                            Hủy
+                            {intl.formatMessage({ id: 'cancel' })}
                         </Button>
                         <AnimateButton>
                             <Button variant="contained" type="submit">
-                                Lưu thay đổi
+                                {intl.formatMessage({ id: 'save-changes' })}
                             </Button>
                         </AnimateButton>
                     </Stack>

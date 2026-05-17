@@ -7,7 +7,7 @@ const axiosServices = axios.create({ baseURL: import.meta.env.VITE_APP_API_URL |
 axiosServices.interceptors.request.use(
   async (config) => {
     const accessToken = localStorage.getItem('serviceToken');
-    if (accessToken) {
+    if (accessToken && !config.url?.includes('/auth/login')) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
     return config;

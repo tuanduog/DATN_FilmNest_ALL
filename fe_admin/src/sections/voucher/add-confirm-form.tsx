@@ -15,6 +15,7 @@ import {
     Stack,
     Typography
 } from '@mui/material';
+import { useIntl } from 'react-intl';
 
 // project-imports
 import { create } from 'api/voucher';
@@ -29,6 +30,7 @@ interface ConfirmProps {
 
 export default function AddConfirmForm({ handleBack, voucher }: ConfirmProps) {
     const navigate = useNavigate();
+    const intl = useIntl();
 
     const [alert, setAlert] = useState({
         open: false,
@@ -42,13 +44,13 @@ export default function AddConfirmForm({ handleBack, voucher }: ConfirmProps) {
 
             if (response.status === HttpStatusCode.Ok || response.status === HttpStatusCode.Created || !response.status) {
                 navigate('/admin/voucher', {
-                    state: { alert: { open: true, severity: 'success', message: 'Thêm khuyến mãi thành công' } }
+                    state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'add-voucher-success' }) } }
                 });
             } else {
-                setAlert({ open: true, message: 'Có lỗi xảy ra khi thêm khuyến mãi', severity: 'error' });
+                setAlert({ open: true, message: intl.formatMessage({ id: 'add-voucher-error' }), severity: 'error' });
             }
         } catch (err: any) {
-            setAlert({ open: true, message: err.message || 'Lỗi hệ thống', severity: 'error' });
+            setAlert({ open: true, message: err.message || intl.formatMessage({ id: 'system-error' }), severity: 'error' });
         }
     };
 
@@ -57,54 +59,54 @@ export default function AddConfirmForm({ handleBack, voucher }: ConfirmProps) {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 20 }, mr: { xs: 0, lg: 20 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Xác nhận thông tin khuyến mãi
+                        {intl.formatMessage({ id: 'confirm-voucher-info' })}
                     </Typography>
 
                     <Grid container spacing={3}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mã khuyến mãi</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'voucher-code' })}</InputLabel>
                                 <Typography variant="body1">{voucher.code}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Loại khuyến mãi</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'voucher-type' })}</InputLabel>
                                 <Typography variant="body1">
-                                    {voucher.type === 'PUBLIC' ? 'Chung (Công khai)' : 'Cá nhân (Gói hội viên)'}
+                                    {voucher.type === 'PUBLIC' ? intl.formatMessage({ id: 'public-voucher' }) : intl.formatMessage({ id: 'personal-voucher' })}
                                 </Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mô tả</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'description' })}</InputLabel>
                                 <Typography variant="body1">{voucher.description}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Ngày bắt đầu</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'start-date' })}</InputLabel>
                                 <Typography variant="body1">
-                                    {voucher.startDate ? formatDate(voucher.startDate) : 'Không giới hạn'}
+                                    {voucher.startDate ? formatDate(voucher.startDate) : intl.formatMessage({ id: 'unlimited' })}
                                 </Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Ngày kết thúc</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'end-date' })}</InputLabel>
                                 <Typography variant="body1">
-                                    {voucher.endDate ? formatDate(voucher.endDate) : 'Không giới hạn'}
+                                    {voucher.endDate ? formatDate(voucher.endDate) : intl.formatMessage({ id: 'unlimited' })}
                                 </Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: voucher.type === 'PUBLIC' ? 4 : 12 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mức giảm giá (%)</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'discount-value' })} (%)</InputLabel>
                                 <Typography variant="body1">{voucher.discount}%</Typography>
                             </Stack>
                         </Grid>
@@ -112,7 +114,7 @@ export default function AddConfirmForm({ handleBack, voucher }: ConfirmProps) {
                         {voucher.type === 'PUBLIC' && (
                             <Grid size={{ xs: 12, sm: 4 }}>
                                 <Stack spacing={1}>
-                                    <InputLabel sx={{ fontWeight: 'bold' }}>Số lượng</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'quantity' })}</InputLabel>
                                     <Typography variant="body1">{voucher.quantity}</Typography>
                                 </Stack>
                             </Grid>
@@ -121,11 +123,11 @@ export default function AddConfirmForm({ handleBack, voucher }: ConfirmProps) {
                         {voucher.type === 'PUBLIC' && (
                             <Grid size={{ xs: 12 }}>
                                 <Stack spacing={1}>
-                                    <InputLabel sx={{ fontWeight: 'bold' }}>Giá trị đơn tối thiểu để áp dụng (VNĐ)</InputLabel>
+                                    <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'min-order-value-label' })}</InputLabel>
                                     <Typography variant="body1">
                                         {voucher.minOrderValue && voucher.minOrderValue > 0
                                             ? `${voucher.minOrderValue.toLocaleString()} VNĐ`
-                                            : '0 VNĐ'}
+                                            : `0 VNĐ`}
                                     </Typography>
                                 </Stack>
                             </Grid>
@@ -137,12 +139,12 @@ export default function AddConfirmForm({ handleBack, voucher }: ConfirmProps) {
 
                 <Stack direction="row" justifyContent="space-between">
                     <Button variant="outlined" color="secondary" onClick={handleBack}>
-                        Quay lại
+                        {intl.formatMessage({ id: 'back' })}
                     </Button>
 
                     <AnimateButton>
                         <Button variant="contained" color="primary" onClick={handleSubmit}>
-                            Xác nhận & Lưu
+                            {intl.formatMessage({ id: 'confirm-and-save' })}
                         </Button>
                     </AnimateButton>
                 </Stack>

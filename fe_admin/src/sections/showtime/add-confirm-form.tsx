@@ -38,7 +38,7 @@ export default function AddConfirmForm({ handleBack, showtime }: AddConfirmFormP
 
             if (response.status === HttpStatusCode.Ok) {
                 navigate('/admin/showtime', {
-                    state: { alert: { open: true, severity: 'success', message: 'Thêm suất chiếu thành công' } }
+                    state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'add-showtime-success' }) } }
                 });
             } else if (response.status === HttpStatusCode.BadRequest) {
                 setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
@@ -55,37 +55,37 @@ export default function AddConfirmForm({ handleBack, showtime }: AddConfirmFormP
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Xác nhận thông tin suất chiếu
+                        {intl.formatMessage({ id: 'confirm-showtime-info' })}
                     </Typography>
 
                     <Grid container spacing={3}>
                         <Grid size={{ xs: 12, md: 12 }}>
-                            <InputLabel sx={{ mb: 1 }}>Phim</InputLabel>
+                            <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'movie' })}</InputLabel>
                             <Typography variant="subtitle1" fontWeight="600">{showtime.movieName}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel sx={{ mb: 1 }}>Rạp chiếu</InputLabel>
+                            <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'theater' })}</InputLabel>
                             <Typography variant="body1">{showtime.theaterName}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel sx={{ mb: 1 }}>Phòng chiếu</InputLabel>
+                            <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'room' })}</InputLabel>
                             <Typography variant="body1">{showtime.roomName}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel sx={{ mb: 1 }}>Ngày chiếu</InputLabel>
+                            <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'show-date' })}</InputLabel>
                             <Typography variant="body1">{formatDate(showtime.showDate)}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <InputLabel sx={{ mb: 1 }}>Giờ chiếu</InputLabel>
+                            <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'show-time' })}</InputLabel>
                             <Typography variant="body1">{showtime.startTime}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 12 }}>
-                            <InputLabel sx={{ mb: 1 }}>Phụ phí (VND)</InputLabel>
+                            <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'surcharge-vnd' })}</InputLabel>
                             <Typography variant="body1">
                                 {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(showtime.surcharge)}
                             </Typography>
@@ -95,11 +95,11 @@ export default function AddConfirmForm({ handleBack, showtime }: AddConfirmFormP
 
                 <Stack direction="row" justifyContent="flex-end" spacing={2}>
                     <Button variant="outlined" color="secondary" onClick={handleBack}>
-                        Quay lại
+                        {intl.formatMessage({ id: 'back' })}
                     </Button>
                     <AnimateButton>
                         <Button variant="contained" onClick={handleSave}>
-                            Xác nhận
+                            {intl.formatMessage({ id: 'confirm' })}
                         </Button>
                     </AnimateButton>
                 </Stack>

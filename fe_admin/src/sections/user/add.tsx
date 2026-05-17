@@ -44,7 +44,6 @@ export default function AddUser() {
         gender: '',
         dob: '',
         nationality: '',
-        role: ''
     };
 
     const [user, setUser] = useState<User>(initialValues);
@@ -60,7 +59,7 @@ export default function AddUser() {
     return (
         <Box>
             <Box display="flex" alignItems="center" gap={2} mb={3}>
-                <Typography variant="h3">Thêm người dùng</Typography>
+                <Typography variant="h3">Thêm khách hàng</Typography>
             </Box>
 
             {activeStep == 0 ? (

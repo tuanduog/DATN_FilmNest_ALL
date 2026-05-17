@@ -18,6 +18,10 @@ export interface PageRequest {
     status?: string | undefined;
     role?: string | undefined;
     showingStatus?: string | undefined;
+    startDate?: string | undefined;
+    endDate?: string | undefined;
+    paymentStatus?: string | undefined;
+    theaterId?: number | undefined;
 }
 
 export const DEFAULT_PAGE_SIZE = 10;

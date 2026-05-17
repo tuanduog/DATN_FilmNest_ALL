@@ -61,7 +61,8 @@ import {
 // project-imports
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
-import { deleteById, getList } from 'api/room';
+import { deleteById, getList, getListByTheaterId } from 'api/room';
+import { getList as getTheaters } from 'api/theater';
 
 import EmptyTable from 'components/third-party/react-table/EmptyTable';
 import HeaderSort from 'components/third-party/react-table/HeaderSort';
@@ -86,6 +87,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
 import { Room } from 'types/room';
+import { Theater } from 'types/theater';
 
 const fuzzyFilter: FilterFn<Room> = (row, columnId, value, addMeta) => {
     // rank the item
@@ -120,20 +122,21 @@ function EditAction({
     const navigate = useNavigate();
     const intl = useIntl();
     const { user, logout } = useAuth();
+    const isManager = user?.role?.toUpperCase() === 'MANAGER';
     const [openDelete, setOpenDelete] = useState(false);
 
     const handleDelete = async () => {
         const response = await deleteById(Number(row.original.id));
 
         if (response.status == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: 'Xóa phòng chiếu thành công', severity: 'success' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'delete-room-success' }), severity: 'success' });
             setReload(!reload);
         } else if (response.status == HttpStatusCode.Unauthorized) {
             logout();
         } else if (response.status == HttpStatusCode.UnprocessableEntity) {
             setAlert({ open: true, message: response.data, severity: 'error' });
         } else {
-            setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
         }
 
         setOpenDelete(false);
@@ -142,13 +145,13 @@ function EditAction({
     return (
         <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
             <Tooltip title={intl.formatMessage({ id: 'detail-room' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/room/detail/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
+                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/room/detail/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
                     <Eye variant="Outline" />
                 </IconButton>
             </Tooltip>
 
             <Tooltip title={intl.formatMessage({ id: 'edit-room' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/room/edit/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
+                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/room/edit/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
                     <Edit2 variant="Outline" />
                 </IconButton>
             </Tooltip>
@@ -165,21 +168,23 @@ function EditAction({
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa phòng này không?</DialogTitle>
+                <DialogTitle id="alert-dialog-title">
+                    {intl.formatMessage({ id: 'delete-room-confirm' })}
+                </DialogTitle>
 
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa phòng này, tất cả thông tin đi kèm cũng sẽ bị xóa.
+                        {intl.formatMessage({ id: 'delete-room-description' })}
                     </DialogContentText>
                 </DialogContent>
 
                 <DialogActions>
                     <Button variant="contained" color="primary" onClick={() => setOpenDelete(false)}>
-                        Huỷ
+                        {intl.formatMessage({ id: 'cancel' })}
                     </Button>
 
                     <Button variant="contained" color="error" onClick={() => handleDelete()} autoFocus>
-                        Xác nhận
+                        {intl.formatMessage({ id: 'confirm' })}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -320,11 +325,16 @@ export default function RoomPage() {
             },
             {
                 id: 'type',
-                header: intl.formatMessage({ id: 'type' }),
+                header: intl.formatMessage({ id: 'room-type' }),
                 accessorKey: 'type',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '35%' }
+                meta: { width: '35%' },
+                cell: (cell) => {
+                    const { type } = cell.row.original;
+                    const typeUpper = (type || '').toUpperCase();
+                    return typeUpper === 'IMAX' ? intl.formatMessage({ id: 'IMAX' }) : typeUpper === 'THREE_D' ? intl.formatMessage({ id: '3D' }) : intl.formatMessage({ id: 'standard' });
+                }
             },
             {
                 id: 'capacity',
@@ -382,7 +392,9 @@ export default function RoomPage() {
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: ''
+        status: '',
+        type: '',
+        theaterId: undefined
     });
     const [alert, setAlert] = useState({
         open: false,
@@ -391,6 +403,19 @@ export default function RoomPage() {
     });
     const navigate = useNavigate();
     const location = useLocation();
+    const [theaters, setTheaters] = useState<Theater[]>([]);
+
+    useEffect(() => {
+        const fetchTheaters = async () => {
+            if (user?.role?.toUpperCase() !== 'MANAGER') {
+                const response = await getTheaters({ size: 1000, page: 0 });
+                if (response.status === HttpStatusCode.Ok) {
+                    setTheaters(response.data.content);
+                }
+            }
+        };
+        fetchTheaters();
+    }, [user]);
     const [columnOrder, setColumnOrder] = useState<string[]>(() => columns.map((c) => c.id!));
 
     const dataIds = useMemo<UniqueIdentifier[]>(() => data?.map(({ id }: any) => id), [data]);
@@ -412,7 +437,15 @@ export default function RoomPage() {
 
     useEffect(() => {
         const fetchRooms = async () => {
-            const response = await getList(pageRequest);
+            const cleanParams = Object.fromEntries(
+                Object.entries(pageRequest).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+            );
+            let response;
+            if (user?.role?.toUpperCase() === 'MANAGER' && user?.theaterId) {
+                response = await getListByTheaterId(Number(user.theaterId), cleanParams);
+            } else {
+                response = await getList(cleanParams);
+            }
 
             if (response.status === HttpStatusCode.Ok) {
                 setData(response.data.content);
@@ -544,7 +577,7 @@ export default function RoomPage() {
                         justifyContent: 'center',
                     }}
                     variant="contained"
-                    onClick={() => navigate('/admin/room/add')}
+                    onClick={() => navigate(`/${user?.role?.toUpperCase() === 'MANAGER' ? 'manager' : 'admin'}/room/add`)}
                     startIcon={<Add />}
                 >
                     <FormattedMessage id="add-room" />
@@ -570,7 +603,7 @@ export default function RoomPage() {
                             px: 2
                         }}
                     >
-                        {alert?.message || 'Không có thông báo'}
+                        {alert?.message || intl.formatMessage({ id: 'no-notification' })}
                     </Alert>
                 </Snackbar>
 
@@ -592,7 +625,7 @@ export default function RoomPage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm theo tên phòng'}
+                            placeholder={intl.formatMessage({ id: 'search-room-placeholder' })}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {
@@ -623,6 +656,46 @@ export default function RoomPage() {
                                 <FormattedMessage id="inactive" />
                             </MenuItem>
                         </Select>
+
+                        <Select
+                            value={pageRequest.type || ''}
+                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, type: event.target.value })}
+                            displayEmpty
+                            input={<OutlinedInput />}
+                            slotProps={{ input: { 'aria-label': 'Type Filter' } }}
+                        >
+                            <MenuItem value="">
+                                <FormattedMessage id="room-type" />
+                            </MenuItem>
+                            <MenuItem value="STANDARD">
+                                <FormattedMessage id="standard" />
+                            </MenuItem>
+                            <MenuItem value="IMAX">
+                                <FormattedMessage id="IMAX" />
+                            </MenuItem>
+                            <MenuItem value="THREE_D">
+                                <FormattedMessage id="3D" />
+                            </MenuItem>
+                        </Select>
+
+                        {user?.role?.toUpperCase() !== 'MANAGER' && (
+                            <Select
+                                value={pageRequest.theaterId ?? ''}
+                                onChange={(event) => setPageRequest({ ...pageRequest, page: 0, theaterId: ((event.target.value as any) === '' ? undefined : Number(event.target.value)) })}
+                                displayEmpty
+                                input={<OutlinedInput />}
+                                slotProps={{ input: { 'aria-label': 'Theater Filter' } }}
+                            >
+                                <MenuItem value="">
+                                    <FormattedMessage id="theater-list-in-room-page" />
+                                </MenuItem>
+                                {theaters.map((theater) => (
+                                    <MenuItem key={theater.id} value={theater.id}>
+                                        {theater.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        )}
                     </Stack>
 
                     <Typography variant="caption" color="secondary" sx={{ display: 'flex', alignItems: 'center' }}>
@@ -670,7 +743,7 @@ export default function RoomPage() {
                                     ) : (
                                         <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                                             <TableCell colSpan={table.getAllColumns().length}>
-                                                <EmptyTable msg="Không có dữ liệu" />
+                                                <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
                                             </TableCell>
                                         </TableRow>
                                     )}

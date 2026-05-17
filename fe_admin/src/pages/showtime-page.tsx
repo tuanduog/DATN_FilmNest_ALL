@@ -61,7 +61,7 @@ import {
 // project-imports
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
-import { deleteById, getList } from 'api/showtime';
+import { deleteById, getList, getListByTheaterId } from 'api/showtime';
 
 import EmptyTable from 'components/third-party/react-table/EmptyTable';
 import HeaderSort from 'components/third-party/react-table/HeaderSort';
@@ -122,20 +122,21 @@ function EditAction({
     const navigate = useNavigate();
     const intl = useIntl();
     const { user, logout } = useAuth();
+    const isManager = user?.role?.toUpperCase() === 'MANAGER';
     const [openDelete, setOpenDelete] = useState(false);
 
     const handleDelete = async () => {
         const response = await deleteById(Number(row.original.id));
 
         if (response.status == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: 'Xóa phòng chiếu thành công', severity: 'success' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'delete-showtime-success' }), severity: 'success' });
             setReload(!reload);
         } else if (response.status == HttpStatusCode.Unauthorized) {
             logout();
         } else if (response.status == HttpStatusCode.UnprocessableEntity) {
             setAlert({ open: true, message: response.data, severity: 'error' });
         } else {
-            setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
         }
 
         setOpenDelete(false);
@@ -144,13 +145,13 @@ function EditAction({
     return (
         <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
             <Tooltip title={intl.formatMessage({ id: 'detail-showtime' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/showtime/detail/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
+                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/showtime/detail/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
                     <Eye variant="Outline" />
                 </IconButton>
             </Tooltip>
 
             <Tooltip title={intl.formatMessage({ id: 'edit-showtime' })}>
-                <IconButton color="primary" onClick={() => navigate(`/admin/showtime/edit/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
+                <IconButton color="primary" onClick={() => navigate(`/${isManager ? 'manager' : 'admin'}/showtime/edit/${row.id}`)} disabled={row.original.status === 'INACTIVE'}>
                     <Edit2 variant="Outline" />
                 </IconButton>
             </Tooltip>
@@ -167,21 +168,23 @@ function EditAction({
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa suất chiếu này không?</DialogTitle>
+                <DialogTitle id="alert-dialog-title">
+                    {intl.formatMessage({ id: 'delete-showtime-confirm' })}
+                </DialogTitle>
 
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa suất chiếu này, tất cả thông tin đi kèm cũng sẽ bị xóa.
+                        {intl.formatMessage({ id: 'delete-showtime-description' })}
                     </DialogContentText>
                 </DialogContent>
 
                 <DialogActions>
                     <Button variant="contained" color="primary" onClick={() => setOpenDelete(false)}>
-                        Huỷ
+                        {intl.formatMessage({ id: 'cancel' })}
                     </Button>
 
                     <Button variant="contained" color="error" onClick={() => handleDelete()} autoFocus>
-                        Xác nhận
+                        {intl.formatMessage({ id: 'confirm' })}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -423,8 +426,13 @@ export default function ShowtimePage() {
     };
 
     useEffect(() => {
-        const fetchRooms = async () => {
-            const response = await getList(pageRequest);
+        const fetchShowtimes = async () => {
+            let response;
+            if (user?.role?.toUpperCase() === 'MANAGER' && user?.theaterId) {
+                response = await getListByTheaterId(Number(user.theaterId), pageRequest);
+            } else {
+                response = await getList(pageRequest);
+            }
 
             if (response.status === HttpStatusCode.Ok) {
                 setData(response.data.content);
@@ -438,7 +446,7 @@ export default function ShowtimePage() {
             }
         };
 
-        fetchRooms();
+        fetchShowtimes();
     }, [pageRequest, intl, logout, reload]);
 
     useEffect(() => {
@@ -556,7 +564,7 @@ export default function ShowtimePage() {
                         justifyContent: 'center',
                     }}
                     variant="contained"
-                    onClick={() => navigate('/admin/showtime/add')}
+                    onClick={() => navigate(`/${user?.role?.toUpperCase() === 'MANAGER' ? 'manager' : 'admin'}/showtime/add`)}
                     startIcon={<Add />}
                 >
                     <FormattedMessage id="add-showtime" />
@@ -582,7 +590,7 @@ export default function ShowtimePage() {
                             px: 2
                         }}
                     >
-                        {alert?.message || 'Không có thông báo'}
+                        {alert?.message || intl.formatMessage({ id: 'no-notification' })}
                     </Alert>
                 </Snackbar>
 
@@ -604,7 +612,7 @@ export default function ShowtimePage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm theo tên phòng'}
+                            placeholder={intl.formatMessage({ id: 'search-showtime-placeholder' })}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {
@@ -682,7 +690,7 @@ export default function ShowtimePage() {
                                     ) : (
                                         <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                                             <TableCell colSpan={table.getAllColumns().length}>
-                                                <EmptyTable msg="Không có dữ liệu" />
+                                                <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
                                             </TableCell>
                                         </TableRow>
                                     )}

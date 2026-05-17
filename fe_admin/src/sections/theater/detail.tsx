@@ -52,13 +52,13 @@ export default function TheaterDetail() {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Thông tin rạp chiếu
+                        {intl.formatMessage({ id: 'theater-info' })}
                     </Typography>
 
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="name" sx={{ mb: 1 }}>
-                                Tên rạp chiếu
+                                {intl.formatMessage({ id: 'theater-name' })}
                             </InputLabel>
 
                             <Typography>{theater?.name}</Typography>
@@ -66,7 +66,7 @@ export default function TheaterDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="provinceName" sx={{ mb: 1 }}>
-                                Tỉnh/Thành phố
+                                {intl.formatMessage({ id: 'province-city' })}
                             </InputLabel>
 
                             <Typography>{theater?.provinceName}</Typography>
@@ -74,7 +74,7 @@ export default function TheaterDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="communeName" sx={{ mb: 1 }}>
-                                Xã/Phường
+                                {intl.formatMessage({ id: 'commune-ward' })}
                             </InputLabel>
 
                             <Typography>{theater?.communeName}</Typography>
@@ -82,7 +82,7 @@ export default function TheaterDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="address" sx={{ mb: 1 }}>
-                                Địa chỉ
+                                {intl.formatMessage({ id: 'address' })}
                             </InputLabel>
 
                             <Typography>{theater?.address}</Typography>
@@ -90,7 +90,7 @@ export default function TheaterDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="hotline" sx={{ mb: 1 }}>
-                                Hotline
+                                {intl.formatMessage({ id: 'hotline' })}
                             </InputLabel>
 
                             <Typography>{theater?.hotline}</Typography>
@@ -98,7 +98,7 @@ export default function TheaterDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="openTime" sx={{ mb: 1 }}>
-                                Giờ mở cửa
+                                {intl.formatMessage({ id: 'open-time' })}
                             </InputLabel>
 
                             <Typography>{theater?.openTime}</Typography>
@@ -106,7 +106,7 @@ export default function TheaterDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="closeTime" sx={{ mb: 1 }}>
-                                Giờ đóng cửa
+                                {intl.formatMessage({ id: 'close-time' })}
                             </InputLabel>
 
                             <Typography>{theater?.closeTime}</Typography>
@@ -114,7 +114,7 @@ export default function TheaterDetail() {
 
                         <Grid size={12}>
                             <InputLabel htmlFor="description" sx={{ mb: 1 }}>
-                                Mô tả
+                                {intl.formatMessage({ id: 'description' })}
                             </InputLabel>
 
                             <Typography>{theater?.description}</Typography>
@@ -126,7 +126,7 @@ export default function TheaterDetail() {
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
                             <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/theater/edit/${id}`)}>
-                                Cập nhật
+                                {intl.formatMessage({ id: 'update' })}
                             </Button>
                         </AnimateButton>
                     </Stack>

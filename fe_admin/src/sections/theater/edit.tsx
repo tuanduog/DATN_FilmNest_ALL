@@ -42,15 +42,15 @@ function MapClickHandler({ onClick }: MapClickHandlerProps) {
     return null;
 }
 
-const validationSchema = Yup.object({
-    name: Yup.string().required('Tên rạp chiếu là bắt buộc'),
-    address: Yup.string().required('Địa chỉ là bắt buộc'),
-    provinceCode: Yup.string().required('Tỉnh/thành phố là bắt buộc'),
-    communeCode: Yup.string().required('Xã/phường là bắt buộc'),
-    description: Yup.string().required('Mô tả là bắt buộc'),
-    hotline: Yup.string().required('Hotline là bắt buộc'),
-    openTime: Yup.string().required('Giờ mở cửa là bắt buộc'),
-    closeTime: Yup.string().required('Giờ đóng cửa là bắt buộc'),
+const validationSchema = (intl: any) => Yup.object({
+    name: Yup.string().required(intl.formatMessage({ id: 'theater-name-required' })),
+    address: Yup.string().required(intl.formatMessage({ id: 'address-required' })),
+    provinceCode: Yup.string().required(intl.formatMessage({ id: 'province-required' })),
+    communeCode: Yup.string().required(intl.formatMessage({ id: 'commune-required' })),
+    description: Yup.string().required(intl.formatMessage({ id: 'description-required' })),
+    hotline: Yup.string().required(intl.formatMessage({ id: 'hotline-required' })),
+    openTime: Yup.string().required(intl.formatMessage({ id: 'open-time-required' })),
+    closeTime: Yup.string().required(intl.formatMessage({ id: 'close-time-required' })),
 });
 
 export default function EditTheater() {
@@ -135,14 +135,14 @@ export default function EditTheater() {
     const formik = useFormik<Theater>({
         initialValues: theater,
         enableReinitialize: true,
-        validationSchema: validationSchema,
+        validationSchema: validationSchema(intl),
         onSubmit: async (values) => {
             try {
                 const response = await update(Number(id), values);
 
                 if (response.status === HttpStatusCode.Ok) {
                     navigate('/admin/theater', {
-                        state: { alert: { open: true, severity: 'success', message: 'Cập nhật rạp chiếu thành công' } }
+                        state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'update-theater-success' }) } }
                     });
                 } else if (response.status === HttpStatusCode.BadRequest) {
                     setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
@@ -182,19 +182,19 @@ export default function EditTheater() {
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                            Cập nhật thông tin rạp chiếu
+                            {intl.formatMessage({ id: 'edit-theater-info' })}
                         </Typography>
 
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tên rạp chiếu
+                                    {intl.formatMessage({ id: 'theater-name' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="name"
                                     name="name"
-                                    placeholder="Nhập tên rạp chiếu"
+                                    placeholder={intl.formatMessage({ id: 'search-theater-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.name}
@@ -207,13 +207,13 @@ export default function EditTheater() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="hotline" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Hotline
+                                    {intl.formatMessage({ id: 'hotline' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="hotline"
                                     name="hotline"
-                                    placeholder="Nhập hotline"
+                                    placeholder={intl.formatMessage({ id: 'hotline-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.hotline}
@@ -226,7 +226,7 @@ export default function EditTheater() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tỉnh/Thành phố
+                                    {intl.formatMessage({ id: 'province-city' })}
                                 </InputLabel>
 
                                 <FormControl fullWidth size="small" error={formik.touched.provinceCode && Boolean(formik.errors.provinceCode)}>
@@ -238,7 +238,7 @@ export default function EditTheater() {
                                         onBlur={formik.handleBlur}
                                         displayEmpty
                                     >
-                                        <MenuItem value={0} disabled>Chọn tỉnh/thành phố</MenuItem>
+                                        <MenuItem value={0} disabled>{intl.formatMessage({ id: 'select-province-city' })}</MenuItem>
                                         {provinces.map((p) => (
                                             <MenuItem key={p.code} value={p.code}>{p.name}</MenuItem>
                                         ))}
@@ -251,7 +251,7 @@ export default function EditTheater() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Xã/Phường
+                                    {intl.formatMessage({ id: 'commune-ward' })}
                                 </InputLabel>
                                 <FormControl fullWidth size="small" error={formik.touched.communeCode && Boolean(formik.errors.communeCode)}>
                                     <Select
@@ -263,7 +263,7 @@ export default function EditTheater() {
                                         displayEmpty
                                         disabled={!formik.values.provinceCode}
                                     >
-                                        <MenuItem value={0} disabled>Chọn xã/phường</MenuItem>
+                                        <MenuItem value={0} disabled>{intl.formatMessage({ id: 'select-commune-ward' })}</MenuItem>
                                         {communes.map((c) => (
                                             <MenuItem key={c.code} value={c.code}>{c.name}</MenuItem>
                                         ))}
@@ -276,7 +276,7 @@ export default function EditTheater() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="openTime" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Giờ mở cửa
+                                    {intl.formatMessage({ id: 'open-time' })}
                                 </InputLabel>
 
                                 <TextField
@@ -296,7 +296,7 @@ export default function EditTheater() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="closeTime" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Giờ đóng cửa
+                                    {intl.formatMessage({ id: 'close-time' })}
                                 </InputLabel>
 
                                 <TextField
@@ -315,7 +315,7 @@ export default function EditTheater() {
                             </Grid>
 
                             <Grid size={12}>
-                                <InputLabel sx={{ mb: 1 }}>Chọn vị trí trên bản đồ (tuỳ chọn)</InputLabel>
+                                <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'select-location-on-map' })}</InputLabel>
                                 <MapContainer
                                     center={
                                         formik.values.latitude && formik.values.longitude
@@ -354,13 +354,13 @@ export default function EditTheater() {
 
                             <Grid size={12}>
                                 <InputLabel htmlFor="address" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Địa chỉ
+                                    {intl.formatMessage({ id: 'address' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="address"
                                     name="address"
-                                    placeholder="Nhập địa chỉ"
+                                    placeholder={intl.formatMessage({ id: 'address-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.address}
@@ -373,13 +373,13 @@ export default function EditTheater() {
 
                             <Grid size={12}>
                                 <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Mô tả
+                                    {intl.formatMessage({ id: 'description' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="description"
                                     name="description"
-                                    placeholder="Nhập mô tả"
+                                    placeholder={intl.formatMessage({ id: 'description-placeholder' })}
                                     size="small"
                                     multiline
                                     rows={4}
@@ -402,7 +402,7 @@ export default function EditTheater() {
                                 sx={{ my: 3 }}
                                 onClick={() => navigate('/admin/theater')}
                             >
-                                Quay lại
+                                {intl.formatMessage({ id: 'back' })}
                             </Button>
 
                             <AnimateButton>
@@ -412,7 +412,7 @@ export default function EditTheater() {
                                     sx={{ my: 3, ml: 1 }}
                                     disabled={formik.isSubmitting}
                                 >
-                                    {formik.isSubmitting ? 'Đang lưu...' : 'Xác nhận'}
+                                    {formik.isSubmitting ? intl.formatMessage({ id: 'saving' }) : intl.formatMessage({ id: 'confirm' })}
                                 </Button>
                             </AnimateButton>
                         </Stack>

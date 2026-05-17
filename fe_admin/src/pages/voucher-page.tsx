@@ -86,7 +86,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
 import { Voucher } from 'types/voucher';
-import formatDate from 'utils/formatDateTime';
 
 const fuzzyFilter: FilterFn<Voucher> = (row, columnId, value, addMeta) => {
     // rank the item
@@ -127,14 +126,14 @@ function EditAction({
         const response = await deleteById(Number(row.original.id));
 
         if (response.status == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: 'Xóa khuyến mãi thành công', severity: 'success' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'delete-voucher-success' }), severity: 'success' });
             setReload(!reload);
         } else if (response.status == HttpStatusCode.Unauthorized) {
             logout();
         } else if (response.status == HttpStatusCode.UnprocessableEntity) {
             setAlert({ open: true, message: response.data, severity: 'error' });
         } else {
-            setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'unknown-error' }), severity: 'error' });
         }
 
         setOpenDelete(false);
@@ -166,21 +165,23 @@ function EditAction({
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa khuyến mãi này không?</DialogTitle>
+                <DialogTitle id="alert-dialog-title">
+                    {intl.formatMessage({ id: 'delete-voucher-confirm' })}
+                </DialogTitle>
 
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa khuyến mãi này, tất cả thông tin đi kèm cũng sẽ bị xóa.
+                        {intl.formatMessage({ id: 'delete-voucher-description' })}
                     </DialogContentText>
                 </DialogContent>
 
                 <DialogActions>
                     <Button variant="contained" color="primary" onClick={() => setOpenDelete(false)}>
-                        Huỷ
+                        {intl.formatMessage({ id: 'cancel' })}
                     </Button>
 
                     <Button variant="contained" color="error" onClick={() => handleDelete()} autoFocus>
-                        Xác nhận
+                        {intl.formatMessage({ id: 'confirm' })}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -330,7 +331,7 @@ export default function VoucherPage() {
                     const { type } = cell.row.original;
                     return (
                         <Chip
-                            label={type.toUpperCase() === 'PUBLIC' ? intl.formatMessage({ id: 'public' }) : intl.formatMessage({ id: 'private' })}
+                            label={type.toUpperCase() === 'PUBLIC' ? intl.formatMessage({ id: 'public' }) : intl.formatMessage({ id: 'personal' })}
                             color={type.toUpperCase() === 'PUBLIC' ? 'success' : 'error'}
                         />
                     );
@@ -385,7 +386,8 @@ export default function VoucherPage() {
         size: DEFAULT_PAGE_SIZE,
         sort: '',
         keyword: '',
-        status: ''
+        status: '',
+        type: ''
     });
     const [alert, setAlert] = useState({
         open: false,
@@ -415,7 +417,10 @@ export default function VoucherPage() {
 
     useEffect(() => {
         const fetchVouchers = async () => {
-            const response = await getList(pageRequest);
+            const cleanParams = Object.fromEntries(
+                Object.entries(pageRequest).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+            );
+            const response = await getList(cleanParams);
 
             if (response.status === HttpStatusCode.Ok) {
                 setData(response.data.content);
@@ -573,7 +578,7 @@ export default function VoucherPage() {
                             px: 2
                         }}
                     >
-                        {alert?.message || 'Không có thông báo'}
+                        {alert?.message || intl.formatMessage({ id: 'no-notification' })}
                     </Alert>
                 </Snackbar>
 
@@ -595,7 +600,7 @@ export default function VoucherPage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm theo mã khuyến mãi'}
+                            placeholder={intl.formatMessage({ id: 'search-voucher-placeholder' })}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {
@@ -624,6 +629,24 @@ export default function VoucherPage() {
                             </MenuItem>
                             <MenuItem value="INACTIVE">
                                 <FormattedMessage id="inactive" />
+                            </MenuItem>
+                        </Select>
+
+                        <Select
+                            value={pageRequest.type || ''}
+                            onChange={(event) => setPageRequest({ ...pageRequest, page: 0, type: event.target.value })}
+                            displayEmpty
+                            input={<OutlinedInput />}
+                            slotProps={{ input: { 'aria-label': 'Type Filter' } }}
+                        >
+                            <MenuItem value="">
+                                <FormattedMessage id="type" />
+                            </MenuItem>
+                            <MenuItem value="PUBLIC">
+                                <FormattedMessage id="public" />
+                            </MenuItem>
+                            <MenuItem value="PERSONAL">
+                                <FormattedMessage id="personal" />
                             </MenuItem>
                         </Select>
                     </Stack>
@@ -673,7 +696,7 @@ export default function VoucherPage() {
                                     ) : (
                                         <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                                             <TableCell colSpan={table.getAllColumns().length}>
-                                                <EmptyTable msg="Không có dữ liệu" />
+                                                <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
                                             </TableCell>
                                         </TableRow>
                                     )}

@@ -499,7 +499,7 @@ const TheaterDialog: React.FC<TheaterDialogProps> = ({ open, id, onClose, onConf
                   px: 2
                 }}
               >
-                {alert?.message || 'Không có thông báo'}
+                {alert?.message || intl.formatMessage({ id: 'no-notification' })}
               </Alert>
             </Snackbar>
 
@@ -571,7 +571,7 @@ const TheaterDialog: React.FC<TheaterDialogProps> = ({ open, id, onClose, onConf
                       ) : (
                         <TableRow sx={{ '&.MuiTableRow-root:hover': { bgcolor: 'transparent' } }}>
                           <TableCell colSpan={table.getAllColumns().length}>
-                            <EmptyTable msg="Không có dữ liệu" />
+                            <EmptyTable msg={intl.formatMessage({ id: 'no-data' })} />
                           </TableCell>
                         </TableRow>
                       )}
@@ -637,7 +637,7 @@ const TheaterDialog: React.FC<TheaterDialogProps> = ({ open, id, onClose, onConf
           size="large"
           onClick={handleConfirm}
         >
-          Thêm vào lớp
+          {intl.formatMessage({ id: 'confirm' })}
         </Button>
       </Box>
     </Dialog>

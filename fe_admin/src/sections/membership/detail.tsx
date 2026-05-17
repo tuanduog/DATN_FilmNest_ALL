@@ -77,13 +77,13 @@ export default function MembershipDetail() {
     const getBenefitName = (benefit: any) => {
         const type = benefit.type?.toUpperCase();
         if (type === 'VOUCHER') {
-            return benefit.voucher ? `Voucher: ${benefit.voucher.code}` : 'Voucher (Không tìm thấy)';
+            return benefit.voucher ? `Voucher: ${benefit.voucher.code}` : `Voucher (${intl.formatMessage({ id: 'not-found' })})`;
         }
         if (type === 'COMBO') {
-            return benefit.combo ? `Combo: ${benefit.combo.name}` : 'Combo (Không tìm thấy)';
+            return benefit.combo ? `Combo: ${benefit.combo.name}` : `Combo (${intl.formatMessage({ id: 'not-found' })})`;
         }
         if (type === 'DIRECT') {
-            return `Quyền lợi trực tiếp: ${benefit.description}`;
+            return `${intl.formatMessage({ id: 'direct-benefit' })}: ${benefit.description}`;
         }
     };
 
@@ -92,7 +92,7 @@ export default function MembershipDetail() {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Thông tin gói thành viên
+                        {intl.formatMessage({ id: 'membership-info' })}
                     </Typography>
 
                     <Grid container spacing={2}>
@@ -110,7 +110,7 @@ export default function MembershipDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="name" sx={{ mb: 1 }}>
-                                Tên gói thành viên
+                                {intl.formatMessage({ id: 'membership-name' })}
                             </InputLabel>
 
                             <Typography>{membership?.name}</Typography>
@@ -118,15 +118,15 @@ export default function MembershipDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="type" sx={{ mb: 1 }}>
-                                Loại gói thành viên
+                                {intl.formatMessage({ id: 'membership-type' })}
                             </InputLabel>
 
-                            <Typography>{membership?.type}</Typography>
+                            <Typography>{membership?.type === "gold" ? intl.formatMessage({ id: 'gold' }) : membership?.type === "silver" ? intl.formatMessage({ id: 'silver' }) : intl.formatMessage({ id: 'platinum' })}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="price" sx={{ mb: 1 }}>
-                                Giá tiền (VND)
+                                {intl.formatMessage({ id: 'price' })} (VND)
                             </InputLabel>
 
                             <Typography>{membership?.price}</Typography>
@@ -134,7 +134,7 @@ export default function MembershipDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="duration" sx={{ mb: 1 }}>
-                                Thời hạn (ngày)
+                                {intl.formatMessage({ id: 'duration' })} ({intl.formatMessage({ id: 'month' })})
                             </InputLabel>
 
                             <Typography>{membership?.duration}</Typography>
@@ -143,14 +143,14 @@ export default function MembershipDetail() {
                             <Grid size={12}>
                                 <Divider sx={{ my: 2 }} />
                                 <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-                                    Các quyền lợi của gói thành viên
+                                    {intl.formatMessage({ id: 'membership-benefits' })}
                                 </Typography>
                                 <List disablePadding>
                                     {membership.benefits.map((benefit: MembershipBenefit, index: number) => (
                                         <ListItem key={index} sx={{ py: 1, px: 0, borderBottom: '1px dashed', borderColor: 'divider' }}>
                                             <ListItemText
                                                 primary={getBenefitName(benefit)}
-                                                secondary={`Số lượng: ${benefit.quantity}`}
+                                                secondary={`${intl.formatMessage({ id: 'quantity' })}: ${benefit.quantity}`}
                                             />
                                         </ListItem>
                                     ))}
@@ -164,7 +164,7 @@ export default function MembershipDetail() {
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
                             <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/membership/edit/${id}`)}>
-                                Cập nhật
+                                {intl.formatMessage({ id: 'update' })}
                             </Button>
                         </AnimateButton>
                     </Stack>

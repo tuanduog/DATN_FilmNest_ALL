@@ -61,14 +61,14 @@ import {
 // project-imports
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
-import { deleteById, getList } from 'api/user';
+import { update, getList } from 'api/user';
 
 import EmptyTable from 'components/third-party/react-table/EmptyTable';
 import HeaderSort from 'components/third-party/react-table/HeaderSort';
 import RowEditable from 'components/third-party/react-table/RowEditable';
 
 // assets
-import { Add, ArrowDown2, ArrowRight2, Command, Edit2, Eye, Lock, TableDocument, Trash } from 'iconsax-reactjs';
+import { Add, ArrowDown2, ArrowRight2, Command, Edit2, Eye, Lock, Unlock, TableDocument } from 'iconsax-reactjs';
 import { DEFAULT_PAGE_SIZE, PageRequest } from 'types/paging';
 import {
     Alert,
@@ -121,13 +121,21 @@ function EditAction({
     const navigate = useNavigate();
     const intl = useIntl();
     const { user, logout } = useAuth();
-    const [openDelete, setOpenDelete] = useState(false);
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const isLocked = row.original.status === 'INACTIVE';
 
-    const handleDelete = async () => {
-        const response = await deleteById(Number(row.original.id));
+    const handleToggleLock = async () => {
+        const response = await update(Number(row.original.id), {
+            ...row.original,
+            status: isLocked ? 'ACTIVE' : 'INACTIVE'
+        });
 
         if (response.status == HttpStatusCode.Ok) {
-            setAlert({ open: true, message: 'Xóa người dùng thành công', severity: 'success' });
+            setAlert({
+                open: true,
+                message: isLocked ? 'Mở khóa tài khoản thành công' : 'Khóa tài khoản thành công',
+                severity: 'success'
+            });
             setReload(!reload);
         } else if (response.status == HttpStatusCode.Unauthorized) {
             logout();
@@ -137,7 +145,7 @@ function EditAction({
             setAlert({ open: true, message: 'Lỗi không xác định', severity: 'error' });
         }
 
-        setOpenDelete(false);
+        setOpenConfirm(false);
     };
 
     return (
@@ -148,38 +156,42 @@ function EditAction({
                 </IconButton>
             </Tooltip>
 
-            <Tooltip title={intl.formatMessage({ id: 'edit-user' })}>
+            {/* <Tooltip title={intl.formatMessage({ id: 'edit-user' })}>
                 <IconButton color="primary" onClick={() => navigate(`/admin/user/edit/${row.id}`)} disabled={row.original.status == 'inactive'}>
                     <Edit2 variant="Outline" />
                 </IconButton>
-            </Tooltip>
+            </Tooltip> */}
 
-            <Tooltip title={intl.formatMessage({ id: 'delete-user' })}>
-                <IconButton color="error" onClick={() => setOpenDelete(true)} disabled={row.original.status == 'inactive'}>
-                    <Trash variant="Outline" />
+            <Tooltip title={intl.formatMessage({ id: isLocked ? 'unlock-user' : 'lock-user' })}>
+                <IconButton color={isLocked ? 'success' : 'error'} onClick={() => setOpenConfirm(true)}>
+                    {isLocked ? <Unlock variant="Outline" /> : <Lock variant="Outline" />}
                 </IconButton>
             </Tooltip>
 
             <Dialog
-                open={openDelete}
-                onClose={() => setOpenDelete(false)}
+                open={openConfirm}
+                onClose={() => setOpenConfirm(false)}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn có muốn xóa người dùng này không?</DialogTitle>
+                <DialogTitle id="alert-dialog-title">
+                    {isLocked ? 'Bạn có muốn mở khóa tài khoản này không?' : 'Bạn có muốn khóa tài khoản này không?'}
+                </DialogTitle>
 
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Khi xóa người dùng này, tất cả thông tin đi kèm cũng sẽ bị xóa.
+                        {isLocked
+                            ? 'Khi mở khóa, người dùng này có thể đăng nhập lại vào hệ thống.'
+                            : 'Khi khóa, người dùng này sẽ không thể đăng nhập vào hệ thống cho đến khi được mở khóa lại.'}
                     </DialogContentText>
                 </DialogContent>
 
                 <DialogActions>
-                    <Button variant="contained" color="primary" onClick={() => setOpenDelete(false)}>
+                    <Button variant="contained" color="primary" onClick={() => setOpenConfirm(false)}>
                         Huỷ
                     </Button>
 
-                    <Button variant="contained" color="error" onClick={() => handleDelete()} autoFocus>
+                    <Button variant="contained" color={isLocked ? 'success' : 'error'} onClick={() => handleToggleLock()} autoFocus>
                         Xác nhận
                     </Button>
                 </DialogActions>
@@ -390,14 +402,6 @@ export default function UserPage() {
                         </Stack>
                     );
                 }
-            },
-            {
-                id: 'role',
-                header: intl.formatMessage({ id: 'role' }),
-                accessorKey: 'role',
-                dataType: 'text',
-                enableGrouping: false,
-                meta: { width: '35%' }
             },
             {
                 id: 'status',
@@ -649,7 +653,7 @@ export default function UserPage() {
                                     setPageRequest({ ...pageRequest, page: 0, keyword: globalFilter });
                                 }
                             }}
-                            placeholder={'Tìm kiếm theo tên combo'}
+                            placeholder={'Tìm kiếm theo tên khách hàng'}
                             sx={{ minWidth: 100 }}
                             inputProps={{
                                 sx: {

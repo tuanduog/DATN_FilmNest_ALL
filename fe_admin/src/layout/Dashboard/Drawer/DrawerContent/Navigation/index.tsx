@@ -13,6 +13,7 @@ import { useGetMenuMaster } from 'api/menu';
 import { MenuOrientation, HORIZONTAL_MAX_ITEM } from 'config';
 import useConfig from 'hooks/useConfig';
 import menuItems from 'menu-items';
+import useAuth from 'hooks/useAuth';
 
 // types
 import { NavItemType } from 'types/menu';
@@ -25,6 +26,7 @@ export default function Navigation() {
   const { menuOrientation } = useConfig();
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
+  const { user } = useAuth();
 
   const [selectedID, setSelectedID] = useState<string | undefined>('');
   const [selectedItems, setSelectedItems] = useState<string | undefined>('');
@@ -32,15 +34,22 @@ export default function Navigation() {
 
   const isHorizontal = menuOrientation === MenuOrientation.HORIZONTAL && !downLG;
 
+  const role = user?.role?.toUpperCase();
+  const filteredMenuItems = menuItems.items.filter((item) => {
+    if (role === 'ADMIN') return item.id === 'admin-pages';
+    if (role === 'MANAGER') return item.id === 'manager-pages';
+    return false;
+  });
+
   const lastItem = isHorizontal ? HORIZONTAL_MAX_ITEM : null;
-  let lastItemIndex = menuItems.items.length - 1;
+  let lastItemIndex = filteredMenuItems.length - 1;
   let remItems: NavItemType[] = [];
   let lastItemId: string;
 
-  if (lastItem && lastItem < menuItems.items.length) {
-    lastItemId = menuItems.items[lastItem - 1].id!;
+  if (lastItem && lastItem < filteredMenuItems.length) {
+    lastItemId = filteredMenuItems[lastItem - 1].id!;
     lastItemIndex = lastItem - 1;
-    remItems = menuItems.items.slice(lastItem - 1, menuItems.items.length).map((item) => ({
+    remItems = filteredMenuItems.slice(lastItem - 1, filteredMenuItems.length).map((item) => ({
       title: item.title,
       elements: item.children,
       icon: item.icon,
@@ -50,7 +59,7 @@ export default function Navigation() {
     }));
   }
 
-  const navGroups = menuItems.items.slice(0, lastItemIndex + 1).map((item) => {
+  const navGroups = filteredMenuItems.slice(0, lastItemIndex + 1).map((item) => {
     switch (item.type) {
       case 'group':
         if (item.url && item.id !== lastItemId) {

@@ -69,13 +69,13 @@ export default function EmployeeDetail() {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Thông tin nhân viên
+                        {intl.formatMessage({ id: 'employee-info' })}
                     </Typography>
 
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="code" sx={{ mb: 1 }}>
-                                Mã nhân viên
+                                {intl.formatMessage({ id: 'code' })}
                             </InputLabel>
 
                             <Typography>{employee?.code}</Typography>
@@ -83,7 +83,7 @@ export default function EmployeeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="fullname" sx={{ mb: 1 }}>
-                                Họ và tên
+                                {intl.formatMessage({ id: 'fullname' })}
                             </InputLabel>
 
                             <Typography>{employee?.fullname}</Typography>
@@ -91,7 +91,7 @@ export default function EmployeeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="email" sx={{ mb: 1 }}>
-                                Email
+                                {intl.formatMessage({ id: 'email' })}
                             </InputLabel>
 
                             <Typography>{employee?.email}</Typography>
@@ -99,7 +99,7 @@ export default function EmployeeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="phone" sx={{ mb: 1 }}>
-                                Số điện thoại
+                                {intl.formatMessage({ id: 'phone' })}
                             </InputLabel>
 
                             <Typography>{employee?.phone}</Typography>
@@ -107,15 +107,15 @@ export default function EmployeeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="gender" sx={{ mb: 1 }}>
-                                Giới tính
+                                {intl.formatMessage({ id: 'gender' })}
                             </InputLabel>
 
-                            <Typography>{employee?.gender === 'MALE' ? 'Nam' : employee?.gender === 'FEMALE' ? 'Nữ' : 'Khác'}</Typography>
+                            <Typography>{employee?.gender === 'MALE' ? intl.formatMessage({ id: 'male' }) : employee?.gender === 'FEMALE' ? intl.formatMessage({ id: 'female' }) : intl.formatMessage({ id: 'other' })}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="dob" sx={{ mb: 1 }}>
-                                Ngày sinh
+                                {intl.formatMessage({ id: 'dob' })}
                             </InputLabel>
 
                             <Typography>{formatDate(employee?.dob)}</Typography>
@@ -123,7 +123,7 @@ export default function EmployeeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="nationality" sx={{ mb: 1 }}>
-                                Quốc tịch
+                                {intl.formatMessage({ id: 'nationality' })}
                             </InputLabel>
 
                             <Stack direction="row" alignItems="center" spacing={1}>
@@ -144,15 +144,15 @@ export default function EmployeeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="role" sx={{ mb: 1 }}>
-                                Vai trò
+                                {intl.formatMessage({ id: 'role' })}
                             </InputLabel>
 
-                            <Typography>{employee?.role}</Typography>
+                            <Typography>{employee?.role === "manager" ? intl.formatMessage({ id: 'manager' }) : intl.formatMessage({ id: 'staff' })}</Typography>
                         </Grid>
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="salary" sx={{ mb: 1 }}>
-                                Mức lương
+                                {intl.formatMessage({ id: 'salary' })}
                             </InputLabel>
 
                             <Typography>{employee?.salary}</Typography>
@@ -160,7 +160,7 @@ export default function EmployeeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="hireAt" sx={{ mb: 1 }}>
-                                Ngày bắt đầu làm việc
+                                {intl.formatMessage({ id: 'hire-at' })}
                             </InputLabel>
 
                             <Typography>{formatDate(employee?.hireAt)}</Typography>
@@ -168,19 +168,19 @@ export default function EmployeeDetail() {
 
                         <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="theaterName" sx={{ mb: 1 }}>
-                                Rạp chiếu phụ trách
+                                {intl.formatMessage({ id: 'theater-responsibility' })}
                             </InputLabel>
 
                             <Typography>{employee?.theaterName}</Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 6 }}>
+                        {/* <Grid size={{ xs: 12, md: 6 }}>
                             <InputLabel htmlFor="managerName" sx={{ mb: 1 }}>
-                                Người quản lý trực tiếp
+                                {intl.formatMessage({ id: 'direct-manager' })}
                             </InputLabel>
 
                             <Typography>{employee?.managerName}</Typography>
-                        </Grid>
+                        </Grid> */}
                     </Grid>
                 </Box>
 
@@ -188,7 +188,7 @@ export default function EmployeeDetail() {
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
                             <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/admin/employee/edit/${id}`)}>
-                                Cập nhật
+                                {intl.formatMessage({ id: 'update' })}
                             </Button>
                         </AnimateButton>
                     </Stack>

@@ -69,7 +69,7 @@ export default function UserDetail() {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 30 }, mr: { xs: 0, lg: 30 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Thông tin người dùng
+                        Thông tin khách hàng
                     </Typography>
 
                     <Grid container spacing={2}>
@@ -147,8 +147,8 @@ export default function UserDetail() {
                 <Grid size={12} sx={{ p: 0, m: 0 }}>
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <AnimateButton>
-                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(`/user/edit/${id}`)}>
-                                Cập nhật
+                            <Button variant="contained" sx={{ my: 3, ml: 1 }} onClick={() => navigate(-1)}>
+                                Quay lại
                             </Button>
                         </AnimateButton>
                     </Stack>

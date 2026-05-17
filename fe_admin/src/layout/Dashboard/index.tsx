@@ -3,9 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 // material-ui
 import useMediaQuery from '@mui/material/useMediaQuery';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 
@@ -75,7 +73,7 @@ export default function MainLayout() {
             <Outlet />
             <Footer />
           </Container>
-          <Link style={{ textDecoration: 'none' }} href={url} target="_blank">
+          {/* <Link style={{ textDecoration: 'none' }} href={url} target="_blank">
             <Button
               variant="contained"
               color="error"
@@ -84,7 +82,7 @@ export default function MainLayout() {
             >
               Buy Now
             </Button>
-          </Link>
+          </Link> */}
         </Box>
       </Box>
     </AuthGuard>

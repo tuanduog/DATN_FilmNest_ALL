@@ -21,6 +21,7 @@ import TheaterComedyIcon from '@mui/icons-material/TheaterComedy';
 import StarIcon from '@mui/icons-material/Star';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import AnimateButton from 'components/@extended/AnimateButton';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Room } from 'types/room';
 import { create, update } from 'api/room';
@@ -33,12 +34,6 @@ interface RoomConfirmFormProps {
     room: Room;
     isEdit?: boolean;
 }
-
-const ROOM_TYPE_LABEL: Record<string, string> = {
-    STANDARD: 'Tiêu chuẩn (2D)',
-    IMAX: 'IMAX',
-    THREE_D: '3D'
-};
 
 const getSeatColor = (seat: Seat) => {
     if ((seat.seatStatus || '').toUpperCase() === 'DELETED') return 'transparent';
@@ -85,6 +80,7 @@ const generateAlphabetLabel = (index: number) => {
 
 export default function RoomConfirmForm({ handleBack, room, isEdit = false }: RoomConfirmFormProps) {
     const navigate = useNavigate();
+    const intl = useIntl();
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({
         open: false,
@@ -92,25 +88,41 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
         severity: 'success' as 'success' | 'error'
     });
 
-    const seats: Seat[][] = room.seats
+    const seats: (Seat & { isHidden?: boolean })[][] = room.seats
         ? (() => {
             const flat = room.seats as Seat[];
-            const rows: Seat[][] = [];
+            const rows: (Seat & { isHidden?: boolean })[][] = [];
             for (let r = 0; r < room.totalRow; r++) {
-                rows.push(flat.filter((s) => s.row === r).sort((a, b) => a.col - b.col));
+                const rowSeats = flat.filter((s) => s.row === r).sort((a, b) => a.col - b.col);
+                let skipNext = false;
+                const processedRow = rowSeats.map(seat => {
+                    if (skipNext) {
+                        skipNext = false;
+                        return { ...seat, isHidden: true };
+                    }
+                    if ((seat.type || '').toUpperCase() === 'SWEETBOX' && (seat.seatStatus || 'ACTIVE').toUpperCase() === 'ACTIVE') {
+                        skipNext = true;
+                    }
+                    return { ...seat, isHidden: false };
+                });
+                rows.push(processedRow);
             }
             return rows;
         })()
         : [];
 
+    const calculatedCapacity = seats.flat().filter(
+        (s) => (s.seatStatus || 'ACTIVE').toUpperCase() === 'ACTIVE' && !s.isHidden
+    ).length;
+
     const countByType = (type: SeatType) =>
-        (room.seats as Seat[] | undefined)?.filter(
-            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE'
-        ).length ?? 0;
+        seats.flat().filter(
+            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || 'ACTIVE').toUpperCase() === 'ACTIVE' && !s.isHidden
+        ).length;
 
     const getPriceByType = (type: SeatType) =>
-        (room.seats as Seat[] | undefined)?.find(
-            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || '').toUpperCase() === 'ACTIVE'
+        seats.flat().find(
+            (s) => (s.type || '').toUpperCase() === type && (s.seatStatus || 'ACTIVE').toUpperCase() === 'ACTIVE' && !s.isHidden
         )?.price ?? 0;
 
     const handleSubmit = async () => {
@@ -119,7 +131,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
             const payload = {
                 id: room.id,
                 name: room.name,
-                capacity: room.capacity,
+                capacity: calculatedCapacity,
                 totalRow: room.totalRow,
                 totalColumn: room.totalColumn,
                 type: room.type,
@@ -138,16 +150,16 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
             const response = isEdit ? await update(room.id!, payload) : await create(payload as any);
 
             if (response.status === HttpStatusCode.Ok) {
-                setAlert({ open: true, message: isEdit ? 'Cập nhật phòng chiếu thành công!' : 'Tạo phòng chiếu thành công!', severity: 'success' });
+                setAlert({ open: true, message: intl.formatMessage({ id: isEdit ? 'update-room-success' : 'add-room-success' }), severity: 'success' });
                 setTimeout(() => {
                     navigate('/admin/room');
                 }, 1500);
             } else {
-                const errMsg = response?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+                const errMsg = response?.message || intl.formatMessage({ id: 'error-occurred' });
                 setAlert({ open: true, message: errMsg, severity: 'error' });
             }
         } catch {
-            setAlert({ open: true, message: 'Có lỗi xảy ra. Vui lòng thử lại.', severity: 'error' });
+            setAlert({ open: true, message: intl.formatMessage({ id: 'error-occurred' }), severity: 'error' });
         } finally {
             setLoading(false);
         }
@@ -157,10 +169,10 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
         <Stack spacing={3}>
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
-                    {isEdit ? 'Xác nhận cập nhật phòng chiếu' : 'Xác nhận thông tin phòng chiếu'}
+                    {isEdit ? <FormattedMessage id="confirm-update-room" /> : <FormattedMessage id="confirm-room-info" />}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" mb={3}>
-                    {isEdit ? 'Vui lòng kiểm tra lại các thay đổi trước khi lưu.' : 'Vui lòng kiểm tra lại toàn bộ thông tin trước khi hoàn tất tạo phòng chiếu.'}
+                    {isEdit ? <FormattedMessage id="check-update-changes" /> : <FormattedMessage id="check-create-changes" />}
                 </Typography>
 
                 <Grid container spacing={2}>
@@ -169,7 +181,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                             <Stack direction="row" spacing={1.5} alignItems="center">
                                 <MeetingRoomIcon color="primary" />
                                 <Box>
-                                    <Typography variant="caption" color="textSecondary">Tên phòng chiếu</Typography>
+                                    <Typography variant="caption" color="textSecondary"><FormattedMessage id="room-name" /></Typography>
                                     <Typography variant="body1" fontWeight={600}>{room.name}</Typography>
                                 </Box>
                             </Stack>
@@ -177,9 +189,9 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                             <Stack direction="row" spacing={1.5} alignItems="center">
                                 <CategoryIcon color="primary" />
                                 <Box>
-                                    <Typography variant="caption" color="textSecondary">Loại phòng</Typography>
+                                    <Typography variant="caption" color="textSecondary"><FormattedMessage id="room-type" /></Typography>
                                     <Typography variant="body1" fontWeight={600}>
-                                        {ROOM_TYPE_LABEL[(room.type || '').toUpperCase()] || room.type}
+                                        {(room.type || '').toUpperCase() === 'STANDARD' ? <FormattedMessage id="standard-2d" /> : (room.type || '').toUpperCase() === 'THREE_D' ? '3D' : room.type}
                                     </Typography>
                                 </Box>
                             </Stack>
@@ -187,7 +199,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                             <Stack direction="row" spacing={1.5} alignItems="center">
                                 <TheaterComedyIcon color="primary" />
                                 <Box>
-                                    <Typography variant="caption" color="textSecondary">Rạp chiếu</Typography>
+                                    <Typography variant="caption" color="textSecondary"><FormattedMessage id="theater" /></Typography>
                                     <Typography variant="body1" fontWeight={600}>{room.theaterName || `ID: ${room.theaterId}`}</Typography>
                                 </Box>
                             </Stack>
@@ -199,21 +211,21 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                             <Stack direction="row" spacing={1.5} alignItems="center">
                                 <EventSeatIcon color="primary" />
                                 <Box>
-                                    <Typography variant="caption" color="textSecondary">Tổng chỗ ngồi (kế hoạch)</Typography>
-                                    <Typography variant="body1" fontWeight={600}>{room.capacity} chỗ</Typography>
+                                    <Typography variant="caption" color="textSecondary"><FormattedMessage id="planned-capacity" /></Typography>
+                                    <Typography variant="body1" fontWeight={600}>{calculatedCapacity} <FormattedMessage id="seats" /></Typography>
                                 </Box>
                             </Stack>
 
                             <Box>
-                                <Typography variant="caption" color="textSecondary">Kích thước sơ đồ</Typography>
-                                <Typography variant="body1" fontWeight={600}>{room.totalRow} hàng × {room.totalColumn} cột</Typography>
+                                <Typography variant="caption" color="textSecondary"><FormattedMessage id="grid-size" /></Typography>
+                                <Typography variant="body1" fontWeight={600}>{room.totalRow} <FormattedMessage id="row-count" /> × {room.totalColumn} <FormattedMessage id="column-count" /></Typography>
                             </Box>
 
                             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                                 <Chip
                                     size="small"
                                     icon={<EventSeatIcon style={{ fontSize: 14, color: '#2196f3' }} />}
-                                    label={`Thường: ${countByType('STANDARD')} (${getPriceByType('STANDARD').toLocaleString()}đ)`}
+                                    label={`${intl.formatMessage({ id: 'standard' })}: ${countByType('STANDARD')} (${getPriceByType('STANDARD').toLocaleString()}đ)`}
                                     sx={{ bgcolor: '#e3f2fd', color: '#0d47a1', fontWeight: 600, border: '1px solid #2196f3' }}
                                 />
                                 <Chip
@@ -237,7 +249,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
             {seats.length > 0 && (
                 <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                     <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        Xem trước sơ đồ ghế
+                        <FormattedMessage id="preview-seat-map" />
                     </Typography>
                     <Divider sx={{ mb: 3 }} />
 
@@ -256,7 +268,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                                 boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
                                 borderTop: '4px solid #90a4ae'
                             }}>
-                                <Typography variant="caption" color="textSecondary" sx={{ letterSpacing: 4, fontWeight: 'bold' }}>MÀN HÌNH</Typography>
+                                <Typography variant="caption" color="textSecondary" sx={{ letterSpacing: 4, fontWeight: 'bold' }}><FormattedMessage id="screen" /></Typography>
                             </Box>
 
                             <Stack spacing={1}>
@@ -265,27 +277,30 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                                         <Typography variant="caption" sx={{ width: 24, textAlign: 'center', fontWeight: 'bold', color: '#546e7a' }}>
                                             {generateAlphabetLabel(rIndex)}
                                         </Typography>
-                                        {row.map((seat) => (
-                                            <Box
-                                                key={`${seat.row}-${seat.col}`}
-                                                sx={{
-                                                    width: ((seat.type || '').toUpperCase() === 'SWEETBOX' && (seat.seatStatus || '').toUpperCase() === 'ACTIVE') ? 60 : 38,
-                                                    height: 38,
-                                                    bgcolor: getSeatColor(seat),
-                                                    border: getSeatBorder(seat),
-                                                    borderRadius: 1,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}
-                                            >
-                                                {(seat.seatStatus || '').toUpperCase() !== 'DELETED' && (
-                                                    <Typography variant="caption" sx={{ fontSize: '0.6rem', fontWeight: 600, color: getSeatTextColor(seat) }}>
-                                                        {seat.label}
-                                                    </Typography>
-                                                )}
-                                            </Box>
-                                        ))}
+                                        {row.map((seat) => {
+                                            if (seat.isHidden) return null;
+                                            return (
+                                                <Box
+                                                    key={`${seat.row}-${seat.col}`}
+                                                    sx={{
+                                                        width: ((seat.type || '').toUpperCase() === 'SWEETBOX' && (seat.seatStatus || '').toUpperCase() === 'ACTIVE') ? 84 : 38,
+                                                        height: 38,
+                                                        bgcolor: getSeatColor(seat),
+                                                        border: getSeatBorder(seat),
+                                                        borderRadius: 1,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                    }}
+                                                >
+                                                    {(seat.seatStatus || '').toUpperCase() !== 'DELETED' && (
+                                                        <Typography variant="caption" sx={{ fontSize: '0.6rem', fontWeight: 600, color: getSeatTextColor(seat) }}>
+                                                            {seat.label}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            )
+                                        })}
                                         <Typography variant="caption" sx={{ width: 24, textAlign: 'center', fontWeight: 'bold', color: '#546e7a' }}>
                                             {generateAlphabetLabel(rIndex)}
                                         </Typography>
@@ -299,7 +314,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
 
             <Stack direction="row" justifyContent="space-between" sx={{ pb: 2 }}>
                 <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack} disabled={loading}>
-                    Quay lại
+                    <FormattedMessage id="back" />
                 </Button>
                 <AnimateButton>
                     <Button
@@ -309,7 +324,7 @@ export default function RoomConfirmForm({ handleBack, room, isEdit = false }: Ro
                         onClick={handleSubmit}
                         disabled={loading}
                     >
-                        {loading ? 'Đang lưu...' : isEdit ? 'Cập nhật phòng' : 'Hoàn tất tạo phòng'}
+                        {loading ? <FormattedMessage id="saving-room" /> : isEdit ? <FormattedMessage id="update-room" /> : <FormattedMessage id="complete-create-room" />}
                     </Button>
                 </AnimateButton>
             </Stack>

@@ -116,7 +116,7 @@ export default function Localization() {
                         }
                       />
                     </ListItemButton>
-                    <ListItemButton selected={i18n === 'fr'} onClick={() => handleListItemClick('fr')}>
+                    {/* <ListItemButton selected={i18n === 'fr'} onClick={() => handleListItemClick('fr')}>
                       <ListItemText
                         primary={
                           <Grid container>
@@ -151,7 +151,7 @@ export default function Localization() {
                           </Grid>
                         }
                       />
-                    </ListItemButton>
+                    </ListItemButton> */}
                     <ListItemButton selected={i18n === 'vi'} onClick={() => handleListItemClick('vi')}>
                       <ListItemText
                         primary={

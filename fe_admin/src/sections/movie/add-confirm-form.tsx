@@ -57,7 +57,7 @@ export default function AddConfirmForm({ handleBack, movie }: ConfirmProps) {
                     return;
                 }
             } catch (err) {
-                setAlert({ open: true, message: 'Lỗi tải ảnh. Gửi form thất bại', severity: 'error' });
+                setAlert({ open: true, message: intl.formatMessage({ id: 'upload-image-error' }), severity: 'error' });
                 return;
             }
         }
@@ -72,7 +72,7 @@ export default function AddConfirmForm({ handleBack, movie }: ConfirmProps) {
 
             if (response.status === HttpStatusCode.Ok) {
                 navigate('/admin/movie', {
-                    state: { alert: { open: true, severity: 'success', message: 'Thêm phim mới thành công' } }
+                    state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'add-movie-success' }) } }
                 });
             } else if (response.status === HttpStatusCode.BadRequest) {
                 setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
@@ -93,7 +93,7 @@ export default function AddConfirmForm({ handleBack, movie }: ConfirmProps) {
             <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', ml: { xs: 0, lg: 25 }, mr: { xs: 0, lg: 25 }, borderRadius: 2 }}>
                 <Box mb={4}>
                     <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                        Xác nhận thông tin phim
+                        {intl.formatMessage({ id: 'confirm-movie-info' })}
                     </Typography>
 
                     <Grid container spacing={2}>
@@ -113,67 +113,67 @@ export default function AddConfirmForm({ handleBack, movie }: ConfirmProps) {
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Tên phim</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'movie-name' })}</InputLabel>
                                 <Typography>{movie.name}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Thời lượng (phút)</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'duration-minutes' })}</InputLabel>
                                 <Typography>{movie.duration}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Đạo diễn</InputLabel>
-                                <Typography>{movie.director || 'Chưa cập nhật'}</Typography>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'director' })}</InputLabel>
+                                <Typography>{movie.director || intl.formatMessage({ id: 'not-updated' })}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Thể loại</InputLabel>
-                                <Typography>{movie.genre || 'Chưa cập nhật'}</Typography>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'genre' })}</InputLabel>
+                                <Typography>{movie.genre || intl.formatMessage({ id: 'not-updated' })}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Ngày khởi chiếu</InputLabel>
-                                <Typography>{movie.releaseDate ? formatDate(movie.releaseDate) : 'Chưa cập nhật'}</Typography>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'release-date' })}</InputLabel>
+                                <Typography>{movie.releaseDate ? formatDate(movie.releaseDate) : intl.formatMessage({ id: 'not-updated' })}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Ngày kết thúc</InputLabel>
-                                <Typography>{movie.endDate ? formatDate(movie.endDate) : 'Chưa cập nhật'}</Typography>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'end-date' })}</InputLabel>
+                                <Typography>{movie.endDate ? formatDate(movie.endDate) : intl.formatMessage({ id: 'not-updated' })}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={12}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Diễn viên</InputLabel>
-                                <Typography>{movie.actor || 'Chưa cập nhật'}</Typography>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'actor' })}</InputLabel>
+                                <Typography>{movie.actor || intl.formatMessage({ id: 'not-updated' })}</Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={12}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Trailer URL</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'trailer-link' })}</InputLabel>
                                 <Typography sx={{ wordBreak: 'break-all' }}>
-                                    {movie.trailerUrl || 'Chưa cập nhật'}
+                                    {movie.trailerUrl || intl.formatMessage({ id: 'not-updated' })}
                                 </Typography>
                             </Stack>
                         </Grid>
 
                         <Grid size={12}>
                             <Stack spacing={1}>
-                                <InputLabel sx={{ fontWeight: 'bold' }}>Mô tả</InputLabel>
+                                <InputLabel sx={{ fontWeight: 'bold' }}>{intl.formatMessage({ id: 'description' })}</InputLabel>
                                 <Typography sx={{ whiteSpace: 'pre-wrap' }}>
-                                    {movie.description || 'Chưa cập nhật'}
+                                    {movie.description || intl.formatMessage({ id: 'not-updated' })}
                                 </Typography>
                             </Stack>
                         </Grid>
@@ -184,12 +184,12 @@ export default function AddConfirmForm({ handleBack, movie }: ConfirmProps) {
 
                 <Grid display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
                     <Button variant="contained" sx={{ my: 3 }} color="secondary" onClick={handleBack}>
-                        Quay lại
+                        {intl.formatMessage({ id: 'back' })}
                     </Button>
 
                     <AnimateButton>
                         <Button variant="contained" type="button" sx={{ my: 3 }} color="primary" onClick={handleSubmit}>
-                            Xác nhận
+                            {intl.formatMessage({ id: 'confirm' })}
                         </Button>
                     </AnimateButton>
                 </Grid>

@@ -17,6 +17,7 @@ import {
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useState, useEffect } from 'react';
+import { useIntl } from 'react-intl';
 import { Theater } from 'types/theater';
 import AnimateButton from 'components/@extended/AnimateButton';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
@@ -42,18 +43,19 @@ function MapClickHandler({ onClick }: MapClickHandlerProps) {
     return null;
 }
 
-const validationSchema = Yup.object({
-    name: Yup.string().required('Tên rạp chiếu là bắt buộc'),
-    address: Yup.string().required('Địa chỉ là bắt buộc'),
-    provinceCode: Yup.number().required('Tỉnh/thành phố là bắt buộc').min(1, 'Vui lòng chọn tỉnh/thành phố'),
-    communeCode: Yup.number().required('Xã/phường là bắt buộc').min(1, 'Vui lòng chọn xã/phường'),
-    description: Yup.string().required('Mô tả là bắt buộc'),
-    hotline: Yup.string().required('Hotline là bắt buộc'),
-    openTime: Yup.string().required('Giờ mở cửa là bắt buộc'),
-    closeTime: Yup.string().required('Giờ đóng cửa là bắt buộc'),
+const validationSchema = (intl: any) => Yup.object({
+    name: Yup.string().required(intl.formatMessage({ id: 'theater-name-required' })),
+    address: Yup.string().required(intl.formatMessage({ id: 'address-required' })),
+    provinceCode: Yup.number().required(intl.formatMessage({ id: 'province-required' })).min(1, intl.formatMessage({ id: 'select-province-required' })),
+    communeCode: Yup.number().required(intl.formatMessage({ id: 'commune-required' })).min(1, intl.formatMessage({ id: 'select-commune-required' })),
+    description: Yup.string().required(intl.formatMessage({ id: 'description-required' })),
+    hotline: Yup.string().required(intl.formatMessage({ id: 'hotline-required' })),
+    openTime: Yup.string().required(intl.formatMessage({ id: 'open-time-required' })),
+    closeTime: Yup.string().required(intl.formatMessage({ id: 'close-time-required' })),
 });
 
 export default function TheaterForm({ handleNext, setTheater, theater }: TheaterFormProps) {
+    const intl = useIntl();
     const [provinces, setProvinces] = useState<any[]>([]);
     const [communes, setCommunes] = useState<any[]>([]);
 
@@ -65,7 +67,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
 
     const formik = useFormik<Theater>({
         initialValues: theater,
-        validationSchema: validationSchema,
+        validationSchema: validationSchema(intl),
         onSubmit: async (values) => {
             setTheater(values);
             handleNext();
@@ -122,19 +124,19 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                            Thông tin rạp chiếu
+                            {intl.formatMessage({ id: 'theater-info' })}
                         </Typography>
 
                         <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tên rạp chiếu
+                                    {intl.formatMessage({ id: 'theater-name' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="name"
                                     name="name"
-                                    placeholder="Nhập tên rạp chiếu"
+                                    placeholder={intl.formatMessage({ id: 'search-theater-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.name}
@@ -147,13 +149,13 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="hotline" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Hotline
+                                    {intl.formatMessage({ id: 'hotline' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="hotline"
                                     name="hotline"
-                                    placeholder="Nhập hotline"
+                                    placeholder={intl.formatMessage({ id: 'hotline-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.hotline}
@@ -166,7 +168,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tỉnh/Thành phố
+                                    {intl.formatMessage({ id: 'province-city' })}
                                 </InputLabel>
 
                                 <FormControl fullWidth size="small" error={formik.touched.provinceCode && Boolean(formik.errors.provinceCode)}>
@@ -179,7 +181,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                                         displayEmpty
                                     >
                                         <MenuItem value="" disabled sx={{ display: 'none' }}>
-                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn tỉnh/thành phố</Box>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}>{intl.formatMessage({ id: 'select-province-city' })}</Box>
                                         </MenuItem>
                                         {provinces.map((p) => (
                                             <MenuItem key={p.code} value={p.code}>{p.name}</MenuItem>
@@ -193,7 +195,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Xã/Phường
+                                    {intl.formatMessage({ id: 'commune-ward' })}
                                 </InputLabel>
                                 <FormControl fullWidth size="small" error={formik.touched.communeCode && Boolean(formik.errors.communeCode)}>
                                     <Select
@@ -206,7 +208,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                                         disabled={!formik.values.provinceCode}
                                     >
                                         <MenuItem value="" disabled sx={{ display: 'none' }}>
-                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn xã/phường</Box>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}>{intl.formatMessage({ id: 'select-commune-ward' })}</Box>
                                         </MenuItem>
                                         {communes.map((c) => (
                                             <MenuItem key={c.code} value={c.code}>{c.name}</MenuItem>
@@ -220,7 +222,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="openTime" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Giờ mở cửa
+                                    {intl.formatMessage({ id: 'open-time' })}
                                 </InputLabel>
 
                                 <TextField
@@ -240,7 +242,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="closeTime" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Giờ đóng cửa
+                                    {intl.formatMessage({ id: 'close-time' })}
                                 </InputLabel>
 
                                 <TextField
@@ -297,13 +299,13 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
 
                             <Grid size={12}>
                                 <InputLabel htmlFor="address" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Địa chỉ
+                                    {intl.formatMessage({ id: 'address' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="address"
                                     name="address"
-                                    placeholder="Nhập địa chỉ"
+                                    placeholder={intl.formatMessage({ id: 'address-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.address}
@@ -316,13 +318,13 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
 
                             <Grid size={12}>
                                 <InputLabel htmlFor="description" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Mô tả
+                                    {intl.formatMessage({ id: 'description' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="description"
                                     name="description"
-                                    placeholder="Nhập mô tả"
+                                    placeholder={intl.formatMessage({ id: 'description-placeholder' })}
                                     size="small"
                                     multiline
                                     rows={4}
@@ -341,7 +343,7 @@ export default function TheaterForm({ handleNext, setTheater, theater }: Theater
                         <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                             <AnimateButton>
                                 <Button variant="contained" type="submit" sx={{ my: 3, ml: 1 }}>
-                                    Tiếp tục
+                                    {intl.formatMessage({ id: 'continue' })}
                                 </Button>
                             </AnimateButton>
                         </Stack>

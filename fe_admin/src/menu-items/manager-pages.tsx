@@ -1,12 +1,23 @@
-// assets
-import { I24Support, MessageProgramming } from 'iconsax-reactjs';
+import {
+    Category,
+    VideoSquare,
+    Clock,
+    Ticket,
+    Building,
+    MessageProgramming,
+    I24Support
+} from 'iconsax-reactjs';
 
 // type
 import { NavItemType } from 'types/menu';
 
 // icons
-// icons
 const icons = {
+    dashboard: Category,
+    room: VideoSquare,
+    showtime: Clock,
+    booking: Ticket,
+    theaterProfile: Building,
     maintenance: MessageProgramming,
     contactus: I24Support
 };
@@ -14,7 +25,7 @@ const icons = {
 // ==============================|| MENU ITEMS - PAGES ||============================== //
 
 const manager: NavItemType = {
-    id: 'group-pages',
+    id: 'manager-pages',
     title: 'manager',
     type: 'group',
     children: [
@@ -23,7 +34,35 @@ const manager: NavItemType = {
             title: 'dashboard',
             type: 'item',
             url: '/manager/dashboard',
-            icon: icons.contactus
+            icon: icons.dashboard
+        },
+        {
+            id: 'room',
+            title: 'room',
+            type: 'item',
+            url: '/manager/room',
+            icon: icons.room
+        },
+        {
+            id: 'showtime',
+            title: 'showtime',
+            type: 'item',
+            url: '/manager/showtime',
+            icon: icons.showtime
+        },
+        {
+            id: 'booking',
+            title: 'booking',
+            type: 'item',
+            url: '/manager/booking',
+            icon: icons.booking
+        },
+        {
+            id: 'theater-profile',
+            title: 'theater-profile',
+            type: 'item',
+            url: '/manager/theater-profile',
+            icon: icons.theaterProfile
         }
     ]
 };

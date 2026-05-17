@@ -14,6 +14,7 @@ type UserProfile = {
   name?: string;
   role?: string;
   tier?: string;
+  theaterId?: string | number;
 };
 
 export type AuthInfo = {

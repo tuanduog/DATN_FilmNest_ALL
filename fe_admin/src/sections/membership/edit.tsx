@@ -34,17 +34,17 @@ import { Combo } from 'types/combo';
 import { Voucher } from 'types/voucher';
 import Divider from '@mui/material/Divider';
 
-const validationSchema = Yup.object({
-    name: Yup.string().required('Tên gói thành viên là bắt buộc'),
-    type: Yup.string().required('Loại gói thành viên là bắt buộc'),
-    price: Yup.number().required('Giá tiền là bắt buộc').min(1, 'Giá tiền phải lớn hơn 0'),
-    duration: Yup.number().required('Thời hạn là bắt buộc').min(1, 'Thời hạn phải lớn hơn 0')
-});
-
 export default function EditMembership() {
     const { id } = useParams<{ id: string }>();
     const intl = useIntl();
     const navigate = useNavigate();
+
+    const validationSchema = Yup.object({
+        name: Yup.string().required(intl.formatMessage({ id: 'membership-name-required' })),
+        type: Yup.string().required(intl.formatMessage({ id: 'membership-type-required' })),
+        price: Yup.number().required(intl.formatMessage({ id: 'price-required' })).min(1, intl.formatMessage({ id: 'discount-min' })),
+        duration: Yup.number().required(intl.formatMessage({ id: 'duration-required' })).min(1, intl.formatMessage({ id: 'discount-min' }))
+    });
     const [image, setImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>('');
 
@@ -108,7 +108,7 @@ export default function EditMembership() {
                 const resCombo = await getListCombo({ page: 0, size: 100, keyword: '', sort: '', status: 'ACTIVE' });
                 if (resCombo?.data?.content) setCombos(resCombo.data.content);
 
-                const resVoucher = await getListVoucher({ page: 0, size: 100, keyword: '', sort: '', status: 'ACTIVE' });
+                const resVoucher = await getListVoucher({ page: 0, size: 100, keyword: '', sort: '', type: 'PERSONAL', status: 'ACTIVE' });
                 if (resVoucher?.data?.content) setVouchers(resVoucher.data.content);
             } catch (error) {
                 console.error('Failed to fetch benefits', error);
@@ -138,7 +138,7 @@ export default function EditMembership() {
                         }
                     }
                 } catch (err) {
-                    setAlert({ open: true, message: 'Lỗi tải ảnh', severity: 'error' });
+                    setAlert({ open: true, message: intl.formatMessage({ id: 'upload-image-error' }), severity: 'error' });
                     return;
                 }
             }
@@ -153,7 +153,7 @@ export default function EditMembership() {
 
                 if (response.status === HttpStatusCode.Ok) {
                     navigate('/admin/membership', {
-                        state: { alert: { open: true, severity: 'success', message: 'Cập nhật gói thành viên thành công' } }
+                        state: { alert: { open: true, severity: 'success', message: intl.formatMessage({ id: 'update-membership-success' }) } }
                     });
                 } else if (response.status === HttpStatusCode.BadRequest) {
                     setAlert({ open: true, message: intl.formatMessage({ id: 'invalid-form' }), severity: 'error' });
@@ -183,13 +183,13 @@ export default function EditMembership() {
                 <form onSubmit={formik.handleSubmit} noValidate>
                     <Box mb={4}>
                         <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-                            Thông tin gói thành viên
+                            {intl.formatMessage({ id: 'membership-info' })}
                         </Typography>
 
                         <Grid container spacing={2}>
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
-                                    <InputLabel sx={{ mb: 1 }}>Hình ảnh gói thành viên</InputLabel>
+                                    <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'membership-image' })}</InputLabel>
                                     {!preview ? (
                                         <ImageDropZone
                                             value={preview ?? ''}
@@ -239,13 +239,13 @@ export default function EditMembership() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="name" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Tên gói thành viên
+                                    {intl.formatMessage({ id: 'membership-name' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="name"
                                     name="name"
-                                    placeholder="Nhập tên gói thành viên"
+                                    placeholder={intl.formatMessage({ id: 'membership-name-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.name}
@@ -258,7 +258,7 @@ export default function EditMembership() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="type" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Loại gói thành viên
+                                    {intl.formatMessage({ id: 'membership-type' })}
                                 </InputLabel>
 
                                 <FormControl
@@ -275,11 +275,13 @@ export default function EditMembership() {
                                         onBlur={formik.handleBlur}
                                     >
                                         <MenuItem value="" disabled sx={{ display: 'none' }}>
-                                            <Box component="span" sx={{ color: 'text.secondary' }}>Chọn loại gói thành viên</Box>
+                                            <Box component="span" sx={{ color: 'text.secondary' }}>
+                                                {intl.formatMessage({ id: 'select-membership-type' })}
+                                            </Box>
                                         </MenuItem>
-                                        <MenuItem value="PREMIUM">Premium</MenuItem>
-                                        <MenuItem value="GOLD">Gold</MenuItem>
-                                        <MenuItem value="SILVER">Silver</MenuItem>
+                                        <MenuItem value="PLATINUM">{intl.formatMessage({ id: 'platinum' })}</MenuItem>
+                                        <MenuItem value="GOLD">{intl.formatMessage({ id: 'gold' })}</MenuItem>
+                                        <MenuItem value="SILVER">{intl.formatMessage({ id: 'silver' })}</MenuItem>
                                     </Select>
 
                                     <FormHelperText>
@@ -290,13 +292,13 @@ export default function EditMembership() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="price" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Giá tiền
+                                    {intl.formatMessage({ id: 'price' })}
                                 </InputLabel>
 
                                 <TextField
                                     id="price"
                                     name="price"
-                                    placeholder="Nhập giá tiền"
+                                    placeholder={intl.formatMessage({ id: 'price-placeholder' })}
                                     size="small"
                                     type='number'
                                     fullWidth
@@ -310,14 +312,14 @@ export default function EditMembership() {
 
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <InputLabel htmlFor="duration" required sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, mb: 1 }}>
-                                    Thời hạn (tháng)
+                                    {intl.formatMessage({ id: 'duration' })} ({intl.formatMessage({ id: 'month' })})
                                 </InputLabel>
 
                                 <TextField
                                     id="duration"
                                     name="duration"
                                     type="number"
-                                    placeholder="Nhập thời hạn (tháng)"
+                                    placeholder={intl.formatMessage({ id: 'duration-placeholder' })}
                                     size="small"
                                     fullWidth
                                     value={formik.values.duration}
@@ -331,7 +333,7 @@ export default function EditMembership() {
                             <Grid size={12}>
                                 <Divider sx={{ my: 2 }} />
                                 <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-                                    Các quyền lợi của gói thành viên
+                                    {intl.formatMessage({ id: 'membership-benefits' })}
                                 </Typography>
 
                                 {(formik.values.benefits || []).map((benefit, index) => (
@@ -348,7 +350,9 @@ export default function EditMembership() {
                                                         formik.setFieldValue('benefits', newBenefits);
                                                     }}
                                                 >
-                                                    <MenuItem value="" disabled sx={{ display: 'none' }}>Chọn loại quyền lợi</MenuItem>
+                                                    <MenuItem value="" disabled sx={{ display: 'none' }}>
+                                                        {intl.formatMessage({ id: 'select-benefit-type' })}
+                                                    </MenuItem>
                                                     <MenuItem value="VOUCHER">Voucher</MenuItem>
                                                     <MenuItem value="COMBO">Combo</MenuItem>
                                                     <MenuItem value="DIRECT">Trực tiếp</MenuItem>
@@ -368,7 +372,9 @@ export default function EditMembership() {
                                                                 formik.setFieldValue('benefits', newBenefits);
                                                             }}
                                                         >
-                                                            <MenuItem value="" disabled sx={{ display: 'none' }}>Chọn Voucher</MenuItem>
+                                                            <MenuItem value="" disabled sx={{ display: 'none' }}>
+                                                                {intl.formatMessage({ id: 'select-voucher' })}
+                                                            </MenuItem>
                                                             {vouchers.map(v => <MenuItem key={v.id} value={v.id}>{v.code}</MenuItem>)}
                                                         </Select>
                                                     </FormControl>
@@ -383,7 +389,9 @@ export default function EditMembership() {
                                                                 formik.setFieldValue('benefits', newBenefits);
                                                             }}
                                                         >
-                                                            <MenuItem value="" disabled sx={{ display: 'none' }}>Chọn Combo</MenuItem>
+                                                            <MenuItem value="" disabled sx={{ display: 'none' }}>
+                                                                {intl.formatMessage({ id: 'select-combo' })}
+                                                            </MenuItem>
                                                             {combos.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
                                                         </Select>
                                                     </FormControl>
@@ -393,7 +401,7 @@ export default function EditMembership() {
                                         {benefit.type !== 'VOUCHER' && benefit.type !== 'COMBO' && (
                                             <Grid size={{ xs: 12, md: 6 }}>
                                                 <TextField
-                                                    placeholder="Mô tả quyền lợi"
+                                                    placeholder={intl.formatMessage({ id: 'benefit-description-placeholder' })}
                                                     size="small"
                                                     fullWidth
                                                     value={benefit.description || ''}
@@ -408,7 +416,7 @@ export default function EditMembership() {
                                         <Grid size={{ xs: 12, md: 2 }}>
                                             <TextField
                                                 type="number"
-                                                placeholder="Số lượng"
+                                                placeholder={intl.formatMessage({ id: 'quantity' })}
                                                 size="small"
                                                 fullWidth
                                                 value={benefit.quantity || ''}
@@ -437,7 +445,7 @@ export default function EditMembership() {
                                         formik.setFieldValue('benefits', newBenefits);
                                     }}
                                 >
-                                    Thêm quyền lợi
+                                    {intl.formatMessage({ id: 'add-benefit' })}
                                 </Button>
                             </Grid>
                         </Grid>
@@ -447,7 +455,7 @@ export default function EditMembership() {
                         <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                             <AnimateButton>
                                 <Button variant="contained" type="submit" sx={{ my: 3, ml: 1 }}>
-                                    Xác nhận
+                                    {intl.formatMessage({ id: 'confirm' })}
                                 </Button>
                             </AnimateButton>
                         </Stack>

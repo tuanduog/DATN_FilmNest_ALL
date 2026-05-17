@@ -1,5 +1,6 @@
 import { useRef, useState, ReactNode, SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router';
+import { FormattedMessage } from 'react-intl';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -29,6 +30,7 @@ import useAuth from 'hooks/useAuth';
 // assets
 import avatar1 from 'assets/images/users/avatar-6.png';
 import { Setting2, Profile, Logout } from 'iconsax-reactjs';
+import { useIntl } from 'react-intl';
 
 // types
 interface TabPanelProps {
@@ -75,7 +77,7 @@ const tabStyle = {
 export default function ProfilePage() {
   const theme = useTheme();
   const navigate = useNavigate();
-
+  const intl = useIntl();
   const { logout, user } = useAuth();
   const handleLogout = async () => {
     try {
@@ -160,13 +162,13 @@ export default function ProfilePage() {
                           <Stack>
                             <Typography variant="subtitle1">{user?.name}</Typography>
                             <Typography variant="body2" color="secondary">
-                              UI/UX Designer
+                              {user?.role === "Admin" ? intl.formatMessage({ id: 'admin' }) : intl.formatMessage({ id: 'manager' })}
                             </Typography>
                           </Stack>
                         </Stack>
                       </Grid>
                       <Grid>
-                        <Tooltip title="Logout">
+                        <Tooltip title={<FormattedMessage id="logout" />}>
                           <IconButton size="large" color="error" sx={{ p: 1 }} onClick={handleLogout}>
                             <Logout variant="Bulk" />
                           </IconButton>
@@ -177,8 +179,8 @@ export default function ProfilePage() {
 
                   <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
-                      <Tab sx={tabStyle} icon={<Profile size={18} style={{ marginBottom: 0 }} />} label="Profile" {...a11yProps(0)} />
-                      <Tab sx={tabStyle} icon={<Setting2 size={18} style={{ marginBottom: 0 }} />} label="Setting" {...a11yProps(1)} />
+                      <Tab sx={tabStyle} icon={<Profile size={18} style={{ marginBottom: 0 }} />} label={<FormattedMessage id="profile" />} {...a11yProps(0)} />
+                      <Tab sx={tabStyle} icon={<Setting2 size={18} style={{ marginBottom: 0 }} />} label={<FormattedMessage id="setting" />} {...a11yProps(1)} />
                     </Tabs>
                   </Box>
                   <TabPanel value={value} index={0} dir={theme.direction}>
