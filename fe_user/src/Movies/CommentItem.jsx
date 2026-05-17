@@ -1,248 +1,269 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import './CommentItem.css';
+import { filterProfanity } from '../utils/profanityFilter';
 
-function CommentItem ({ cmt, handleCmt, messSub, setMessSub, messWtag, setMesWtag}) {
+function ChildReactionButtons({ child, client }) {
+    const [likeCount, setLikeCount] = useState(child.likeCount ?? 0);
+    const [dislikeCount, setDislikeCount] = useState(child.dislikeCount ?? 0);
+    const [reaction, setReaction] = useState(child.myReaction ?? null);
+
+    useEffect(() => { setLikeCount(child.likeCount ?? 0); }, [child.likeCount]);
+    useEffect(() => { setDislikeCount(child.dislikeCount ?? 0); }, [child.dislikeCount]);
+    useEffect(() => { setReaction(child.myReaction ?? null); }, [child.myReaction]);
+
+    const publishReaction = (type) => {
+        const userStr = sessionStorage.getItem('user');
+        if (!userStr) return;
+        const user = JSON.parse(userStr);
+        if (client?.current?.connected) {
+            client.current.publish({
+                destination: "/app/push-reaction",
+                body: JSON.stringify({ commentId: child.commentId, type, userId: user.userId })
+            });
+        }
+    };
+
+    const handleLike = () => {
+        if (reaction === "like") { setReaction(null); setLikeCount(c => c - 1); publishReaction("UNLIKE"); }
+        else {
+            if (reaction === "dislike") setDislikeCount(c => c - 1);
+            setReaction("like"); setLikeCount(c => c + 1); publishReaction("LIKE");
+        }
+    };
+
+    const handleDislike = () => {
+        if (reaction === "dislike") { setReaction(null); setDislikeCount(c => c - 1); publishReaction("UNDISLIKE"); }
+        else {
+            if (reaction === "like") setLikeCount(c => c - 1);
+            setReaction("dislike"); setDislikeCount(c => c + 1); publishReaction("DISLIKE");
+        }
+    };
+
+    return (
+        <>
+            <button className={`reaction-btn ${reaction === "like" ? "active-like" : ""}`} onClick={handleLike}>
+                <i className="fa-regular fa-thumbs-up"></i>
+                <span>{likeCount}</span>
+            </button>
+            <button className={`reaction-btn ${reaction === "dislike" ? "active-dislike" : ""}`} onClick={handleDislike}>
+                <i className="fa-regular fa-thumbs-down"></i>
+                <span>{dislikeCount}</span>
+            </button>
+        </>
+    );
+}
+
+function CommentItem({ cmt, handleCmt, messSub, setMessSub, messWtag, setMesWtag, client }) {
     const [showSubInput, setShowSubInput] = useState(false);
     const [showSubInput1, setShowSubInput1] = useState(false);
     const [showReply, setShowReply] = useState(false);
-    const [userName, setUserName] = useState("");
-    const [id, setId] = useState("");
-    const [likeCount, setLikeCount] = useState(2);
-    const [dislikeCount, setDislikeCount] = useState(1);
-    const [reaction, setReaction] = useState(null);
+    const [taggedUser, setTaggedUser] = useState("");
+    const [taggedId, setTaggedId] = useState("");
+    const [likeCount, setLikeCount] = useState(cmt.likeCount ?? 0);
+    const [dislikeCount, setDislikeCount] = useState(cmt.dislikeCount ?? 0);
+    const [reaction, setReaction] = useState(cmt.myReaction ?? null);
 
-    const oldDate = new Date(cmt.createdAt);
-    
-    const timeAgo = (oldDate) => {
-        const now = new Date();
-        const diffMs = now - oldDate;
+    // Sync khi WebSocket cập nhật props từ parent
+    useEffect(() => { setLikeCount(cmt.likeCount ?? 0); }, [cmt.likeCount]);
+    useEffect(() => { setDislikeCount(cmt.dislikeCount ?? 0); }, [cmt.dislikeCount]);
+    useEffect(() => { setReaction(cmt.myReaction ?? null); }, [cmt.myReaction]);
 
-        const seconds = Math.floor(diffMs / 1000);
-        const minutes = Math.floor(diffMs / (1000 * 60));
-        const hours   = Math.floor(diffMs / (1000 * 60 * 60));
-        const days    = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    /* ─── Helpers ─── */
+    const timeAgo = (date) => {
+        const diff = Date.now() - new Date(date).getTime();
+        const s = Math.floor(diff / 1000);
+        const m = Math.floor(diff / 60000);
+        const h = Math.floor(diff / 3600000);
+        const d = Math.floor(diff / 86400000);
+        if (s < 60) return `${s} giây trước`;
+        if (m < 60) return `${m} phút trước`;
+        if (h < 24) return `${h} giờ trước`;
+        return `${d} ngày trước`;
+    };
 
-        if(seconds < 60) return `${seconds} giây trước`;
-        if(minutes < 60) return `${minutes} phút trước`;
-        if(hours < 24) return `${hours} giờ trước`;
-        return `${days} ngày trước`;
-    }
+    const getInitials = (name = "") => name.charAt(0) || "?";
 
-    const timePass = timeAgo(oldDate);
-
-    const handleSubInput = () => {
-        if(showSubInput){
-            setShowSubInput(false);
-        } else {
-            setShowSubInput(true);
+    const toBlue = (content) => {
+        if (!cmt.children?.length) return <>{content}</>;
+        for (const c of cmt.children) {
+            const tag = "@" + c.userName;
+            if (content.includes(tag)) {
+                const rest = content.replace(tag, "");
+                return <span><span className="comment-tag">{tag}</span>{rest}</span>;
+            }
         }
-    }
-    const handleSubInput1 = (userName) => {
-        if(showSubInput1){
+        return <>{content}</>;
+    };
+
+    /* ─── Reactions ─── */
+    const publishReaction = (type) => {
+        const userStr = sessionStorage.getItem('user');
+        if (!userStr) return;
+        const user = JSON.parse(userStr);
+        if (client?.current?.connected) {
+            client.current.publish({
+                destination: "/app/push-reaction",
+                body: JSON.stringify({ commentId: cmt.commentId, type, userId: user.userId })
+            });
+        }
+    };
+
+    const handleLike = () => {
+        if (reaction === "like") { setReaction(null); setLikeCount(c => c - 1); publishReaction("UNLIKE"); }
+        else {
+            if (reaction === "dislike") setDislikeCount(c => c - 1);
+            setReaction("like"); setLikeCount(c => c + 1); publishReaction("LIKE");
+        }
+    };
+
+    const handleDislike = () => {
+        if (reaction === "dislike") { setReaction(null); setDislikeCount(c => c - 1); publishReaction("UNDISLIKE"); }
+        else {
+            if (reaction === "like") setLikeCount(c => c - 1);
+            setReaction("dislike"); setDislikeCount(c => c + 1); publishReaction("DISLIKE");
+        }
+    };
+
+    /* ─── Reply toggles ─── */
+    const toggleSubInput = () => setShowSubInput(v => !v);
+
+    const toggleSubInput1 = (userName, commentId) => {
+        if (showSubInput1) {
             setShowSubInput1(false);
         } else {
             setShowSubInput1(true);
             setMesWtag(`@${userName} `);
-            setUserName(userName);
-            setId(cmt.commentId);
+            setTaggedUser(userName);
+            setTaggedId(commentId);
         }
-    }
-
-    const handleReply = () => {
-        if(showReply){
-            setShowReply(false);
-        } else {
-            setShowReply(true);
-            setShowSubInput1(false);
-        }
-    }
-    const toBlue = (content) => {
-        if (!cmt.children || cmt.children.length === 0) return <>{content}</>;
-
-        for(let c of cmt.children) { // for each ko tra ve return ma chay het moi tra
-            const tag = "@" + c.userName;
-            if (content.includes(tag)) {
-                const newContent = content.replace(tag, "");
-                return (
-                    <span>
-                        <span style={{ color: '#0d6efd' }}>{tag}</span>
-                        <span>{newContent}</span>
-                    </span>
-                );
-            }
-        };
-        return <>{content}</>;
     };
 
-    const handleLike = () => {
-    if (reaction === "like") {
-        setReaction(null);
-        setLikeCount(likeCount - 1);
-    } else {
-        if (reaction === "dislike") setDislikeCount(dislikeCount - 1);
-        setReaction("like");
-        setLikeCount(likeCount + 1);
-    }
-};
+    const toggleReply = () => {
+        setShowReply(v => !v);
+        setShowSubInput1(false);
+    };
 
-const handleDislike = () => {
-    if (reaction === "dislike") {
-        setReaction(null);
-        setDislikeCount(dislikeCount - 1);
-    } else {
-        if (reaction === "like") setLikeCount(likeCount - 1);
-        setReaction("dislike");
-        setDislikeCount(dislikeCount + 1);
-    }
-};
-
+    /* ─── Render ─── */
     return (
-        <div className="mt-4">
-            <div className="row d-flex justify-content-center ps-5 pe-5">
-                <div className="col-12">
-                    <div className="card">
-                    <div className="card-body p-4">
+        <div className="comment-item">
+            {/* Avatar */}
+            <div className="comment-avatar">{getInitials(cmt.userName)}</div>
 
-                        <div className="row">
-                        <div className="col">
-                            <div className="d-flex flex-start">
-                            <img className="rounded-circle shadow-1-strong me-3"
-                                src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(10).webp" alt="avatar" width="65"
-                                height="65" />
-                            <div className="flex-grow-1 flex-shrink-1">
-                                <div style={{border: '1px solid #e0e0e0', padding: '10px', borderRadius: '8px', paddingLeft: '17px'}}>
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <p className="mb-1" style={{fontWeight: 'inherit'}}>
-                                    {cmt.userName} <span className="small" style={{fontWeight: 'normal', fontSize: '12px'}}>- {timePass}</span>
-                                    </p>
-                                </div>
-                                <p className="small mb-0">
-                                    {cmt.content}
-                                </p>
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div className="d-flex align-items-center">
-                                        <a className="link-muted me-2" style={{textDecoration: 'none', fontSize: '14px', color: reaction === "like" ? "#0d6efd" : ""}} 
-                                        ><i className="fa-regular fa-s fa-thumbs-up cl" onClick={() => handleLike(cmt.commentId)}></i>{likeCount}</a>
-                                        <a className="link-muted ps-2" style={{textDecoration: 'none', fontSize: '14px', color: reaction === "dislike" ? "#0d6efd" : ""}}
-                                        ><i className="fa-regular fa-thumbs-down cl" onClick={() => handleDislike(cmt.commentId)}></i>{dislikeCount}</a>
-                                    </div>
-                                    <a className='rep' style={{paddingRight: '7px'}} onClick={handleSubInput}><i className="fas fa-reply fa-xs"></i><span className="small"> Phản hồi</span></a>
-                                </div>
-                                </div>
-
-                                { showSubInput && (
-                                    <div className="mt-3" >
-                                    <form>
-                                        <div className="mb-2">
-                                        <textarea
-                                            className="form-control ps-3 pt-2"
-                                            rows="2"
-                                            placeholder="Viết phản hồi của bạn..."
-                                            value={messSub}
-                                            onChange={(e) => setMessSub(e.target.value)}
-                                            style={{
-                                            fontSize: "14px",
-                                            resize: "none",
-                                            borderRadius: "6px",
-                                            backgroundColor: "#fdfdfd",
-                                            }}
-                                        ></textarea>
-                                        </div>
-                                        <div className="d-flex justify-content-end">
-                                        <button type="button" className="btn btn-primary btn-sm" onClick={() => handleCmt(1, cmt.commentId)}>
-                                            <i className="fas fa-paper-plane me-1" style={{fontSize: '12px'}}></i> 
-                                            Gửi phản hồi
-                                        </button>
-                                        </div>
-                                    </form>
-                                    </div>
-                                )}
-
-                                {cmt.children && cmt.children.length > 0 && (
-                                    <div style={{paddingTop: "8px" }}>
-                                        <p style={{ display: "flex", alignItems: "center", gap: "6px", margin: 0, fontSize: "14px", color: "#555" }}
-                                        onClick={handleReply}>
-                                            <div className='showRep' style={{color: '#0d6efd'}}>
-                                                <i className={`fa-solid ${showReply ? "fa-caret-up" : "fa-caret-down"}`}></i>
-                                                <span>{cmt.children.length} bình luận phản hồi</span>
-                                            </div>
-                                        </p>
-                                    </div>
-                                )}
-
-                                {showReply && (
-                                    <div>
-                                        {cmt.children.map((child) => (
-                                            <div className="d-flex flex-start mt-4" key={child.commentId}>
-                                                <a className="me-3" href="">
-                                                    <img className="rounded-circle shadow-1-strong"
-                                                    src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(11).webp" alt="avatar"
-                                                    width="65" height="65" />
-                                                </a>
-                                                <div className="flex-grow-1 flex-shrink-1">
-                                                    <div style={{border: '1px solid #e0e0e0', padding: '10px', borderRadius: '8px', paddingLeft: '17px'}}>
-                                                    <div className="d-flex justify-content-between align-items-center">
-                                                        <p className="mb-1">
-                                                        {child.userName} <span className="small">- {timeAgo(new Date(child.createdAt))}</span>
-                                                        </p>
-                                                    </div>
-                                                    <p className="small mb-0">
-                                                        {toBlue(child.content)}
-                                                    </p>
-                                                    <div className="d-flex justify-content-between align-items-center">
-                                                    <div className="d-flex align-items-center">
-                                                        <a className="link-muted me-2" style={{textDecoration: 'none', fontSize: '14px'}}>
-                                                            <i className="fa-regular fa-thumbs-up cl"></i>5</a>
-                                                        <a className="link-muted ps-2" style={{textDecoration: 'none', fontSize: '14px'}}>
-                                                            <i className="fa-regular fa-thumbs-down cl"></i>3</a>
-                                                    </div>
-                                                    <a className='rep' style={{paddingRight: '7px'}} onClick={() => handleSubInput1(child.userName)}><i className="fas fa-reply fa-xs"></i><span className="small"> Phản hồi</span></a>
-                                                    </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                        { showSubInput1 && (
-                                        <div className="mt-3" >
-                                        <form className='ms-4 ps-2'>
-                                            <div className="mb-2 ms-5">
-                                                <textarea
-                                                        className="form-control ps-3 pt-2"
-                                                        rows="2"
-                                                        placeholder="Viết phản hồi của bạn... (Thêm @ tag tên)"
-                                                        value={messWtag}
-                                                        onChange={(e) => setMesWtag(e.target.value)}
-                                                        style={{
-                                                        fontSize: "14px",
-                                                        resize: "none",
-                                                        borderRadius: "6px",
-                                                        backgroundColor: "#fdfdfd",
-                                                        }}
-                                                    ></textarea>
-                                            
-                                            </div>
-                                            <div className="d-flex justify-content-end">
-                                            <button type="button" className="btn btn-primary btn-sm" onClick={() => handleCmt(2, id)}>
-                                                <i className="fas fa-paper-plane me-1" style={{fontSize: '12px'}}></i> 
-                                                Gửi phản hồi
-                                            </button>
-                                            </div>
-                                        </form>
-                                        </div>
-                                        )}
-                                    </div>
-                                    )}   
-                            </div>
-                            </div>
-                        </div>
-                        </div>
+            {/* Main bubble */}
+            <div style={{ flex: 1 }}>
+                <div className="comment-bubble">
+                    {/* Header */}
+                    <div className="comment-header">
+                        <span className="comment-username">{cmt.userName}</span>
+                        <span className="comment-time">{timeAgo(cmt.createdAt)}</span>
                     </div>
+
+                    {/* Content */}
+                    <p className="comment-content">{filterProfanity(cmt.content)}</p>
+
+                    {/* Actions */}
+                    <div className="comment-actions">
+                        <button
+                            className={`reaction-btn ${reaction === "like" ? "active-like" : ""}`}
+                            onClick={handleLike}
+                        >
+                            <i className="fa-regular fa-thumbs-up"></i>
+                            <span>{likeCount}</span>
+                        </button>
+
+                        <button
+                            className={`reaction-btn ${reaction === "dislike" ? "active-dislike" : ""}`}
+                            onClick={handleDislike}
+                        >
+                            <i className="fa-regular fa-thumbs-down"></i>
+                            <span>{dislikeCount}</span>
+                        </button>
+
+                        <div className="reaction-divider"></div>
+
+                        <button className="rep" onClick={toggleSubInput}>
+                            <i className="fas fa-reply fa-xs"></i>
+                            Phản hồi
+                        </button>
                     </div>
                 </div>
+
+                {/* ── Level-1 reply input ── */}
+                {showSubInput && (
+                    <div className="reply-input-box">
+                        <textarea
+                            rows="2"
+                            placeholder="Viết phản hồi của bạn..."
+                            value={messSub}
+                            onChange={(e) => setMessSub(e.target.value)}
+                        />
+                        <div className="d-flex justify-content-end mt-2">
+                            <button className="btn-send" onClick={() => { handleCmt(1, cmt.commentId); setShowSubInput(false); }}>
+                                <i className="fas fa-paper-plane" style={{ fontSize: 12 }}></i>
+                                Gửi
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* ── View replies button ── */}
+                {cmt.children?.length > 0 && (
+                    <button className="view-replies-btn" onClick={toggleReply}>
+                        <i className={`fa-solid ${showReply ? "fa-caret-up" : "fa-caret-down"}`}></i>
+                        {showReply ? "Ẩn" : "Xem"} {cmt.children.length} phản hồi
+                    </button>
+                )}
+
+                {/* ── Reply thread ── */}
+                {showReply && (
+                    <div className="reply-thread">
+                        {cmt.children.map((child) => (
+                            <div className="reply-item" key={child.commentId}>
+                                <div className="comment-avatar-sm">{getInitials(child.userName)}</div>
+                                <div style={{ flex: 1 }}>
+                                    <div className="comment-bubble-sm">
+                                        <div className="comment-header">
+                                            <span className="comment-username">{child.userName}</span>
+                                            <span className="comment-time">{timeAgo(child.createdAt)}</span>
+                                        </div>
+                                        <p className="comment-content">{toBlue(filterProfanity(child.content))}</p>
+
+                                        {/* Child actions */}
+                                        <div className="comment-actions">
+                                            <ChildReactionButtons child={child} client={client} />
+                                            <div className="reaction-divider"></div>
+                                            <button className="rep" onClick={() => toggleSubInput1(child.userName, child.commentId)}>
+                                                <i className="fas fa-reply fa-xs"></i>
+                                                Phản hồi
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* ── Level-2 reply input ── */}
+                        {showSubInput1 && (
+                            <div className="reply-input-box">
+                                <textarea
+                                    rows="2"
+                                    placeholder={`Phản hồi @${taggedUser}...`}
+                                    value={messWtag}
+                                    onChange={(e) => setMesWtag(e.target.value)}
+                                />
+                                <div className="d-flex justify-content-end mt-2">
+                                    <button className="btn-send" onClick={() => { handleCmt(2, taggedId); setShowSubInput1(false); }}>
+                                        <i className="fas fa-paper-plane" style={{ fontSize: 12 }}></i>
+                                        Gửi
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
-    )
+    );
 }
 
 export default CommentItem;

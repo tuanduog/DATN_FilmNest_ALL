@@ -109,13 +109,16 @@
   font-weight: 800;
   color: #1e293b;
   margin-bottom: 12px;
-  height: 48px;
+  min-height: 48px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
   transition: color 0.3s ease;
   cursor: pointer;
+  line-height: 1.3;
 }
 
 .movieTitle:hover {

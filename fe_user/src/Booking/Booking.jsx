@@ -123,7 +123,9 @@ function Booking() {
         const seat = seats.find(s => s.label === seatLabel);
         if (!seat) return "normal";
         const type = (seat.type || seat.seatType || "normal").toLowerCase();
-        return type === "standard" ? "normal" : type;
+        if (type === "standard") return "normal";
+        if (type === "sweetbox") return "couple";
+        return type;
     };
 
     useEffect(() => {
@@ -148,7 +150,7 @@ function Booking() {
                             const seatSelecting = JSON.parse(message.body);
                             console.log("Seat selecting:", seatSelecting);
                             if (!seatSelecting || Object.keys(seatSelecting).length === 0) return;
-                            
+
                             const entries = Object.entries(seatSelecting);
                             const updates = {};
                             entries.forEach(([uid, seatsStr]) => {
@@ -157,7 +159,7 @@ function Booking() {
                                     updates[uid] = seatList;
                                 }
                             });
-                            
+
                             setOthersSelecting(prev => ({
                                 ...prev,
                                 ...updates
@@ -294,31 +296,53 @@ function Booking() {
                                     }, {})
                                 ).sort(([a], [b]) => parseInt(a) - parseInt(b)).map(([row, rowSeats]) => (
                                     <div className="seat-row" key={row}>
-                                        {rowSeats.sort((a, b) => a.col - b.col).map((seat) => {
+                                        {(() => {
+                                            const sortedSeats = rowSeats.sort((a, b) => a.col - b.col);
+                                            let skipNext = false;
+                                            return sortedSeats.map((seat) => {
+                                                if (skipNext) {
+                                                    skipNext = false;
+                                                    return null;
+                                                }
 
-                                            const seatLabel = seat.label;
-                                            const isSold = bookeds.some(booking =>
-                                                booking.chair?.split(', ').includes(seatLabel)
-                                            );
-                                            let type = (seat.type || seat.seatType || "normal").toLowerCase();
-                                            if (type === "standard") type = "normal";
+                                                let type = (seat.type || seat.seatType || "normal").toLowerCase();
+                                                let isDeleted = (seat.seatStatus || "").toUpperCase() === "DELETED";
 
-                                            return (
-                                                <div
-                                                    key={seat.id}
-                                                    className={`seat ${type} ${isSold ? 'sold' :
-                                                        selectedSeat.includes(seatLabel)
-                                                            ? 'selected'
-                                                            : allowSelect.includes(seatLabel)
-                                                                ? 'selecting'
-                                                                : ''}`}
-                                                    onClick={() => handleSeatSelection(seatLabel)}
-                                                    title={`${seatLabel} - ${type.toUpperCase()}`}
-                                                >
-                                                    {seatLabel}
-                                                </div>
-                                            );
-                                        })}
+                                                if (type === "sweetbox" && !isDeleted) {
+                                                    type = "couple";
+                                                    skipNext = true;
+                                                } else if (type === "standard") {
+                                                    type = "normal";
+                                                }
+
+                                                if (isDeleted) {
+                                                    return (
+                                                        <div key={seat.id} style={{ width: '42px', height: '42px', visibility: 'hidden' }}></div>
+                                                    );
+                                                }
+
+                                                const seatLabel = seat.label;
+                                                const isSold = bookeds.some(booking =>
+                                                    booking.chair?.split(', ').includes(seatLabel)
+                                                );
+
+                                                return (
+                                                    <div
+                                                        key={seat.id}
+                                                        className={`seat ${type} ${isSold ? 'sold' :
+                                                            selectedSeat.includes(seatLabel)
+                                                                ? 'selected'
+                                                                : allowSelect.includes(seatLabel)
+                                                                    ? 'selecting'
+                                                                    : ''}`}
+                                                        onClick={() => handleSeatSelection(seatLabel)}
+                                                        title={`${seatLabel} - ${type.toUpperCase()}`}
+                                                    >
+                                                        {seatLabel}
+                                                    </div>
+                                                );
+                                            });
+                                        })()}
                                     </div>
 
                                 ))

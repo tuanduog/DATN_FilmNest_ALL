@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
@@ -55,7 +55,6 @@ const ShowtimePopup = ({ show, movie, onClose, savedTheater }) => {
         try {
             const res = await axios.get(`http://localhost:8099/api/showtime/v1/movie/${savedTheater?.id}/${movieId}`);
             setShowTime(res.data.data);
-            console.log(res.data.data);
         } catch (error) {
             console.error("Lỗi khi lấy lịch chiếu", error);
             setShowTime([]);

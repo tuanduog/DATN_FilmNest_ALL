@@ -9,6 +9,8 @@ import CommentItem from './CommentItem';
 import { useParams } from 'react-router-dom';
 import ShowtimePopup from '../Home/Showtime-popup';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import { containsProfanity, filterProfanity } from '../utils/profanityFilter';
 
 function Movie_detail() {
     const { t, i18n } = useTranslation();
@@ -34,6 +36,7 @@ function Movie_detail() {
     const [messSub, setMessSub] = useState("");
     const [messWtag, setMesWtag] = useState("");
     const [dataCmt, setDataCmt] = useState([]);
+    const [dataCmtAfterBuild, setDataCmtAfterBuild] = useState([]);
     const client = useRef(null);
 
     const handleCloseModal = () => setShowModal(false);
@@ -124,47 +127,69 @@ function Movie_detail() {
         }
     }, [id]);
 
+    const BuildCommentTree = (comments) => {
+        const map = {};
+        const roots = [];
+        comments.forEach(cmt => {
+            map[cmt.commentId] = { ...cmt, children: [] }
+        });
+
+        comments.forEach(cmt => {
+            if (cmt.parentId === 0) {
+                roots.push(map[cmt.commentId]); // comment gốc
+            } else if (map[cmt.parentId]) {
+                map[cmt.parentId].children.push(map[cmt.commentId]);
+            }
+        });
+        return roots;
+    }
+
     const fetchComments = async (movieId) => {
         try {
-            const res = await axios.get(`http://localhost:8099/api/comment/v1/${movieId}`);
-            setDataCmt(Array.isArray(res.data.data) ? res.data.data : []);
+            const res = await axios.get(`http://localhost:8099/api/comment/v1/${movieId}`, { withCredentials: true });
+            const rawList = Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
+            setDataCmtAfterBuild(rawList);
+            const tree = BuildCommentTree(rawList);
+            setDataCmt(tree);
         } catch (error) {
             console.error("Lỗi lấy comment", error);
         }
     }
 
-    const handleCmt = async (type, idCmt) => {
+    const handleCmt = (level, parentId) => {
         const userStr = sessionStorage.getItem('user');
         if (!userStr) {
             navigate("/Login");
             return;
         }
         const user = JSON.parse(userStr);
-        let content = "";
-        if (type === 0) content = message;
-        else if (type === 1) content = messSub;
-        else content = messWtag;
+        let content = null;
+        if (level === 0) content = message;
+        else if (level === 1) content = messSub;
+        else if (level === 2) content = messWtag;
 
-        let cmt = {
+        if (!content || !content.trim()) return;
+
+        // Tự động che từ ngữ không phù hợp thay vì chặn
+        const safeContent = filterProfanity(content);
+
+        const mess = {
+            content: safeContent,
+            level: level,
+            parentId: parentId,
             userId: user.userId,
-            movieId: movieInfo.movieId || movieInfo.id,
-            content: content,
-            parentId: type === 0 ? 0 : idCmt,
-            tag: type === 2 ? messWtag.split(' ')[0] : ""
+            movieId: id,
+            userName: user.username
         };
-
         if (client.current && client.current.connected) {
-            client.current.publish({
-                destination: `/app/comment/${movieInfo.movieId || movieInfo.id}`,
-                body: JSON.stringify(cmt),
-            });
+            client.current.publish({ destination: "/app/push-cmt", body: JSON.stringify(mess) });
+            setMessSub("");
+            setMesWtag("");
+            setMessage("");
+        } else {
+            console.error("WebSocket chưa kết nối!");
         }
-
-        setMessage("");
-        setMessSub("");
-        setMesWtag("");
     };
-
 
     useEffect(() => {
         fetchMovie();
@@ -174,12 +199,38 @@ function Movie_detail() {
             hasScroll.current = true;
         }
 
+        if (client.current) {
+            client.current.deactivate();
+        }
+
         const stompClient = new Client({
             brokerURL: "ws://localhost:8099/wsocket",
+            debug: (str) => console.log("STOMP:", str),
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
             onConnect: () => {
-                stompClient.subscribe(`/topic/comments/${id}`, (msg) => {
-                    const newCmt = JSON.parse(msg.body);
-                    setDataCmt((prev) => [newCmt, ...prev]);
+                console.log("Connected to WS!");
+                stompClient.subscribe(`/topic/comment/${id}`, (msg) => {
+                    const res = JSON.parse(msg.body);
+                    setDataCmtAfterBuild((prev) => {
+                        const updated = [...prev, res];
+                        const tree = BuildCommentTree(updated);
+                        setDataCmt(tree);
+                        return updated;
+                    });
+                });
+                stompClient.subscribe(`/topic/reaction/${id}`, (msg) => {
+                    const res = JSON.parse(msg.body);
+                    setDataCmtAfterBuild((prev) => {
+                        const updated = prev.map(cmt =>
+                            cmt.commentId === res.commentId
+                                ? { ...cmt, likeCount: res.likeCount, dislikeCount: res.dislikeCount, myReaction: res.myReaction }
+                                : cmt
+                        );
+                        setDataCmt(BuildCommentTree(updated));
+                        return updated;
+                    });
                 });
             },
         });
@@ -260,10 +311,8 @@ function Movie_detail() {
                 </div>
             )}
 
-
-
             {/* Backdrop & Info Section */}
-            <div className="movie-backdrop" style={{ backgroundImage: `url(${movieInfo.image})` }}>
+            <div className="movie-backdrop" style={{ backgroundImage: movieInfo.image ? `url(${movieInfo.image})` : 'none' }}>
                 <div className="backdrop-overlay"></div>
             </div>
 
@@ -299,7 +348,7 @@ function Movie_detail() {
 
                         <div className="d-flex gap-3">
                             <button className="btn btn-primary btn-book" onClick={handleOpenModal}>{t('bookNow')}</button>
-                            <button className="btn btn-outline-danger btn-trailer" onClick={() => setShowTrailer(true)}>
+                            <button className="btn btn-outline-primary btn-trailer" onClick={() => setShowTrailer(true)}>
                                 <i className="bi bi-play-circle-fill me-2"></i>{t('watchTrailer')}
                             </button>
                         </div>
@@ -313,42 +362,88 @@ function Movie_detail() {
 
                         <div className="comment-section">
                             <h3 className="section-title">{t('comments')}</h3>
+
+                            {/* Comment list */}
                             <div className="mt-4">
-                                {Array.isArray(dataCmt) && dataCmt.map((cmt) => (
-                                    <CommentItem
-                                        key={cmt.commentId}
-                                        cmt={cmt}
-                                        handleCmt={handleCmt}
-                                        messSub={messSub}
-                                        setMessSub={setMessSub}
-                                        messWtag={messWtag}
-                                        setMesWtag={setMesWtag}
-                                    />
-                                ))}
+                                {Array.isArray(dataCmt) && dataCmt.length > 0 ? (
+                                    dataCmt.map((cmt) => (
+                                        <CommentItem
+                                            key={cmt.commentId}
+                                            cmt={cmt}
+                                            handleCmt={handleCmt}
+                                            messSub={messSub}
+                                            setMessSub={setMessSub}
+                                            messWtag={messWtag}
+                                            setMesWtag={setMesWtag}
+                                            client={client}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="no-comment">
+                                        <i className="bi bi-chat-square-text" style={{ fontSize: 40, opacity: 0.3 }}></i>
+                                        <p className="mt-2">{t('noComments')}</p>
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="comment-input-wrapper mt-5">
-                                <textarea
-                                    className="form-control border-0 bg-white"
-                                    rows="3"
-                                    placeholder={t('commentPlaceholder')}
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                ></textarea>
-                                <div className="d-flex justify-content-end mt-3">
-                                    <button className="btn btn-primary px-4" onClick={() => handleCmt(0, 0)}>
-                                        <i className="bi bi-send-fill me-2"></i>{t('sendComment')}
-                                    </button>
+                            {/* Write comment */}
+                            <div className="comment-input-wrapper mt-4">
+                                <div className="d-flex gap-3">
+                                    <div style={{
+                                        flexShrink: 0, width: 42, height: 42, borderRadius: '50%',
+                                        background: 'linear-gradient(135deg, #0d6efd, #00d2ff)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: '#fff', fontWeight: 700, fontSize: 16,
+                                        boxShadow: '0 4px 12px rgba(13,110,253,0.30)'
+                                    }}>
+                                        {(JSON.parse(sessionStorage.getItem('user') || '{}')?.username || '?').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <textarea
+                                            style={{
+                                                width: '100%', border: '2px solid #ece8e3', borderRadius: 14,
+                                                padding: '14px 18px', fontSize: 14, resize: 'none',
+                                                background: '#fff', color: '#2d2a26', outline: 'none',
+                                                fontFamily: "'Inter', sans-serif",
+                                                transition: 'border-color 0.25s, box-shadow 0.25s'
+                                            }}
+                                            rows="3"
+                                            placeholder={t('commentPlaceholder')}
+                                            value={message}
+                                            onChange={(e) => setMessage(e.target.value)}
+                                            onFocus={e => { e.target.style.borderColor = '#0d6efd'; e.target.style.boxShadow = '0 0 0 4px rgba(13,110,253,0.08)'; }}
+                                            onBlur={e => { e.target.style.borderColor = '#ece8e3'; e.target.style.boxShadow = 'none'; }}
+                                        />
+                                        <div className="d-flex justify-content-end mt-2">
+                                            <button
+                                                style={{
+                                                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                                                    padding: '10px 24px', background: 'linear-gradient(135deg, #0d6efd, #00d2ff)',
+                                                    color: '#fff', border: 'none', borderRadius: 12,
+                                                    fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                                                    fontFamily: "'Inter', sans-serif",
+                                                    transition: 'all 0.25s ease', boxShadow: '0 4px 14px rgba(13,110,253,0.25)'
+                                                }}
+                                                onMouseEnter={e => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 8px 22px rgba(13,110,253,0.35)'; }}
+                                                onMouseLeave={e => { e.target.style.transform = ''; e.target.style.boxShadow = '0 4px 14px rgba(13,110,253,0.25)'; }}
+                                                onClick={() => handleCmt(0, 0)}
+                                            >
+                                                <i className="bi bi-send-fill"></i>
+                                                {t('sendComment')}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <div className="col-lg-4">
                         {/* Sidebar content */}
-                        <div className="p-4 bg-light rounded-4 sticky-top" style={{ top: '100px' }}>
-                            <h5 className="fw-bold mb-3">{t('sidebarTitle')}</h5>
-                            <p className="small text-muted mb-0">{t('sidebarContent')}</p>
+                        <div className="sticky-top" style={{ top: '100px' }}>
+                            <h5 style={{ fontWeight: 700, color: '#1a1714', marginBottom: 12 }}>{t('sidebarTitle')}</h5>
+                            <p style={{ fontSize: '0.9rem', color: '#8a847d', marginBottom: 0, lineHeight: 1.7 }}>{t('sidebarContent')}</p>
                         </div>
                     </div>
                 </div>
@@ -364,7 +459,6 @@ function Movie_detail() {
         </div>
     );
 }
-
 
 export default Movie_detail;
 

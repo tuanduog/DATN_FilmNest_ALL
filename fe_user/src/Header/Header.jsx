@@ -130,6 +130,7 @@ function Header() {
             setUser(null);
             setJustLoggedOut(true);
             localStorage.removeItem('theater');
+            window.dispatchEvent(new Event('theaterChange'));
             navigate('/');
             setTimeout(() => {
                 handleAuth();
@@ -274,51 +275,83 @@ function Header() {
                 </div>
             )}
             {/* Topbar */}
-            <div className="topblack">
-                <div className="d-flex justify-content-end align-items-center text-white pe-4" style={{ height: '40px', fontSize: '14px' }}>
-                    {/* Language Switcher */}
-                    <div className="d-flex align-items-center me-4">
-                        <span
-                            className={`mx-1 cursor-pointer ${i18n.language === 'vi' ? 'text-warning fw-bold' : 'text-white-50'}`}
-                            onClick={() => i18n.changeLanguage('vi')}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            VN
-                        </span>
-                        <span className="text-white-50">|</span>
-                        <span
-                            className={`mx-1 cursor-pointer ${i18n.language === 'en' ? 'text-warning fw-bold' : 'text-white-50'}`}
-                            onClick={() => i18n.changeLanguage('en')}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            EN
-                        </span>
+            <div className="topbar">
+                <div className="topbar-inner">
+                    {/* Left side - Info */}
+                    <div className="topbar-left">
+                        <i className="bi bi-film"></i>
+                        <span>{t('welcome') || 'Chào mừng đến với FilmNest Cinema'}</span>
                     </div>
 
-                    {!user ? (
-                        <>
-                            <p className="mb-0 me-2 top-link" style={{ cursor: 'pointer' }} onClick={() => handleLogin('login')}>{t('login')}</p>
-                            <p className="mb-0">|</p>
-                            <p className="mb-0 ms-2 top-link" style={{ cursor: 'pointer' }} onClick={() => handleLogin('register')}>{t('register')}</p>
-                        </>
-                    ) : (
-                        <div className='d-flex align-items-center'>
-
-                            {membership ? <span className='px-2 rounded border border-warning text-warning me-2 fw-bold'
-                                style={{ backgroundColor: 'rgba(255, 193, 7, 0.1)', fontSize: '12px' }}>
-                                {typeof membership === 'string' ? membership.toUpperCase() : 'VIP'}
-                            </span> : <></>}
-                            <div className="dropdown">
-                                <span className="mb-0 me-2 fs-6 top-link" style={{ cursor: 'pointer' }} data-bs-toggle="dropdown">
-                                    {t('hello')} {user && user.data && user.data.username ? user.data.username : 'Tài khoản'}! <i className="bi bi-caret-down-fill"></i>
-                                </span>
-                                <ul className="dropdown-menu dropdown-menu-end">
-                                    <li><button className="dropdown-item" onClick={handleNavigate('/Profile')}>{t('profile')}</button></li>
-                                    <li><button className="dropdown-item" onClick={handleLogout}>{t('logout')}</button></li>
-                                </ul>
-                            </div>
+                    {/* Right side */}
+                    <div className="topbar-right">
+                        {/* Language Switcher */}
+                        <div className="lang-switcher">
+                            <button
+                                className={`lang-btn ${i18n.language === 'vi' ? 'active' : ''}`}
+                                onClick={() => i18n.changeLanguage('vi')}
+                            >
+                                VN
+                            </button>
+                            <button
+                                className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
+                                onClick={() => i18n.changeLanguage('en')}
+                            >
+                                EN
+                            </button>
                         </div>
-                    )}
+
+                        <div className="topbar-divider"></div>
+
+                        {!user ? (
+                            <div className="topbar-auth">
+                                <button className="auth-link" onClick={() => handleLogin('login')}>
+                                    <i className="bi bi-box-arrow-in-right"></i>
+                                    {t('login')}
+                                </button>
+                                <span className="auth-separator">|</span>
+                                <button className="auth-link" onClick={() => handleLogin('register')}>
+                                    <i className="bi bi-person-plus"></i>
+                                    {t('register')}
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="topbar-user">
+                                {membership && (
+                                    <span className="membership-badge">
+                                        <i className="bi bi-star-fill"></i>
+                                        {typeof membership === 'string' ? membership.toUpperCase() : 'VIP'}
+                                    </span>
+                                )}
+                                <div className="dropdown">
+                                    <button
+                                        className="user-dropdown-toggle"
+                                        data-bs-toggle="dropdown"
+                                    >
+                                        <span className="user-avatar-icon">
+                                            {user?.data?.username ? user.data.username.charAt(0).toUpperCase() : 'U'}
+                                        </span>
+                                        <span>{user?.data?.username || t('account')}</span>
+                                        <i className="bi bi-caret-down-fill"></i>
+                                    </button>
+                                    <ul className="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <button className="dropdown-item" onClick={handleNavigate('/Profile')}>
+                                                <i className="bi bi-person-circle"></i>
+                                                {t('profile')}
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button className="dropdown-item" onClick={handleLogout}>
+                                                <i className="bi bi-box-arrow-right"></i>
+                                                {t('logout')}
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
