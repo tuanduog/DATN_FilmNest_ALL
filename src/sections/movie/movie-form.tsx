@@ -9,7 +9,8 @@ import {
     Button,
     IconButton,
     Stack,
-    Grid
+    Grid,
+    FormHelperText
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -53,6 +54,9 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
         initialValues: movie,
         validationSchema: validationSchema(intl),
         onSubmit: async (values) => {
+            if (!image && !preview) {
+                return;
+            }
             setMovie({ ...values, image: image });
             handleNext();
         }
@@ -66,6 +70,7 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
 
     const handleDeleteImage = async () => {
         setImage(null);
+        setPreview('');
     };
 
     return (
@@ -80,7 +85,7 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
                         <Grid container spacing={2}>
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
-                                    <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'movie-image' })}</InputLabel>
+                                    <InputLabel required sx={{ mb: 1, '& .MuiInputLabel-asterisk': { color: 'error.main' } }}>{intl.formatMessage({ id: 'movie-image' })}</InputLabel>
                                     {!preview ? (
                                         <ImageDropZone
                                             value={preview ?? ''}
@@ -102,7 +107,11 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
                                             </Box>
 
                                             <IconButton
-                                                onClick={handleDeleteImage}
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleDeleteImage();
+                                                }}
                                                 sx={{
                                                     position: 'absolute',
                                                     top: 4,
@@ -124,6 +133,9 @@ export default function MovieForm({ handleNext, setMovie, movie }: MovieFormProp
                                                 />
                                             </IconButton>
                                         </Box>
+                                    )}
+                                    {formik.submitCount > 0 && !preview && !image && (
+                                        <FormHelperText error sx={{ mt: 1 }}>{intl.formatMessage({ id: 'required-field' })}</FormHelperText>
                                     )}
                                 </Box>
                             </Grid>

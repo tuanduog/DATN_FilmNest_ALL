@@ -62,6 +62,7 @@ import {
 import MainCard from 'components/MainCard';
 import IconButton from 'components/@extended/IconButton';
 import { deleteById, getList, getListByTheaterId } from 'api/room';
+import { getList as getTheaters } from 'api/theater';
 
 import EmptyTable from 'components/third-party/react-table/EmptyTable';
 import HeaderSort from 'components/third-party/react-table/HeaderSort';
@@ -86,6 +87,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { HttpStatusCode } from 'axios';
 import useAuth from 'hooks/useAuth';
 import { Room } from 'types/room';
+import { Theater } from 'types/theater';
 
 const fuzzyFilter: FilterFn<Room> = (row, columnId, value, addMeta) => {
     // rank the item
@@ -330,7 +332,8 @@ export default function RoomPage() {
                 meta: { width: '35%' },
                 cell: (cell) => {
                     const { type } = cell.row.original;
-                    return <Typography variant="body2">{type === 'imax' ? intl.formatMessage({ id: 'IMAX' }) : type === 'three_d' ? intl.formatMessage({ id: '3D' }) : intl.formatMessage({ id: 'standard' })}</Typography>;
+                    const typeUpper = (type || '').toUpperCase();
+                    return typeUpper === 'IMAX' ? intl.formatMessage({ id: 'IMAX' }) : typeUpper === 'THREE_D' ? intl.formatMessage({ id: '3D' }) : intl.formatMessage({ id: 'standard' });
                 }
             },
             {
@@ -390,7 +393,8 @@ export default function RoomPage() {
         sort: '',
         keyword: '',
         status: '',
-        type: ''
+        type: '',
+        theaterId: undefined
     });
     const [alert, setAlert] = useState({
         open: false,
@@ -399,6 +403,19 @@ export default function RoomPage() {
     });
     const navigate = useNavigate();
     const location = useLocation();
+    const [theaters, setTheaters] = useState<Theater[]>([]);
+
+    useEffect(() => {
+        const fetchTheaters = async () => {
+            if (user?.role?.toUpperCase() !== 'MANAGER') {
+                const response = await getTheaters({ size: 1000, page: 0 });
+                if (response.status === HttpStatusCode.Ok) {
+                    setTheaters(response.data.content);
+                }
+            }
+        };
+        fetchTheaters();
+    }, [user]);
     const [columnOrder, setColumnOrder] = useState<string[]>(() => columns.map((c) => c.id!));
 
     const dataIds = useMemo<UniqueIdentifier[]>(() => data?.map(({ id }: any) => id), [data]);
@@ -660,6 +677,25 @@ export default function RoomPage() {
                                 <FormattedMessage id="3D" />
                             </MenuItem>
                         </Select>
+
+                        {user?.role?.toUpperCase() !== 'MANAGER' && (
+                            <Select
+                                value={pageRequest.theaterId ?? ''}
+                                onChange={(event) => setPageRequest({ ...pageRequest, page: 0, theaterId: ((event.target.value as any) === '' ? undefined : Number(event.target.value)) })}
+                                displayEmpty
+                                input={<OutlinedInput />}
+                                slotProps={{ input: { 'aria-label': 'Theater Filter' } }}
+                            >
+                                <MenuItem value="">
+                                    <FormattedMessage id="theater-list-in-room-page" />
+                                </MenuItem>
+                                {theaters.map((theater) => (
+                                    <MenuItem key={theater.id} value={theater.id}>
+                                        {theater.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        )}
                     </Stack>
 
                     <Typography variant="caption" color="secondary" sx={{ display: 'flex', alignItems: 'center' }}>

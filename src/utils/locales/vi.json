@@ -524,5 +524,7 @@
   "revenue-structure": "Cơ Cấu Doanh Thu",
   "top-revenue-movies": "Top Phim Doanh Thu Cao Nhất",
   "view-all": "Xem tất cả",
-  "performance-by-theater": "Hiệu Suất Theo Rạp Chiếu"
+  "performance-by-theater": "Hiệu Suất Theo Rạp Chiếu",
+  "start-date": "Ngày bắt đầu",
+  "theater-list-in-room-page": "Rạp chiếu"
 }

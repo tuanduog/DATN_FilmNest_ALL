@@ -21,6 +21,7 @@ export interface PageRequest {
     startDate?: string | undefined;
     endDate?: string | undefined;
     paymentStatus?: string | undefined;
+    theaterId?: number | undefined;
 }
 
 export const DEFAULT_PAGE_SIZE = 10;

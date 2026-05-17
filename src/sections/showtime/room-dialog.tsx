@@ -258,7 +258,12 @@ const RoomDialog: React.FC<RoomDialogProps> = ({ open, id, theaterId, onClose, o
                 accessorKey: 'type',
                 dataType: 'text',
                 enableGrouping: false,
-                meta: { width: '25%' }
+                meta: { width: '25%' },
+                cell: (cell) => {
+                    const { type } = cell.row.original;
+                    const typeUpper = (type || '').toUpperCase();
+                    return typeUpper === 'IMAX' ? intl.formatMessage({ id: 'IMAX' }) : typeUpper === 'THREE_D' ? intl.formatMessage({ id: '3D' }) : intl.formatMessage({ id: 'standard' });
+                }
             },
             {
                 id: 'capacity',

@@ -10,7 +10,8 @@ import {
     IconButton,
     Stack,
     Grid,
-    MenuItem
+    MenuItem,
+    FormHelperText
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -94,6 +95,10 @@ export default function EditMovie() {
         onSubmit: async (values) => {
             let currentImageUrl = preview;
 
+            if (!currentImageUrl && (!image || !(image instanceof File))) {
+                return;
+            }
+
             if (image && image instanceof File) {
                 const formData = new FormData();
                 formData.append('file', image);
@@ -159,7 +164,7 @@ export default function EditMovie() {
                         <Grid container spacing={2}>
                             <Grid size={12}>
                                 <Box sx={{ width: '100%', mb: 2 }}>
-                                    <InputLabel sx={{ mb: 1 }}>{intl.formatMessage({ id: 'movie-image' })}</InputLabel>
+                                    <InputLabel required sx={{ mb: 1, '& .MuiInputLabel-asterisk': { color: 'error.main' } }}>{intl.formatMessage({ id: 'movie-image' })}</InputLabel>
                                     {!preview ? (
                                         <ImageDropZone
                                             value={preview ?? ''}
@@ -181,7 +186,11 @@ export default function EditMovie() {
                                             </Box>
 
                                             <IconButton
-                                                onClick={handleDeleteImage}
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleDeleteImage();
+                                                }}
                                                 sx={{
                                                     position: 'absolute',
                                                     top: 4,
@@ -203,6 +212,9 @@ export default function EditMovie() {
                                                 />
                                             </IconButton>
                                         </Box>
+                                    )}
+                                    {formik.submitCount > 0 && !preview && (!image || !(image instanceof File)) && (
+                                        <FormHelperText error sx={{ mt: 1 }}>{intl.formatMessage({ id: 'required-field' })}</FormHelperText>
                                     )}
                                 </Box>
                             </Grid>

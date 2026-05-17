@@ -297,7 +297,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 error={formik.touched.totalRow && Boolean(formik.errors.totalRow)}
-                                helperText={formik.touched.totalRow && formik.errors.totalRow}
+                                helperText={formik.touched.totalRow && formik.errors.totalRow ? String(formik.errors.totalRow) : undefined}
                             />
                         </Grid>
 
@@ -319,7 +319,7 @@ export default function RoomSeatConfig({ handleNext, handleBack, setRoom, room }
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 error={formik.touched.totalColumn && Boolean(formik.errors.totalColumn)}
-                                helperText={formik.touched.totalColumn && formik.errors.totalColumn}
+                                helperText={formik.touched.totalColumn && formik.errors.totalColumn ? String(formik.errors.totalColumn) : undefined}
                             />
                         </Grid>
 
